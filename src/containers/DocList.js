@@ -29,6 +29,10 @@ class DocList extends Component {
         dispatch(updateUri(pathname, query, prop, value));
     }
 
+    handleWidgetOnKeyDown = () => {
+        console.log('fire!');
+    }
+
     renderDocumentList = () => {
         const {windowType, query, viewId, selected} = this.props;
         return (<DocumentList

@@ -375,6 +375,12 @@ class Lookup extends Component {
         }
     }
 
+    test = (e) => {
+        console.log('test');
+        console.log(e.key);
+        e.preventDefault();
+    }
+
     render() {
         const {
             rank, readonly, properties, defaultValue, placeholder, align, isModal,
@@ -418,6 +424,7 @@ class Lookup extends Component {
                             placeholder={placeholder}
                             disabled={readonly}
                             tabIndex={tabIndex}
+                            onKeyDown={this.test}
                         />
                     </div>
 
