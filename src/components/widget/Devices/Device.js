@@ -7,7 +7,8 @@ class Device extends Component {
         super(props);
 
         this.state = {
-            value: null
+            value: null,
+            valueChangeStopper: false
         }
     }
 
@@ -20,10 +21,13 @@ class Device extends Component {
         this.sockClient.debug = null;
         this.sockClient.connect({}, frame => {
             this.sockClient.subscribe(device.websocketEndpoint, msg => {
-                const body = JSON.parse(msg.body);
-                this.setState({
-                    value: body.value
-                })
+                if(!this.state.valueChangeStopper){
+                    const body = JSON.parse(msg.body);
+
+                    this.setState({
+                        value: body.value
+                    });
+                }
             });
         });
     }
@@ -39,15 +43,30 @@ class Device extends Component {
         handleChange(value);
     }
 
+    handleToggleChangeStopper = (value) => {
+        this.setState({
+            valueChangeStopper: value
+        })
+    }
+
     render() {
-        const {value} = this.state;
+        const {value, index, isMore} = this.state;
+        const {tabIndex} = this.props;
 
         if(!!value){
             return (
                 <div
-                    className="btn btn-meta-outline-secondary btn-sm btn-inline pointer"
+                    className={"btn btn-device btn-meta-outline-secondary btn-sm btn-inline pointer btn-distance-rev " +
+                        (isMore ? "btn-flagged ": "")
+                    }
                     onClick={this.handleClick}
+                    tabIndex={tabIndex ? tabIndex : ""}
+                    onMouseEnter={() => this.handleToggleChangeStopper(true)}
+                    onFocus={() => this.handleToggleChangeStopper(true)}
+                    onMouseLeave={() => this.handleToggleChangeStopper(false)}
+                    onBlur={() => this.handleToggleChangeStopper(false)}
                 >
+                    {isMore && <span className="btn-flag">{index + 1}</span>}
                     {value}
                 </div>
             )

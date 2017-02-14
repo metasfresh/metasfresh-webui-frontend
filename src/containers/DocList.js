@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 import DocumentList from '../components/app/DocumentList';
 import Container from '../components/Container';
 import Modal from '../components/app/Modal';
+import RawModal from '../components/app/RawModal';
 
 import {
     getWindowBreadcrumb
@@ -17,11 +18,24 @@ import {
 class DocList extends Component {
     constructor(props){
         super(props);
+
+        this.state = {
+            modalTitle: ""
+        }
     }
 
     componentDidMount = () => {
         const {dispatch, windowType} = this.props;
-        dispatch(getWindowBreadcrumb(windowType))
+
+        dispatch(getWindowBreadcrumb(windowType));
+    }
+
+    componentDidUpdate = (prevProps) => {
+        const {dispatch, windowType} = this.props;
+
+        if(prevProps.windowType !== windowType){
+            dispatch(getWindowBreadcrumb(windowType));
+        }
     }
 
     updateUriCallback = (prop, value) => {
@@ -29,27 +43,21 @@ class DocList extends Component {
         dispatch(updateUri(pathname, query, prop, value));
     }
 
-    handleWidgetOnKeyDown = () => {
-        console.log('fire!');
-    }
-
-    renderDocumentList = () => {
-        const {windowType, query, viewId, selected} = this.props;
-        return (<DocumentList
-            type="grid"
-            updateUri={this.updateUriCallback}
-            windowType={windowType}
-            query={query}
-            viewId={viewId}
-            selected={selected}
-        />)
+    setModalTitle = (title) => {
+        this.setState({
+            modalTitle: title
+        })
     }
 
     render() {
         const {
             dispatch, windowType, breadcrumb, query, actions, modal, viewId,
-            selected, references
+            selected, references, rawModal
         } = this.props;
+
+        const {
+            modalTitle
+        } = this.state;
 
         return (
             <Container
@@ -70,11 +78,37 @@ class DocList extends Component {
                         rowId={modal.rowId}
                         modalTitle={modal.title}
                         modalType={modal.modalType}
-                        viewId={viewId}
+                        modalViewId={modal.viewId}
+                        query={query}
                         selected={selected}
+                        viewId={query.viewId}
                      />
                  }
-                {this.renderDocumentList()}
+                 {rawModal.visible &&
+                     <RawModal
+                         modalTitle={modalTitle}
+                     >
+                         <DocumentList
+                             type="grid"
+                             windowType={parseInt(rawModal.type)}
+                             defaultViewId={rawModal.viewId}
+                             selected={selected}
+                             setModalTitle={this.setModalTitle}
+                         />
+                     </RawModal>
+                 }
+                 <DocumentList
+                     type="grid"
+                     updateUri={this.updateUriCallback}
+                     windowType={parseInt(windowType)}
+                     defaultViewId={query.viewId}
+                     defaultSort={query.sort}
+                     defaultPage={parseInt(query.page)}
+                     refType={query.refType}
+                     refId={query.refId}
+                     selected={selected}
+                     inBackground={rawModal.visible}
+                 />
             </Container>
         );
     }
@@ -87,7 +121,7 @@ DocList.propTypes = {
     search: PropTypes.string.isRequired,
     pathname: PropTypes.string.isRequired,
     modal: PropTypes.object.isRequired,
-    viewId: PropTypes.string.isRequired,
+    rawModal: PropTypes.object.isRequired,
     selected: PropTypes.array,
     actions: PropTypes.array.isRequired,
     references: PropTypes.array.isRequired
@@ -98,9 +132,11 @@ function mapStateToProps(state) {
 
     const {
         modal,
+        rawModal,
         selected
     } = windowHandler || {
         modal: false,
+        rawModal: false,
         selected: []
     }
 
@@ -112,12 +148,6 @@ function mapStateToProps(state) {
         actions: [],
         refereces: [],
         breadcrumb: []
-    }
-
-    const {
-        viewId
-    } = listHandler || {
-        viewId: ""
     }
 
     const {
@@ -135,9 +165,9 @@ function mapStateToProps(state) {
         search,
         pathname,
         actions,
-        viewId,
         selected,
-        references
+        references,
+        rawModal
     }
 }
 
