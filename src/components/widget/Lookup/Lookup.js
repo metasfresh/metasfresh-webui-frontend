@@ -160,14 +160,14 @@ class Lookup extends Component {
     }
 
     generatingPropsSelection = () => {
-        const {onChange} = this.props;
+        const {onChange, autoComplete} = this.props;
         const {properts} = this.state;
         const propertiesKeys = Object.keys(properts);
 
         // Chcecking properties model if there is some
         // unselected properties and handling further
         // selection
-        if(propertiesKeys.length === 0){
+        if(propertiesKeys.length === 0 || autoComplete){
             this.setState({
                 property: ''
             });
@@ -190,8 +190,6 @@ class Lookup extends Component {
                 this.handleBlur();
             }
         }
-
-        this.handleBlur();
     }
 
     handleAddNew = () => {

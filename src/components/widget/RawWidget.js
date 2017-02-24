@@ -233,6 +233,7 @@ class RawWidget extends Component {
                         tabIndex={fullScreen ? -1 : tabIndex}
                         viewId={viewId}
                         autoFocus={autoFocus}
+                        autoComplete={true}
                     />
                 )
             case 'List':
