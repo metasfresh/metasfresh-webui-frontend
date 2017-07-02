@@ -25,10 +25,13 @@ class Tabs extends Component {
     }
 
     handleClick = (e, id) => {
-        e.preventDefault();
-        this.setState({
-            'selected': id
-        });
+        e.preventDefault()
+
+        this.setState(
+            () => ({
+                'selected': id
+            })
+        )
     }
 
     handlePillKeyDown = (e, key) => {

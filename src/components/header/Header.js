@@ -68,7 +68,7 @@ class Header extends Component {
             this.closeOverlays();
         }
     }
-    
+
     componentDidUpdate = (prevProps) => {
         const {dispatch, pathname} = this.props;
         if(
@@ -85,16 +85,20 @@ class Header extends Component {
         return { shortcuts: shortcutManager }
     }
 
-    handleInboxOpen = (state) => {
-        this.setState({
-            isInboxOpen: !!state
-        });
+    handleInboxOpen = state => {
+        this.setState(
+            () => ({
+                isInboxOpen: !!state
+            })
+        )
     }
 
-    handleUDOpen = (state) => {
-        this.setState({
-            isUDOpen: !!state
-        })
+    handleUDOpen = state => {
+        this.setState(
+            () => ({
+                isUDOpen: !!state
+            })
+        )
     }
 
     handleMenuOverlay = (e, nodeId) => {
@@ -102,19 +106,18 @@ class Header extends Component {
         e && e.preventDefault();
 
         let toggleBreadcrumb = () => {
-            this.setState({
-                menuOverlay: nodeId
-            }, () => {
-                if(nodeId !== '') {
-                    this.setState({
-                        isMenuOverlayShow: true
-                    });
-                } else {
-                    this.setState({
-                        isMenuOverlayShow: false
-                    });
+            this.setState(
+                () => ({
+                    menuOverlay: nodeId
+                }),
+                () => {
+                    this.setState(
+                        () => ({
+                            isMenuOverlayShow: nodeId !== ''
+                        })
+                    )
                 }
-            });
+            )
         }
 
         if(!isSubheaderShow && !isSideListShow){
@@ -122,7 +125,7 @@ class Header extends Component {
         }
     }
 
-    handleScroll = (event) => {
+    handleScroll = event => {
         const target = event.srcElement;
         let scrollTop = target && target.body.scrollTop;
 
@@ -130,42 +133,44 @@ class Header extends Component {
             scrollTop = document.documentElement.scrollTop;
         }
 
-        if(scrollTop > 0) {
-            this.setState({
-                scrolled: true
+        this.setState(
+            () => ({
+                scrolled: scrollTop > 0
             })
-        } else {
-            this.setState({
-                scrolled: false
-            })
-        }
+        )
     }
 
     handleDashboardLink = () => {
-        const {dispatch} = this.props;
-        dispatch(push('/'));
+        this.props.dispatch(push('/'))
     }
 
-    toggleScrollScope = (open) => {
-        if(!open){
-            document.body.style.overflow = 'auto';
-        }else{
-            document.body.style.overflow = 'hidden';
-        }
+    toggleScrollScope = open => {
+        open
+        ? document.body.style.overflow = 'hidden'
+        : document.body.style.overflow = 'auto'
     }
 
-    toggleTooltip = (tooltip) => {
-        this.setState({
-            tooltipOpen: tooltip
-        });
+    toggleTooltip = tooltipOpen => {
+        this.setState(
+            () => ({
+                tooltipOpen
+            })
+        )
     }
 
     openModal = (windowType, type, caption, isAdvanced) => {
-        const {dispatch, query} = this.props;
-        dispatch(openModal(
-            caption, windowType, type, null, null, isAdvanced,
-            query && query.viewId
-        ));
+        this.props.dispatch(
+            openModal(
+                caption,
+                windowType,
+                type,
+                null,
+                null,
+                isAdvanced,
+                this.props.query &&
+                this.props.query.viewId
+            )
+        )
     }
 
     handlePrint = (windowType, docId, docNo) => {
@@ -176,39 +181,55 @@ class Header extends Component {
     }
 
     handleDelete = () => {
-        this.setState({
-            prompt: Object.assign({}, this.state.prompt, {
-                open: true
+        this.setState(
+            state => ({
+                prompt: Object.assign(
+                    {},
+                    state.prompt,
+                    {
+                        open: true
+                    }
+                )
             })
-        });
+        )
     }
 
     handlePromptCancelClick = () => {
-        this.setState({
-            prompt: Object.assign({}, this.state.prompt, {
-                open: false
+        this.setState(
+            state => ({
+                prompt: Object.assign(
+                    {},
+                    state.prompt,
+                    {
+                        open: false
+                    }
+                )
             })
-        });
+        )
     }
 
     handlePromptSubmitClick = (windowType, docId) => {
-        const {dispatch, handleDeletedStatus} = this.props;
-
-        this.setState({
-            prompt: Object.assign({}, this.state.prompt, {
-                open: false
-            })
-        }, () => {
-            deleteRequest('window', windowType, null, null, [docId])
+        this.setState(
+            state => ({
+                prompt: Object.assign(
+                    {},
+                    state.prompt,
+                    {
+                        open: false
+                    }
+                )
+            }),
+            () => {
+                deleteRequest('window', windowType, null, null, [docId])
                 .then(() => {
-                    handleDeletedStatus(true);
-                    dispatch(push('/window/' + windowType));
-                });
+                    this.props.handleDeletedStatus(true);
+                    this.props.dispatch(push('/window/' + windowType));
+                })
             }
-        );
+        )
     }
 
-    handleDocStatusToggle = (close) => {
+    handleDocStatusToggle = close => {
         const elem = document.getElementsByClassName('js-dropdown-toggler')[0];
 
         if(close) {
@@ -226,26 +247,30 @@ class Header extends Component {
 
         this.toggleScrollScope(id !== null);
 
-        this.setState({
-            isSideListShow: id !== null && id !== sideListTab,
-            sideListTab: id !== sideListTab ? id : null
-        });
+        this.setState(
+            () => ({
+                isSideListShow: id !== null && id !== sideListTab,
+                sideListTab: id !== sideListTab ? id : null
+            })
+        )
     }
 
     closeOverlays = (clickedItem, callback) => {
-        const {isSubheaderShow} = this.state;
-
-        this.setState({
-            menuOverlay: null,
-            isMenuOverlayShow: false,
-            isInboxOpen: false,
-            isUDOpen: false,
-            isSideListShow: false,
-            sideListTab: null,
-            isSubheaderShow:
-                (clickedItem == 'isSubheaderShow' ? !isSubheaderShow : false),
-            tooltipOpen: ''
-        }, callback);
+        this.setState(
+            state => ({
+                menuOverlay: null,
+                isMenuOverlayShow: false,
+                isInboxOpen: false,
+                isUDOpen: false,
+                isSideListShow: false,
+                sideListTab: null,
+                isSubheaderShow: clickedItem == 'isSubheaderShow'
+                    ? !state.isSubheaderShow
+                    : false,
+                tooltipOpen: ''
+            }),
+            callback
+        )
 
         if(
             document.getElementsByClassName('js-dropdown-toggler')[0] &&
@@ -255,9 +280,8 @@ class Header extends Component {
         }
     }
 
-    redirect = (where) => {
-        const {dispatch} = this.props;
-        dispatch(push(where));
+    redirect = where => {
+        this.props.dispatch(push(where));
     }
 
     render() {

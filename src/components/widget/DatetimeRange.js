@@ -2,6 +2,20 @@ import React, { Component } from 'react';
 import DateRangePicker from 'react-bootstrap-daterangepicker';
 import Moment from 'moment';
 
+const ranges = {
+    'Today': [Moment(), Moment()],
+    'Yesterday': [
+        Moment().subtract(1, 'days'), Moment().subtract(1, 'days')
+    ],
+    'Last 7 Days': [Moment().subtract(6, 'days'), Moment()],
+    'Last 30 Days': [Moment().subtract(29, 'days'), Moment()],
+    'This Month': [Moment().startOf('month'), Moment().endOf('month')],
+    'Last Month': [
+        Moment().subtract(1, 'month').startOf('month'),
+        Moment().subtract(1, 'month').endOf('month')
+    ]
+}
+
 class DatetimeRange extends Component {
     constructor(props) {
         super(props);
@@ -12,50 +26,45 @@ class DatetimeRange extends Component {
     }
 
     componentDidMount() {
-        const {value, valueTo, onChange} = this.props;
-        if(value && valueTo){
-            this.setState({
-                startDate: Moment(value),
-                endDate: Moment(valueTo)
-            });
-        }else{
+        if (this.props.value && this.props.valueTo) {
+            this.setState(
+                () => ({
+                    startDate: Moment(this.props.value),
+                    endDate: Moment(this.props.valueTo)
+                })
+            )
+        } else {
             const initDate = new Date();
-            this.setState({
-                startDate: initDate,
-                endDate: initDate
-            }, () => {
-                onChange(initDate, initDate)
-            });
+            this.setState(
+                () => ({
+                    startDate: initDate,
+                    endDate: initDate
+                }),
+                () => {
+                    this.props.onChange(initDate, initDate)
+                }
+            )
         }
     }
 
     handleEvent = (event, picker) => {
-        const {onChange} = this.props;
-
-        this.setState({
-            startDate: picker.startDate,
-            endDate: picker.endDate
-        }, () => {
-            onChange(picker.startDate, picker.endDate);
-        });
+        this.setState(
+            () => ({
+                startDate: picker.startDate,
+                endDate: picker.endDate
+            }),
+            () => {
+                this.props.onChange(picker.startDate, picker.endDate);
+            }
+        )
     }
 
     render() {
-        const ranges = {
-            'Today': [Moment(), Moment()],
-            'Yesterday': [
-                Moment().subtract(1, 'days'), Moment().subtract(1, 'days')
-            ],
-            'Last 7 Days': [Moment().subtract(6, 'days'), Moment()],
-            'Last 30 Days': [Moment().subtract(29, 'days'), Moment()],
-            'This Month': [Moment().startOf('month'), Moment().endOf('month')],
-            'Last Month': [
-                Moment().subtract(1, 'month').startOf('month'),
-                Moment().subtract(1, 'month').endOf('month')
-            ]
-        }
         const {startDate, endDate} = this.state;
-        const {onShow, onHide, mandatory, validStatus, timePicker} = this.props;
+
+        const {
+            onShow, onHide, mandatory, validStatus, timePicker
+        } = this.props;
 
         const format = timePicker ? 'L LT' : 'L';
 

@@ -31,16 +31,20 @@ class FiltersNotFrequent extends Component {
         }
     }
 
-    toggleDropdown = (value) => {
-        this.setState({
-            isOpenDropdown: value
-        })
+    toggleDropdown = isOpenDropdown => {
+        this.setState(
+            () => ({
+                isOpenDropdown
+            })
+        )
     }
 
-    toggleFilter = (index) => {
-        this.setState({
-            openFilterId: index
-        })
+    toggleFilter = openFilterId => {
+        this.setState(
+            () => ({
+                openFilterId
+            })
+        )
     }
 
     render() {

@@ -63,31 +63,40 @@ class NavigationTree extends Component {
     }
 
     openModal = (windowType, type, caption, isAdvanced) => {
-        const {dispatch} = this.props;
-        dispatch(openModal(caption, windowType, type, null, null, isAdvanced));
+        this.props.dispatch(
+            openModal(caption, windowType, type, null, null, isAdvanced)
+        )
     }
 
-    handleQuery = (e) => {
-        e.preventDefault();
-        if(e.target.value){
-            this.setState({
-                query: e.target.value
-            });
+    handleQuery = e => {
+        e.preventDefault()
+
+        if (e.target.value) {
+            this.setState(
+                () => ({
+                    query: e.target.value
+                })
+            )
 
             queryPathsRequest(e.target.value, '', true)
-                .then(response => {
-                    this.setState({
+            .then(response => {
+                this.setState(
+                    () => ({
                         queriedResults: response.data.children
                     })
-                }).catch((err) => {
-                    if(err.response && err.response.status === 404) {
-                        this.setState({
+                )
+            })
+            .catch(err => {
+                if (err.response && err.response.status === 404) {
+                    this.setState(
+                        () => ({
                             queriedResults: [],
                             rootResults: {}
                         })
-                    }
-                });
-        }else{
+                    )
+                }
+            })
+        } else {
             this.getData(this.clearValue);
         }
 
@@ -97,12 +106,13 @@ class NavigationTree extends Component {
         document.getElementById('search-input').value=''
     }
 
-    handleClear = (e) => {
-        e.preventDefault();
-        this.getData(this.clearValue);
+    handleClear = e => {
+        e.preventDefault()
+
+        this.getData(this.clearValue)
     }
 
-    handleKeyDown = (e) => {
+    handleKeyDown = e => {
         const input = document.getElementById('search-input');
         const firstMenuItem =
             document.getElementsByClassName('js-menu-item')[0];
@@ -129,32 +139,44 @@ class NavigationTree extends Component {
     }
 
     handleRedirect = (elementId, isNew, type) => {
-        const {dispatch} = this.props;
-        dispatch(push(
+        this.props.dispatch(push(
             '/' + (type ? type : 'window') + '/' + elementId
         ));
     }
 
-    handleNewRedirect = (elementId) => {
-        const {dispatch} = this.props;
-        dispatch(push('/window/' + elementId + '/new'));
+    handleNewRedirect = elementId => {
+        this.props.dispatch(push('/window/' + elementId + '/new'))
     }
 
     handleDeeper = (e, nodeId) => {
-        e.preventDefault();
+        e.preventDefault()
 
-        nodePathsRequest(nodeId, 4).then(response => {
-            this.setState(Object.assign({}, this.state, {
-                deepNode: response.data
-            }))
+        nodePathsRequest(nodeId, 4)
+        .then(response => {
+            this.setState(
+                state => Object.assign(
+                    {},
+                    state,
+                    {
+                        deepNode: response.data
+                    }
+                )
+            )
         })
     }
-    handleClickBack = (e) => {
-        e.preventDefault();
 
-        this.setState(Object.assign({}, this.state, {
-            deepNode: null
-        }))
+    handleClickBack = e => {
+        e.preventDefault()
+
+        this.setState(
+            state => Object.assign(
+                {},
+                state,
+                {
+                  deepNode: null
+                }
+            )
+        )
     }
 
     renderTree = () => {
@@ -225,21 +247,10 @@ class NavigationTree extends Component {
     }
 }
 
-function mapStateToProps(state) {
-    const { windowHandler } = state;
-
-    const {
-        modal,
-        rawModal
-    } = windowHandler || {
-        modal: {},
-        rawModal: {}
-    }
-
-    return {
-        modal, rawModal
-    }
-}
+const mapStateToProps = ({ windowHandler: { modal = {}, rawModal = {} } }) => ({
+  modal,
+  rawModal
+})
 
 NavigationTree.propTypes = {
     dispatch: PropTypes.func.isRequired,

@@ -8,6 +8,17 @@ import onClickOutside from 'react-onclickoutside';
 import Tooltips from '../tooltips/Tooltips';
 import keymap from '../../keymap.js';
 
+const tabs = [{
+    icon: 'meta-icon-list',
+    title: 'Document list'
+}, {
+    icon: 'meta-icon-share',
+    title: 'Referenced documents'
+}, {
+    icon: 'meta-icon-attachments',
+    title: 'Attachments'
+}]
+
 class SideList extends Component {
     constructor(props) {
         super(props);
@@ -21,14 +32,15 @@ class SideList extends Component {
     }
 
     handleClickOutside = () => {
-        const {closeSideList} = this.props;
-        closeSideList();
+        this.props.closeSideList()
     }
 
     changeTab = (index) => {
-        this.setState({
-            tab: index
-        })
+        this.setState(
+            () => ({
+                tab: index
+            })
+        )
     }
 
     renderBody = () => {
@@ -37,11 +49,7 @@ class SideList extends Component {
             docId, pagination, sorting, viewId
         } = this.props;
 
-        const {
-            tab
-        } = this.state;
-
-        switch (tab) {
+        switch (this.state.tab) {
             case 0:
                 return <DocumentList
                     type="list"
@@ -75,23 +83,15 @@ class SideList extends Component {
         }
     }
 
-    toggleTooltip = (id) => {
-        this.setState({
-            tooltipOpen: id
-        })
+    toggleTooltip = tooltipOpen => {
+        this.setState(
+            () => ({
+                tooltipOpen
+            })
+        )
     }
 
     render() {
-        const {
-            tab, tooltipOpen
-        } = this.state;
-
-        const tabs = [
-            {icon: 'meta-icon-list', title: 'Document list'},
-            {icon: 'meta-icon-share', title: 'Referenced documents'},
-            {icon: 'meta-icon-attachments', title: 'Attachments'}
-        ]
-
         return (
             <div
                 ref={(c) => this.panel = c}
@@ -102,7 +102,7 @@ class SideList extends Component {
                         {tabs.map((item, index) => <div
                             key={index}
                             className={'order-list-btn tooltip-parent ' +
-                                (index === tab ? 'active ' : '')
+                                (index === this.state.tab ? 'active ' : '')
                             }
                             onClick={() => this.changeTab(index)}
                             onMouseEnter={() =>
@@ -114,7 +114,7 @@ class SideList extends Component {
                             tabIndex={0}
                         >
                             <i className={item.icon} />
-                            { tooltipOpen === index &&
+                            { this.state.tooltipOpen === index &&
                                 <Tooltips
                                     name={
                                         keymap

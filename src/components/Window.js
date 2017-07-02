@@ -31,10 +31,12 @@ class Window extends Component {
         }
     }
 
-    toggleTableFullScreen = (tabId) => {
-        this.setState({
-            fullScreen: tabId
-        });
+    toggleTableFullScreen = tabId => {
+        this.setState(
+            () => ({
+                fullScreen: tabId
+            })
+        )
     }
 
     renderTabs = (tabs) => {

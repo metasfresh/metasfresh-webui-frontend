@@ -25,43 +25,63 @@ class Attachments extends Component {
 
         attachmentsRequest('window', windowType, docId)
             .then(response => {
-                this.setState({
-                    data: response.data
-                }, () => {
-                    this.attachments && this.attachments.focus();
-                })
+                this.setState(
+                    () => ({
+                        data: response.data
+                    }),
+                    () => {
+                        this.attachments &&
+                        this.attachments.focus();
+                    }
+                )
             });
     }
 
-    toggleAttachmentDelete = (value) => {
-        this.setState({
-            attachmentHovered: value
-        })
+    toggleAttachmentDelete = attachmentHovered => {
+        this.setState(
+            () => ({
+                attachmentHovered
+            })
+        )
     }
 
-    handleAttachmentClick = (id) => {
-        const {windowType, docId} = this.props;
-        openFile('window', windowType, docId, 'attachments', id);
+    handleAttachmentClick = id => {
+        openFile(
+          'window',
+          this.props.windowType,
+          this.props.docId,
+          'attachments',
+          id
+        )
     }
 
     handleAttachmentDelete = (e, id) => {
-        const {windowType, docId} = this.props;
         e.stopPropagation();
 
         deleteRequest(
-            'window', windowType, docId, null, null, 'attachments', id
-        ).then(() => {
-            return attachmentsRequest(
-                'window', windowType, docId
+            'window',
+            this.props.windowType,
+            this.props.docId,
+            null,
+            null,
+            'attachments',
+            id
+        )
+        .then(() =>
+            attachmentsRequest(
+                'window', this.props.windowType, this.props.docId
             )
-        }).then((response) => {
-            this.setState({
-                data: response.data
-            })
-        });
+        )
+        .then(response => {
+            this.setState(
+                () => ({
+                    data: response.data
+                })
+            )
+        })
     }
 
-    handleKeyDown = (e) => {
+    handleKeyDown = e => {
         const active = document.activeElement;
 
         const keyHandler = (e, dir) => {

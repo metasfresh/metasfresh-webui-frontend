@@ -19,17 +19,22 @@ class Sidenav extends Component {
     }
 
     componentDidMount = () => {
-        const {entity} = this.props;
-        
         getRequest('dashboard', 'kpis', 'available').then(res => {
-            this.setState({
-                indicators: res.data.filter(chart => 
-                    chart.widgetTypes[0] === 'TargetIndicator'),
-                cards: res.data.filter(chart => chart.widgetTypes[0] === 'KPI')
-            })
+            this.setState(
+                () => ({
+                    indicators: res.data
+                    .filter(chart =>
+                        chart.widgetTypes[0] === 'TargetIndicator'
+                    ),
+                    cards: res.data
+                    .filter(chart =>
+                        chart.widgetTypes[0] === 'KPI'
+                    )
+                })
+            )
         })
     }
-    
+
     renderChartList = (charts) => {
         const {moveCard} = this.props;
         if(!charts) return;
@@ -43,7 +48,7 @@ class Sidenav extends Component {
                 entity={item.widgetTypes[0] === 'KPI' ? 'cards' : 'indicators'}
                 transparent={false}
             >
-                {item.widgetTypes[0] === 'KPI' ? 
+                {item.widgetTypes[0] === 'KPI' ?
                     <ChartWidget
                         id={item.kpiId}
                         index={i}
@@ -52,7 +57,7 @@ class Sidenav extends Component {
                         text={item.caption}
                         framework={true}
                         idMaximized={false}
-                    /> : 
+                    /> :
                     <Indicator
                         fullWidth={1}
                         value={item.chartType}
@@ -64,8 +69,6 @@ class Sidenav extends Component {
     }
 
     render() {
-        const {indicators, cards} = this.state;
-        const {entity} = this.props;
         return (
             <div
                 className="board-sidenav overlay-shadow"
@@ -74,13 +77,13 @@ class Sidenav extends Component {
                     Add Target Indicator widget
                 </div>
                 <div>
-                    {this.renderChartList(indicators)}
+                    {this.renderChartList(this.state.indicators)}
                 </div>
                 <div className="board-sidenav-header">
                     Add KPI widget
                 </div>
                 <div>
-                    {this.renderChartList(cards)}
+                    {this.renderChartList(this.state.cards)}
                 </div>
             </div>
         );

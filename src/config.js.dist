@@ -1,0 +1,4 @@
+const config ={
+    API_URL: 'https://w101.metasfresh.com:8443/rest/api',
+    WS_URL: 'https://w101.metasfresh.com:8443/stomp'
+}

@@ -127,9 +127,11 @@ class PieChartComponent extends Component {
                 const interpolate = d3.interpolate(
                     {startAngle: 0, endAngle: 0}, d);
                 prevData[i] = d;
-                this.setState({
-                    prevData: prevData
-                })
+                this.setState(
+                    () => ({
+                        prevData
+                    })
+                )
                 return function(t) {
                     return arc(interpolate(t));
                 }
@@ -157,9 +159,11 @@ class PieChartComponent extends Component {
                 const interpolate = d3.interpolate(current, d);
 
                 prevData[i] = interpolate(0);
-                this.setState({
-                    prevData: prevData
-                })
+                this.setState(
+                    () => ({
+                        prevData
+                    })
+                )
 
                 return function(t) {
                     return arc(interpolate(t));

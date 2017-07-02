@@ -96,16 +96,21 @@ class QuickActions extends Component {
         const {windowType, viewId, selected} = this.props;
         quickActionsRequest(windowType, viewId, selected)
             .then(response => {
-                this.mounted && this.setState({
-                    actions: response.data.actions
-                })
+                this.mounted &&
+                this.setState(
+                    () => ({
+                        actions: response.data.actions
+                    })
+                )
             });
     }
 
     toggleDropdown = (option) => {
-        this.setState({
-            isDropdownOpen: option
-        })
+        this.setState(
+            () => ({
+                isDropdownOpen: option
+            })
+        )
     }
 
     render() {

@@ -14,10 +14,12 @@ class FiltersFrequent extends Component {
         }
     }
 
-    toggleFilter = (index) => {
-        this.setState({
-            openFilterId: index
-        })
+    toggleFilter = openFilterId => {
+        this.setState(
+            () => ({
+                openFilterId
+            })
+        )
     }
 
     handleClickOutside = () => {

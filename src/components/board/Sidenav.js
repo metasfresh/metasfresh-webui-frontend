@@ -21,17 +21,21 @@ class Sidenav extends Component {
 
         if(viewId){
             getView(boardId, viewId, 0).then(res =>
-                this.setState({
-                    view: res.data
-                })
+                this.setState(
+                    () => ({
+                        view: res.data
+                    })
+                )
             );
         }else{
             createView(boardId).then(res => {
                 setViewId(res.data.viewId);
                 getView(boardId, res.data.viewId, 0).then(res =>
-                    this.setState({
-                        view: res.data
-                    })
+                    this.setState(
+                        () => ({
+                            view: res.data
+                        })
+                    )
                 );
             });
         }
@@ -41,12 +45,17 @@ class Sidenav extends Component {
     loadMore = (page) => {
         const {boardId, viewId} = this.props;
 
-        getView(boardId, viewId, page).then(res =>
-            this.setState(prev => update(prev, {
-                view: {
-                    result: {$push: res.data.result}
-                }
-            }))
+        getView(boardId, viewId, page)
+        .then(res =>
+            this.setState(
+                state => update(state, {
+                    view: {
+                        result: {
+                            $push: res.data.result
+                        }
+                    }
+                })
+            )
         );
     }
 

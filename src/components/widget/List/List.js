@@ -19,24 +19,27 @@ class List extends Component {
         }
     }
 
-    componentDidMount(){
-        const {defaultValue} = this.props;
-
-        if(defaultValue) {
-            this.setState({
-                prevValue: defaultValue[Object.keys(defaultValue)[0]]
-            });
+    componentDidMount = () => {
+        if(this.props.defaultValue) {
+            this.setState(
+                () => ({
+                    prevValue: this.props
+                        .defaultValue[Object.keys(this.props.defaultValue)[0]]
+                })
+            )
         }
     }
 
-    componentDidUpdate(prevProps){
-        const {isInputEmpty} = this.props;
-
-        if(isInputEmpty && prevProps.isInputEmpty !== isInputEmpty) {
-
-            this.setState({
-                prevValue: ''
-            });
+    componentDidUpdate = prevProps => {
+        if (
+            this.props.isInputEmpty &&
+            prevProps.isInputEmpty !== this.props.isInputEmpty
+        ) {
+            this.setState(
+                () => ({
+                    prevValue: ''
+                })
+            )
 
         }
     }
@@ -47,46 +50,57 @@ class List extends Component {
             filterWidget, entity, subentity, subentityId, viewId, attribute
         } = this.props;
 
-        this.setState({
-            loading: true
-        });
+        this.setState(
+            () => ({
+                loading: true
+            })
+        )
 
         dropdownRequest(
             windowType,
             filterWidget ? properties[0].parameterName: properties[0].field,
             dataId, tabId, rowId, entity, subentity, subentityId, viewId,
             attribute
-        ).then((res) => {
-            this.setState({
-                list: res.data.values,
-                loading: false
-            });
-        });
+        )
+        .then(res => {
+            this.setState(
+                () => ({
+                    list: res.data.values,
+                    loading: false
+                })
+            )
+        })
     }
 
-    handleSelect = (option) => {
-        const {
-            onChange, lookupList, properties, setNextProperty, mainProperty
-        } = this.props;
-        const {prevValue} = this.state;
+    handleSelect = option => {
+        if (
+            this.state.prevValue !== (option && option[Object.keys(option)[0]])
+        ) {
+            if(this.props.lookupList){
+                const promise =
+                    this.props.onChange(this.props.properties[0].field, option)
 
-         if( prevValue !== (option && option[Object.keys(option)[0]] )) {
-             if(lookupList){
-                    const promise = onChange(properties[0].field, option);
-                    option && this.setState({
+                option &&
+                this.setState(
+                    () => ({
                         selectedItem: option,
                         prevValue: option[Object.keys(option)[0]]
-                    });
-                    if(promise){
-                        promise.then(()=> {
-                            setNextProperty(mainProperty[0].field);
-                        })
-                    } else {
-                        setNextProperty(mainProperty[0].field);
-                    }
+                    })
+                )
+
+                if (promise){
+                    promise
+                    .then(()=> {
+                        this.props
+                            .setNextProperty(this.props.mainProperty[0].field)
+                    })
+                } else {
+                    this.props
+                        .setNextProperty(this.props.mainProperty[0].field)
+                }
 
             } else {
-                onChange(option);
+                this.props.onChange(option)
             }
          }
     }

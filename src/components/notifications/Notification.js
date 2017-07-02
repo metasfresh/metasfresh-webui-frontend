@@ -36,12 +36,12 @@ class Notification extends Component {
         const {item} = this.props;
 
         if(item.count !== nextProps.item.count) {
-            this.handleClosing(false)
+            this.doesNotClosing()
 
             const th = this;
 
             setTimeout(() => {
-                th.handleClosing(true);
+                th.doesClosing();
             }, 10)
         }
     }
@@ -54,77 +54,111 @@ class Notification extends Component {
     }
 
     handleCloseButton = () => {
-        const {dispatch, item} = this.props;
+        this.closing &&
+        clearInterval(this.closing)
 
-        this.closing && clearInterval(this.closing);
-
-        dispatch(deleteNotification(item.title));
+        this.props.dispatch(deleteNotification(this.props.item.title));
     }
 
-    handleClosing = (shouldClose) => {
-        shouldClose ?
-            this.setClosing() :
-            clearInterval(this.closing);
+    doesClosing = () => {
+        this.setClosing()
 
-        this.setState({
-            isClosing: shouldClose
-        })
+        this.setState(
+            () => ({
+                isClosing: true
+            })
+        )
+    }
+
+    doesNotClosing = () => {
+        clearInterval(this.closing)
+
+        this.setState(
+            () => ({
+                isClosing: false
+            })
+        )
     }
 
     handleToggleMore = () => {
-        this.setState({
-            isDisplayedMore: true
-        })
+        this.setState(
+            () => ({
+                isDisplayedMore: true
+            })
+        )
     }
 
     render() {
-        const {item} = this.props;
-        const {isClosing, isDisplayedMore} = this.state;
-
         return (
             <div
                 className={
                     'notification-item ' +
-                    (item.notifType ? item.notifType + ' ' : 'error ')
+                    (
+                        this.props.item.notifType
+                        ? this.props.item.notifType + ' '
+                        : 'error '
+                    )
                 }
-                onMouseEnter={() => this.handleClosing(false)}
-                onMouseLeave={() => this.handleClosing(true)}
+                onMouseEnter={this.doesNotClosing}
+                onMouseLeave={this.doesClosing}
             >
                 <div className="notification-header">
-                    {item.title} {item.count ?
+                    {this.props.item.title} {this.props.item.count ?
                         <span
                             className={
                                 'tag tag-sm tag-default ' +
                                 ('tag-' + (
-                                    item.notifType ? item.notifType : 'error '
+                                    this.props.item.notifType
+                                    ? this.props.item.notifType
+                                    : 'error '
                                 ))
-                            }>{item.count}</span> : ''}
+                            }>{this.props.item.count}</span> : ''}
                     <i
-                        onClick={() => this.handleCloseButton()}
+                        onClick={this.handleCloseButton}
                         className="meta-icon-close-1"
                     />
                 </div>
                 <div className="notification-content">
-                    {item.shortMsg ? item.shortMsg + ' ' : item.msg}
-                    {(item.shortMsg && item.msg && !isDisplayedMore) &&
-                        <u
-                            className="text-xs-right text-small pointer"
-                            onClick={this.handleToggleMore}
-                        >
-                            (read more)
-                        </u>
+                    {
+                        this.props.item.shortMsg
+                        ? this.props.item.shortMsg + ' '
+                        : this.props.item.msg
                     }
-                    {isDisplayedMore ? <p>{item.msg}</p> : ''}
+                    {
+                        (
+                            this.props.item.shortMsg &&
+                            this.props.item.msg &&
+                            !this.state.isDisplayedMore
+                        ) && (
+                            <u
+                                className="text-xs-right text-small pointer"
+                                onClick={this.handleToggleMore}
+                            >(read more)</u>
+                        )
+                    }
+                    {
+                        this.state.isDisplayedMore
+                        ? <p>{this.props.item.msg}</p>
+                        : ''
+                    }
                 </div>
                 <div
                     className={
                         'progress-bar ' +
-                        (item.notifType ? item.notifType : 'error ')
+                        this.props.item.notifType
+                        ? this.props.item.notifType
+                        : 'error '
                     }
                     style={
-                        isClosing ?
-                            {width: 0, transition: 'width 5s linear'} :
-                            {width: '100%', transition: 'width 0s linear'}
+                        this.state.isClosing
+                        ? {
+                            width: 0,
+                            transition: 'width 5s linear'
+                        }
+                        : {
+                            width: '100%',
+                            transition: 'width 0s linear'
+                        }
                     }
                 />
             </div>

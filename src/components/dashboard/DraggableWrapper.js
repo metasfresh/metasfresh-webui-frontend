@@ -41,12 +41,12 @@ export class DraggableWrapper extends Component {
             websocketEndpoint: null
         };
     }
-    
+
     componentDidMount = () => {
         this.getDashboard();
         this.getIndicators();
     }
-    
+
     componentDidUpdate = (prevProps, prevState) => {
         const {websocketEndpoint} = this.state;
         if(
@@ -67,30 +67,35 @@ export class DraggableWrapper extends Component {
             })
         }
     }
-    
+
     componentWillUnmount = () => {
         disconnectWS.call(this);
     }
-    
+
     getType = (entity) => entity === 'cards' ? 'kpis' : 'targetIndicators';
-    
+
     getIndicators = () => {
-        getTargetIndicatorsDashboard().then(response => {
-            this.setState({
-                indicators: response.data.items
-            });
+        getTargetIndicatorsDashboard()
+        .then(response => {
+            this.setState(
+                () => ({
+                    indicators: response.data.items
+                })
+            )
         });
     }
-    
+
     getDashboard = () => {
         getKPIsDashboard().then(response => {
-            this.setState({
-                cards: response.data.items,
-                websocketEndpoint: response.data.websocketEndpoint
-            });
+            this.setState(
+                () => ({
+                    cards: response.data.items,
+                    websocketEndpoint: response.data.websocketEndpoint
+                })
+            )
         });
     }
-    
+
     addCard = (entity, id) => {
         const tmpItemIndex = this.state[entity].findIndex(i => i.id === id);
         addDashboardWidget(this.getType(entity), id, tmpItemIndex).then(res => {
@@ -101,7 +106,7 @@ export class DraggableWrapper extends Component {
             }));
         });
     }
-    
+
     onDrop = (entity, id) => {
         const tmpItemIndex = this.state[entity].findIndex(i => i.id === id);
         patchRequest(
@@ -109,7 +114,7 @@ export class DraggableWrapper extends Component {
             tmpItemIndex, this.getType(entity), id
         );
     }
-    
+
     moveCard = (entity, dragIndex, hoverIndex, item) => {
         const draggedItem = this.state[entity][dragIndex];
         if(draggedItem){
@@ -141,30 +146,35 @@ export class DraggableWrapper extends Component {
             }));
         }
     }
-    
+
     removeCard = (entity, index, id) => {
         removeDashboardWidget(this.getType(entity), id);
-        this.setState(prev => update(prev, {
-            [entity]: {
-                $splice: [
-                    [index, 1]
-                ]
-            }
-        }));
+        this.setState(
+            state =>
+                update(state, {
+                [entity]: {
+                    $splice: [
+                        [index, 1]
+                    ]
+                }
+            })
+        )
     }
-    
+
     maximizeWidget = (id) => {
-        this.setState({
-            idMaximized: id
-        })
+        this.setState(
+            () => ({
+                idMaximized: id
+            })
+        )
     }
-    
+
     renderIndicators = () => {
         const {indicators, idMaximized} = this.state;
         const {editmode} = this.props;
-        
+
         if(!indicators.length && editmode) return (
-            <div className='indicators-wrapper'>
+            <div className="indicators-wrapper">
                 <DndWidget
                     moveCard={this.moveCard}
                     addCard={this.addCard}
@@ -179,9 +189,9 @@ export class DraggableWrapper extends Component {
                 </DndWidget>
             </div>
         );
-        
+
         if(!indicators.length) return false;
-        
+
         return (
             <div
                 className={'indicators-wrapper'}
@@ -214,11 +224,11 @@ export class DraggableWrapper extends Component {
             </div>
         )
     }
-    
+
     renderKpis = () => {
         const {cards, idMaximized} = this.state;
         const {editmode} = this.props;
-        
+
         if(!cards.length && editmode) return (
             <div className="kpis-wrapper">
                 <DndWidget
@@ -235,7 +245,7 @@ export class DraggableWrapper extends Component {
                 </DndWidget>
             </div>
         );
-        
+
         return (
             <div className="kpis-wrapper">
                 {cards.length > 0 ? cards.map((item, id) => {
@@ -284,10 +294,10 @@ export class DraggableWrapper extends Component {
             </div>
         )
     }
-    
+
     render() {
         const {editmode, toggleEditMode} = this.props;
-        
+
         return (
             <div className="dashboard-cards-wrapper">
                 <div
@@ -305,7 +315,7 @@ export class DraggableWrapper extends Component {
         );
     }
 }
-    
+
 DraggableWrapper.propTypes = {
     dispatch: PropTypes.func.isRequired
 };

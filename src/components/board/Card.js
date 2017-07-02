@@ -108,6 +108,22 @@ class Card extends Component {
         }
     }
 
+    onMouseEnter = () => {
+        this.setState(
+            () => ({
+                mouseOn: true
+            })
+        )
+    }
+
+    onMouseLeave = () => {
+        this.setState(
+            () => ({
+                mouseOn: false
+            })
+        )
+    }
+
     render() {
         const {
             targetIndicator, index, laneId
@@ -115,8 +131,8 @@ class Card extends Component {
 
         return (
             <div
-                onMouseEnter={() => this.setState({mouseOn: true})}
-                onMouseLeave={() => this.setState({mouseOn: false})}
+                onMouseEnter={this.onMouseEnter}
+                onMouseLeave={this.onMouseLeave}
             >
                 {targetIndicator && <TargetIndicator
                     {...targetIndicator}

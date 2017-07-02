@@ -24,9 +24,9 @@ class MasterWidget extends Component {
 
     componentDidMount() {
         const {widgetData} = this.props;
-        this.setState({
+        this.setState(() => ({
             data: widgetData[0].value
-        });
+        }));
     }
 
     componentWillReceiveProps(nextProps) {
@@ -37,25 +37,25 @@ class MasterWidget extends Component {
             JSON.stringify(widgetData[0].value) !==
             JSON.stringify(nextProps.widgetData[0].value)
         ){
-            this.setState({
+            this.setState(() => ({
                 data: nextProps.widgetData[0].value
-            });
+            }));
 
             if(!edited) {
-                this.setState({
+                this.setState(() => ({
                         updated: true
-                    }, () => {
+                    }), () => {
                         this.timeout = setTimeout(() => {
-                            this.setState({
+                            this.setState(() => ({
                                 updated: false
-                            })
+                            }))
                         }, 1000);
                     }
                 )
             }else{
-                this.setState({
+                this.setState(() => ({
                     edited: false
-                });
+                }));
             }
         }
     }
@@ -101,7 +101,7 @@ class MasterWidget extends Component {
     // but is need to handle controlled components if
     // they patch on other event than onchange
     //
-    handleChange = (property, val) => {
+    handleChange = (property, data) => {
         const {
             dispatch, tabId, rowId, isModal, relativeDocId, widgetType
         } = this.props;
@@ -110,27 +110,27 @@ class MasterWidget extends Component {
 
         const dateParse = ['Date', 'DateTime', 'Time'];
 
-        this.setState({
+        this.setState(() => ({
             edited: true,
-            data: val
-        }, ()=> {
+            data
+        }), ()=> {
             if (
                 dateParse.indexOf(widgetType) === -1 &&
-                !this.validatePrecision(val)
+                !this.validatePrecision(data)
             ){ return; }
             if(rowId === 'NEW'){
                 currRowId = relativeDocId;
             }
             dispatch(updatePropertyValue(
-                property, val, tabId, currRowId, isModal
+                property, data, tabId, currRowId, isModal
             ));
         });
     }
 
     setEditedFlag = (edited) => {
-        this.setState({
+        this.setState(() => ({
             edited: edited
-        });
+        }));
     }
 
     validatePrecision = (value) => {

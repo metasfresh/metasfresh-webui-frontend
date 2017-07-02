@@ -25,65 +25,66 @@ class RawWidget extends Component {
         }
     }
 
-    componentDidMount(){
-        const {autoFocus, textSelected} = this.props
-
-        if(this.rawWidget && autoFocus){
+    componentDidMount = () => {
+        if(this.rawWidget && this.props.autoFocus){
             this.rawWidget.focus();
         }
 
-        if(textSelected){
+        if(this.props.textSelected){
             this.rawWidget.select();
         }
     }
 
-    handleFocus = (e) => {
-        const {handleFocus} = this.props;
+    handleFocus = e => {
+        this.setState(
+            () => ({
+                isEdited: true,
+                cachedValue: e.target.value
+            })
+        )
 
-        this.setState({
-            isEdited: true,
-            cachedValue: e.target.value
-        });
-
-        handleFocus && handleFocus();
+        this.props.handleFocus &&
+        this.props.handleFocus()
     }
 
-    willPatch = (value, valueTo) => {
-        const {widgetData} = this.props;
-        const {cachedValue} = this.state;
-        return (
-            JSON.stringify(widgetData[0].value) !== JSON.stringify(value) ||
-            JSON.stringify(widgetData[0].valueTo) !== JSON.stringify(valueTo) ||
-            (
-                cachedValue !== undefined &&
-                (JSON.stringify(cachedValue) !== JSON.stringify(value))
-            )
-        );
-    }
+    willPatch = (value, valueTo) => (
+        JSON.stringify(
+            this.props.widgetData[0].value) !== JSON.stringify(value
+        ) ||
+        JSON.stringify(
+            this.props.widgetData[0].valueTo) !== JSON.stringify(valueTo
+        ) ||
+        (
+            this.state.cachedValue !== undefined &&
+            (JSON.stringify(this.state.cachedValue ) !== JSON.stringify(value))
+        )
+    )
 
     handlePatch = (property, value, id, valueTo) => {
-        const {handlePatch} = this.props;
-
         // Do patch only when value is not equal state
         // or cache is set and it is not equal value
-        if(this.willPatch(value, valueTo) && handlePatch){
-            this.setState({
-                cachedValue: undefined
-            });
-            return handlePatch(property, value, id, valueTo);
+        if (this.willPatch(value, valueTo) && this.props.handlePatch) {
+            this.setState(
+                () => ({
+                    cachedValue: undefined
+                })
+            )
+
+            return this.props.handlePatch(property, value, id, valueTo);
         }
 
         return null;
     }
 
     handleBlur = (widgetField, value, id) => {
-        const {handleBlur} = this.props;
+        this.props.handleBlur &&
+        this.props.handleBlur(this.willPatch(value))
 
-        handleBlur && handleBlur(this.willPatch(value));
-
-        this.setState({
-            isEdited: false
-        });
+        this.setState(
+            () => ({
+                isEdited: false
+            })
+        )
 
         this.handlePatch(widgetField, value, id);
     }
@@ -99,18 +100,18 @@ class RawWidget extends Component {
         );
     }
 
-    handleErrorPopup = (value) => {
-        this.setState({
-            errorPopup: value
-        })
+    handleErrorPopup = value => {
+        this.setState(
+            () => ({
+                errorPopup: value
+            })
+        )
     }
 
     getClassnames = (icon, forcedPrimary) => {
         const {
             widgetData, disabled, gridAlign, type, updated, rowId, isModal
         } = this.props;
-
-        const {isEdited} = this.state;
 
         return 'input-block ' +
             (icon ? 'input-icon-container ' : '') +
@@ -125,7 +126,7 @@ class RawWidget extends Component {
                     !widgetData[0].validStatus.valid &&
                     !widgetData[0].validStatus.initialValue
                 ) &&
-                !isEdited) ? 'input-error ' : '') +
+                !this.state.isEdited) ? 'input-error ' : '') +
             (gridAlign ? 'text-xs-' + gridAlign + ' ' : '') +
             (type === 'primary' || forcedPrimary ?
                 'input-primary ' : 'input-secondary ') +
@@ -133,13 +134,15 @@ class RawWidget extends Component {
             (rowId && !isModal ? 'input-table ' : '');
     }
 
-    renderErrorPopup = (reason) => {
-        return (
-            <div className="input-error-popup">
-                {reason ? reason : 'Input error'}
-            </div>
-        )
-    }
+    renderErrorPopup = reason => (
+        <div className="input-error-popup">
+            {
+                reason
+                ? reason
+                : 'Input error'
+            }
+        </div>
+    )
 
     renderWidget = () => {
         const {

@@ -41,9 +41,9 @@ class LoginForm extends Component {
     handleOnChange = (e) => {
         e.preventDefault();
 
-        this.setState({
+        this.setState(() => ({
             err: ''
-        })
+        }))
     }
 
     handleSuccess = () => {
@@ -62,13 +62,12 @@ class LoginForm extends Component {
 
     }
 
-    checkIfAlreadyLogged(err){
-        const {router} = this.context;
+    checkIfAlreadyLogged = err => {
 
         return localLoginRequest()
             .then(response => {
                 if (response.data){
-                    return router.push('/')
+                    return this.context.router.push('/')
                 }
 
                 return Promise.reject(err);
@@ -79,51 +78,62 @@ class LoginForm extends Component {
         const {dispatch, auth} = this.props;
         const {roleSelect, role} = this.state;
 
-        this.setState({
-            pending: true
-        }, () => {
-            if(roleSelect){
-                return loginCompletionRequest(role)
+        this.setState(
+            () => ({
+                pending: true
+            }),
+            () => {
+                if(roleSelect){
+                    return loginCompletionRequest(role)
+                        .then(() => {
+                            dispatch(loginSuccess(auth));
+                            this.handleSuccess();
+                        })
+                }
+
+                loginRequest(this.login.value, this.passwd.value)
+                    .then(response =>{
+                        if(response.data.loginComplete){
+                            return this.handleSuccess();
+                        }
+                        this.setState(
+                            () => ({
+                                roleSelect: true,
+                                roles: response.data.roles,
+                                role: response.data.roles[0]
+                            })
+                        )
+                    })
                     .then(() => {
-                        dispatch(loginSuccess(auth));
-                        this.handleSuccess();
+                        this.setState(
+                            () => ({
+                                pending: false
+                            })
+                        )
+                    })
+                    .catch(err => {
+                        return this.checkIfAlreadyLogged(err);
+                    })
+                    .catch(err => {
+                        this.setState(
+                            () => ({
+                                err: err.response
+                                ? err.response.data.message
+                                : counterpart.translate('login.error.fallback'),
+                                pending: false
+                            })
+                        )
                     })
             }
-
-            loginRequest(this.login.value, this.passwd.value)
-                .then(response =>{
-                    if(response.data.loginComplete){
-                        return this.handleSuccess();
-                    }
-                    this.setState({
-                        roleSelect: true,
-                        roles: response.data.roles,
-                        role: response.data.roles[0]
-                    })
-                })
-                .then(() => {
-                    this.setState({
-                        pending: false
-                    })
-                })
-                .catch(err => {
-                    return this.checkIfAlreadyLogged(err);
-                })
-                .catch(err => {
-                    this.setState({
-                        err: (err.response ?
-                            err.response.data.message : 
-                            counterpart.translate('login.error.fallback')),
-                        pending: false
-                    });
-                })
-        });
+        );
     }
 
     handleRoleSelect = (option) => {
-        this.setState({
-            role: option
-        });
+        this.setState(
+            () => ({
+                role: option
+            })
+        )
     }
 
     render() {
@@ -136,7 +146,9 @@ class LoginForm extends Component {
                 <div className="text-xs-center">
                     <img src={logo} className="header-logo mt-2 mb-2" />
                 </div>
-                {roleSelect ? <div>
+                {
+                    roleSelect
+                    ? (<div>
                         <div className="form-control-label">
                             <small>{counterpart.translate(
                                     'login.selectRole.caption')}
@@ -152,10 +164,11 @@ class LoginForm extends Component {
                             doNotOpenOnFocus={true}
                             mandatory={true}
                         />
-                    </div>:
-                    <div>
+                    </div>)
+                    : (<div>
                         {
-                            err && <div className="input-error">
+                            err &&
+                            <div className="input-error">
                                 {err}
                             </div>
                         }
@@ -196,7 +209,7 @@ class LoginForm extends Component {
                             />
                         </div>
 
-                    </div>
+                    </div>)
                 }
                 <div className="mt-2">
 

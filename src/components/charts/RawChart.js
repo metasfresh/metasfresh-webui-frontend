@@ -32,13 +32,19 @@ class RawChart extends Component {
                 if(this.props.noData) return;
                 this.fetchData();
             }else{
-                this.mounted && this.setState({
-                    forceChartReRender: true,
-                }, () => {
-                    this.setState({
-                        forceChartReRender: false
-                    })
-                })
+                this.mounted &&
+                this.setState(
+                    () => ({
+                        forceChartReRender: true,
+                    }),
+                    () => {
+                        this.setState(
+                            () => ({
+                                forceChartReRender: false
+                            })
+                        )
+                    }
+                )
             }
         }
     }
@@ -53,28 +59,34 @@ class RawChart extends Component {
 
     componentWillUnmount(){
         const {intervalId} = this.state;
-        
+
         this.mounted = false;
-        
+
         if (intervalId){
             clearInterval(intervalId);
 
-            this.mounted && this.setState({
-                intervalId: null
-            })
+            this.mounted &&
+            this.setState(
+                () => ({
+                    intervalId: null
+                })
+            )
         }
     }
-    
+
     init = () => {
         const {pollInterval} = this.props;
         this.fetchData();
 
         if (pollInterval){
-            this.mounted && this.setState({
-                intervalId: setInterval(() => {
-                    this.fetchData();
-                }, pollInterval * 1000)
-            })
+            this.mounted &&
+            this.setState(
+                () => ({
+                    intervalId: setInterval(() => {
+                        this.fetchData();
+                    }, pollInterval * 1000)
+                })
+            )
         }
     }
 
@@ -98,9 +110,19 @@ class RawChart extends Component {
     fetchData(){
         this.getData()
             .then(chartData => {
-                this.mounted && this.setState({ chartData: chartData, err: null });
+                this.mounted &&
+                this.setState(
+                    () => ({
+                        chartData: chartData, err: null
+                    })
+                )
             }).catch(err => {
-                this.mounted && this.setState({ err })
+                this.mounted &&
+                this.setState(
+                    () => ({
+                        err
+                    })
+                )
             })
     }
 

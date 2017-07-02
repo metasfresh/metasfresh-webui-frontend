@@ -28,51 +28,70 @@ class MenuOverlay extends Component {
     }
 
     componentDidMount = () => {
-        getRootBreadcrumb().then(response => {
-            this.setState({
-                data: response
-            })
+        getRootBreadcrumb()
+        .then(data => {
+            this.setState(
+                () => ({
+                    data
+                })
+            )
         })
     }
 
-    handleClickOutside = (e) => this.props.onClickOutside(e);
+    handleClickOutside = e =>
+      this.props.onClickOutside(e)
 
-    handleQuery = (e) => {
+    handleQuery = e => {
         e.preventDefault();
         if(e.target.value){
-            this.setState({
-                query: e.target.value
-            })
-            queryPathsRequest(e.target.value, 9).then(response => {
-                this.setState({
-                    queriedResults: flattenLastElem(response.data)
+            this.setState(
+                () => ({
+                    query: e.target.value
                 })
-            }).catch((err) => {
-                if(err.response && err.response.status === 404) {
-                    this.setState({
-                        queriedResults: []
+            )
+
+            queryPathsRequest(e.target.value, 9)
+            .then(response => {
+                this.setState(
+                    () => ({
+                        queriedResults: flattenLastElem(response.data)
                     })
+                )
+            })
+            .catch(err => {
+                if(err.response && err.response.status === 404) {
+                    this.setState(
+                        () => ({
+                            queriedResults: []
+                        })
+                    )
                 }
             });
-        }else{
-
-            this.setState({
-                query: '',
-                queriedResults: []
-            }, ()=> {
-                document.getElementById('search-input-query').value=''
-            });
+        } else {
+            this.setState(
+                () => ({
+                    query: '',
+                    queriedResults: []
+                }),
+                ()=> {
+                    document.getElementById('search-input-query').value=''
+                }
+            )
         }
     }
 
-    handleClear = (e) => {
-        e.preventDefault();
-        this.setState({
-            query: '',
-            queriedResults: []
-        }, ()=> {
-            document.getElementById('search-input-query').value=''
-        });
+    handleClear = e => {
+        e.preventDefault()
+
+        this.setState(
+            () => ({
+                query: '',
+                queriedResults: []
+            },
+            () => {
+                document.getElementById('search-input-query').value = ''
+            })
+        )
     }
 
     handleRedirect = (elementId, isNew, entity) => {
@@ -88,29 +107,32 @@ class MenuOverlay extends Component {
 
     handleNewRedirect = (elementId) => this.handleRedirect(elementId, true);
 
-    handlePath = (nodeId) => {
-        pathRequest(nodeId).then(response => {
+    handlePath = nodeId => {
+        pathRequest(nodeId)
+        .then(response => {
             let pathArray = [];
             let node = response.data;
 
-            do{
+            do {
                 const children = node.children && node.children[0];
                 node.children = undefined;
 
                 pathArray.push(node);
                 node = children;
-            }while(node);
+            } while(node);
 
             //remove first MENU element
             pathArray.shift();
 
-            this.setState({
-                path: pathArray
-            })
-        });
+            this.setState(
+                () => ({
+                    path: pathArray
+                })
+            )
+        })
     }
 
-    renderPath = (path) => {
+    renderPath = path => {
         return (
             <span>
                 {path && path.map((item, index) =>
