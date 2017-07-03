@@ -48,14 +48,18 @@ class ActionButton extends Component {
         }
     }
 
-    navigate = (up) => {
-        const {selected, list} = this.state;
-        const next = up ? selected + 1 : selected - 1;
+    navigate = up => {
+        const next = up
+            ? this.state.selected + 1
+            : this.state.selected - 1
 
-        this.setState({
-            selected: (next >= 0 && next <= list.values.length) ?
-                next : selected
-        });
+        this.setState(
+            state => ({
+                selected: (next >= 0 && next <= state.list.values.length)
+                    ? next
+                    : state.selected
+            })
+        )
     }
 
     handleDropdownBlur = () => {
@@ -66,36 +70,46 @@ class ActionButton extends Component {
     }
 
     handleDropdownFocus = () => {
-        const {dropdownOpenCallback} = this.props;
+        this.fetchStatusList()
 
-        this.fetchStatusList();
-        dropdownOpenCallback();
-        this.statusDropdown.classList.add('dropdown-status-open');
+        this.props.dropdownOpenCallback()
+
+        this.statusDropdown.classList.add('dropdown-status-open')
     }
 
     fetchStatusList(){
-        const {windowType, fields, dataId} = this.props;
-        if(!dataId){
+        if(!this.props.dataId){
             return;
         }
+
         dropdownRequest(
-            windowType, fields[1].field, dataId, null, null, 'window'
-        ).then((res) => {
-            this.setState({list: res.data});
+            this.props.windowType,
+            this.props.fields[1].field,
+            this.props.dataId,
+            null,
+            null,
+            'window'
+        ).then(res => {
+            this.setState(
+                () => ({
+                    list: res.data
+                })
+            )
         });
     }
 
-    handleChangeStatus = (status) => {
-        const { onChange } = this.props;
-        const changePromise = onChange(status);
+    handleChangeStatus = status => {
+        const changePromise = this.props.onChange(status)
 
-        this.statusDropdown.blur();
+        this.statusDropdown.blur()
+
         if (changePromise instanceof Promise){
-            changePromise.then(() => this.fetchStatusList());
+            changePromise
+            .then(this.fetchStatusList)
         }
     }
 
-    getStatusClassName = (abrev) => {
+    getStatusClassName = abrev => {
         const {data} = this.props;
 
         if((data.action.value !== undefined) &&
@@ -112,7 +126,7 @@ class ActionButton extends Component {
         }
     }
 
-    getStatusContext = (abrev) => {
+    getStatusContext = abrev => {
         if(abrev === 'DR'){
             return 'primary'
         }else if (abrev === 'CO'){
@@ -122,22 +136,27 @@ class ActionButton extends Component {
         }
     }
 
-    renderStatusList = (list) => {
-        const {selected} = this.state;
-        return list.values.map((item, index) => {
-            const key = Object.keys(item)[0];
-            return <li
-                key={index}
-                className={
-                    'dropdown-status-item ' +
-                    (selected === index ? 'dropdown-status-item-on-key ' : '') +
-                    this.getStatusClassName(key)
-                }
-                onClick={() => this.handleChangeStatus(item)}
-            >
-                {item[key]}
-            </li>
-        })
+    renderStatusList = list => {
+        return list.values
+            .map((item, index) => {
+                const key = Object.keys(item)[0]
+
+                return <li
+                    key={index}
+                    className={
+                        'dropdown-status-item ' +
+                        (
+                            this.state.selected === index
+                            ? 'dropdown-status-item-on-key '
+                            : ''
+                        ) +
+                        this.getStatusClassName(key)
+                    }
+                    onClick={() => this.handleChangeStatus(item)}
+                >
+                    {item[key]}
+                </li>
+            })
     }
 
     render() {

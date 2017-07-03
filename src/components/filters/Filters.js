@@ -17,21 +17,25 @@ class Filters extends Component {
         }
     }
 
-    componentWillReceiveProps(props) {
-        const {filtersActive} = props;
-
-        this.init(filtersActive ? filtersActive[0] : null);
+    componentWillReceiveProps = ({ filtersActive }) => {
+        this.init(
+            filtersActive
+            ? filtersActive[0]
+            : null
+        )
     }
 
     componentDidMount() {
-        const {filtersActive} = this.props;
-        filtersActive && this.init(filtersActive[0]);
+        this.props.filtersActive &&
+        this.init(this.props.filtersActive[0]);
     }
 
-    init = (filter) => {
-        this.setState({
-            filter: filter
-        })
+    init = filter => {
+        this.setState(
+            () => ({
+                filter
+            })
+        )
     }
 
     // SETTING FILTERS  --------------------------------------------------------
@@ -42,38 +46,44 @@ class Filters extends Component {
     applyFilters = (filter, cb) => {
         const valid = this.isFilterValid(filter);
 
-        this.setState({
-            notValidFields: !valid
-        }, () => {
-            if (valid){
-                const parsedFilter = filter.parameters ?
-                    Object.assign({}, filter, {
-                        parameters: this.parseToPatch(filter.parameters)
-                    }) : filter;
-                this.setFilterActive([parsedFilter]);
-                cb && cb();
+        this.setState(
+            () => ({
+                notValidFields: !valid
+            }),
+            () => {
+                if (valid){
+                    const parsedFilter = filter.parameters ?
+                        Object.assign({}, filter, {
+                            parameters: this.parseToPatch(filter.parameters)
+                        }) : filter;
+                    this.setFilterActive([parsedFilter]);
+                    cb && cb();
+                }
             }
-        });
+        )
     }
 
-    setFilterActive = (filter) => {
-        const {updateDocList} = this.props;
-
-        this.setState({
-            filter: filter
-        }, () => {
-            updateDocList(filter);
-        })
+    setFilterActive = filter => {
+        this.setState(
+            () => ({
+                filter
+            }),
+            () => {
+                this.props.updateDocList(filter);
+            }
+        )
     }
 
     /*
      *  Mehod to lock backdrop, to do not close on click onClickOutside
      *  widgets that are bigger than filter wrapper
      */
-    handleShow = (value) => {
-        this.setState({
-            widgetShown: value
-        })
+    handleShow = widgetShown => {
+        this.setState(
+            () => ({
+                widgetShown
+            })
+        )
     }
 
     clearFilters = () => {
@@ -81,28 +91,37 @@ class Filters extends Component {
     }
 
     dropdownToggled = () => {
-        this.setState({
-            notValidFields: false
-        })
+        this.setState(
+            () => ({
+                notValidFields: false
+            })
+        )
     }
 
     // PARSING FILTERS ---------------------------------------------------------
 
-    sortFilters = (data) => {
-        return {
-            frequentFilters: data.filter(filter => filter.frequent),
-            notFrequentFilters: data.filter(filter =>
-                !filter.frequent && !filter.static),
-            staticFilters: data.filter(filter => filter.static)
-        }
-    }
+    sortFilters = data => ({
+        frequentFilters: data
+            .filter(filter =>
+                filter.frequent
+            ),
+        notFrequentFilters: data
+            .filter(filter =>
+               !filter.frequent && !filter.static
+            ),
+        staticFilters: data
+            .filter(filter => filter.static)
+    })
 
-    isFilterValid = (filters) => {
-        if(filters.parameters){
-            return !(filters.parameters.filter(
-                item => item.mandatory && !item.value
-            ).length);
-        }else{
+    isFilterValid = filters => {
+        if (filters.parameters) {
+            return !(
+                filters.parameters
+                    .filter(item =>
+                        item.mandatory &&
+                        !item.value
+            ).length)
+        } else {
             return true;
         }
     }

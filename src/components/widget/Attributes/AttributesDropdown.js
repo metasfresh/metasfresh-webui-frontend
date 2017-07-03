@@ -28,15 +28,19 @@ class AttributesDropdown extends Component {
             return onClickOutside();
         }
 
-        this.setState({
-            clickedOutside: true
-        })
+        this.setState(
+            () => ({
+                clickedOutside: true
+            })
+        )
     }
 
     handleFocus = () => {
-        this.setState({
-            focused: true
-        })
+        this.setState(
+            () => ({
+                focused: true
+            })
+        )
     }
 
     handlePatch = (prop, value, attrId) => {
@@ -48,28 +52,30 @@ class AttributesDropdown extends Component {
                 onClickOutside();
             }
 
-            this.setState({
-                focused: false
-            });
+            this.setState(
+                () => ({
+                    focused: false
+                })
+            )
         });
     }
 
     handleBlur = (willPatch) => {
-        const { clickedOutside } = this.state;
-        const { onClickOutside } = this.props;
-
-        if (!willPatch && !clickedOutside){
+        if (!willPatch && !this.state.clickedOutside){
             return;
         }
 
-        this.setState({
-            focused: false,
-            clickedOutside: clickedOutside
-        }, () => {
-            if (!willPatch){
-                onClickOutside();
+        this.setState(
+            state => ({
+                focused: false,
+                clickedOutside: state.clickedOutside
+            }),
+            () => {
+                if (!willPatch){
+                    this.props.onClickOutside();
+                }
             }
-        });
+        )
     }
 
     renderFields = () => {

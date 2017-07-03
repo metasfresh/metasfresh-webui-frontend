@@ -24,9 +24,12 @@ class Device extends Component {
                 if(!this.state.valueChangeStopper){
                     const body = JSON.parse(msg.body);
 
-                    this.mounted && this.setState({
-                        value: body.value
-                    });
+                    this.mounted &&
+                    this.setState(
+                        () => ({
+                            value: body.value
+                        })
+                    )
                 }
             });
         });
@@ -39,51 +42,60 @@ class Device extends Component {
     }
 
     handleClick = () => {
-        const {handleChange} = this.props;
-        const {value} = this.state;
-
-        handleChange(value);
+        this.props.handleChange(this.state.value);
     }
 
-    handleToggleChangeStopper = (value) => {
-        this.setState({
-            valueChangeStopper: value
-        })
+    handleToggleChangeStopperTrue = () => {
+        this.setState(
+            () => ({
+                valueChangeStopper: true
+            })
+        )
     }
 
-    handleKey = (e) => {
-        const {handleChange} = this.props;
-        const {value} = this.state;
+    handleToggleChangeStopperFalse = () => {
+        this.setState(
+            () => ({
+                valueChangeStopper: false
+            })
+        )
+    }
 
+    handleKey = e => {
         switch(e.key){
             case 'Enter':
-                handleChange(value);
-                break;
+                this.props.handleChange(this.state.value)
+
+                break
         }
     }
 
-    render() {
-        const {value, index, isMore} = this.state;
-        const {tabIndex} = this.props;
+    onKeyDown = e => {
+        this.handleKey(e)
+    }
 
-        if(value){
+    render() {
+        if(this.state.value){
             return (
                 <div
                     className={
                         'btn btn-device btn-meta-outline-secondary btn-sm ' +
                         'btn-inline pointer btn-distance-rev ' +
-                        (isMore ? 'btn-flagged ': '')
+                        (this.state.isMore ? 'btn-flagged ': '')
                     }
                     onClick={this.handleClick}
-                    tabIndex={tabIndex ? tabIndex : ''}
-                    onMouseEnter={() => this.handleToggleChangeStopper(true)}
-                    onFocus={() => this.handleToggleChangeStopper(true)}
-                    onMouseLeave={() => this.handleToggleChangeStopper(false)}
-                    onBlur={() => this.handleToggleChangeStopper(false)}
-                    onKeyDown={(e) => this.handleKey(e)}
+                    tabIndex={this.props.tabIndex ? this.props.tabIndex : ''}
+                    onMouseEnter={this.handleToggleChangeStopperTrue}
+                    onFocus={this.handleToggleChangeStopperTrue}
+                    onMouseLeave={this.handleToggleChangeStopperFalse}
+                    onBlur={this.handleToggleChangeStopperFalse}
+                    onKeyDown={this.onKeyDown}
                 >
-                    {isMore && <span className="btn-flag">{index + 1}</span>}
-                    {value}
+                    {
+                        this.state.isMore &&
+                        <span className="btn-flag">{this.state.index + 1}</span>
+                    }
+                    {this.state.value}
                 </div>
             )
         }else{

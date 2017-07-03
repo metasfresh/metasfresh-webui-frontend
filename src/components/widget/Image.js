@@ -50,50 +50,59 @@ class Image extends Component{
         fd.append('file', blob);
 
         return new Promise(resolve => {
-            this.setState({
-                isLoading: true
-            }, () => {
-                resolve();
-            });
+            this.setState(
+                () => ({
+                    isLoading: true
+                }),
+                () => {
+                    resolve()
+                }
+            )
         })
-            .then(() => {
-                return postImageAction(fd)
-            })
-            .then(imageId => {
-                return this.updateImagePreview(imageId)
-            })
-            .then(imageId => {
-                return handlePatch(data.field, imageId)
-            })
-            .then(() => {
-                return new Promise(resolve => {
-                    this.setState({
+        .then(() => {
+            return postImageAction(fd)
+        })
+        .then(imageId =>
+            this.updateImagePreview(imageId)
+        )
+        .then(imageId =>
+            handlePatch(data.field, imageId)
+        )
+        .then(() =>
+            new Promise(resolve => {
+                this.setState(
+                    () => ({
                         isLoading: false
-                    }, () => {
+                    }),
+                    () => {
                         resolve();
-                    })
-                })
+                    }
+                )
             })
+        )
     }
 
-    updateImagePreview(id){
+    updateImagePreview = id => {
         return getImageAction(id)
-            .then(blob => {
-                return new Promise(resolve => {
-                    let reader = new FileReader();
-                    reader.onload = function () {
-                        return resolve(reader.result);
-                    };
-                    reader.readAsDataURL(blob);
-                });
-            })
-            .then(imageBase64 => {
-                this.setState({
-                    imageSrc: imageBase64
-                });
+        .then(blob =>
+            new Promise(resolve => {
+                let reader = new FileReader()
 
-                return id;
-            });
+                reader.onload = () =>
+                    resolve(reader.result)
+
+                reader.readAsDataURL(blob);
+            })
+        )
+        .then(imageSrc => {
+            this.setState(
+                () => ({
+                    imageSrc
+                })
+            )
+
+            return id
+        })
     }
 
     takeSnapshot() {
@@ -114,45 +123,50 @@ class Image extends Component{
         })
     }
 
-    stopUsingCamera(){
-        const { stream } = this.state;
+    stopUsingCamera = () =>
+        new Promise(resolve => {
+            this.setState(
+                () => ({
+                    usingCamera: false
+                }),
+                () => {
+                    // stop using camera
+                    this.state.stream.getVideoTracks()[0].stop()
 
-        return new Promise(resolve => {
-            this.setState({
-                usingCamera: false
-            }, () => {
-                // stop using camera
-                stream.getVideoTracks()[0].stop();
-                resolve();
-            })
+                    resolve()
+                }
+            )
         })
-    }
 
     handleCamera(){
-        this.setState({
-            usingCamera: true
-        }, () => {
-            navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: 'user',
-                    width: 400,
-                    height: 300
-                }
-            })
-                .then(stream => {
-                    this.camera.src = window.URL.createObjectURL(stream);
-                    this.camera.onloadedmetadata = () => {
-                        this.camera.play();
-                    };
-
-                    this.camera.addEventListener('click',
-                        () => this.takeSnapshot()
-                    );
-                    this.setState({
-                        stream: stream
-                    });
+        this.setState(
+            () => ({
+                usingCamera: true
+            }), () => {
+                navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'user',
+                        width: 400,
+                        height: 300
+                    }
                 })
-        });
+                .then(stream => {
+                    this.camera.src = window.URL.createObjectURL(stream)
+
+                    this.camera.onloadedmetadata = () => {
+                        this.camera.play()
+                    }
+
+                    this.camera.addEventListener('click', this.takeSnapshot)
+
+                    this.setState(
+                        () => ({
+                            stream
+                        })
+                    )
+                })
+            }
+        )
     }
 
     handleUploadFile(){
@@ -169,45 +183,64 @@ class Image extends Component{
     }
 
     handleClear = () => {
-        const {handlePatch, data} = this.props;
-        handlePatch(data.field, null);
-        this.imageInput.value = '';
-        this.setState({
-            imageSrc: ''
-        })
+        this.props.handlePatch(
+            this.props.data.field,
+            null
+        )
+
+        this.imageInput.value = ''
+
+        this.setState(
+            () => ({
+                imageSrc: ''
+            })
+        )
     }
 
-    renderVideoPreview(){
-        const {isLoading} = this.state;
-        return <div
-            className={'camera-preview' + (isLoading ? ' loading' : '')}
+    getCameraRef = camera => {
+      this.camera = camera
+    }
+
+    renderVideoPreview = () => {
+        return (
+            <div
+                className={
+                    'camera-preview' + (
+                        this.state.isLoading
+                        ? ' loading'
+                        : ''
+                    )
+                }
             >
-                <video ref={c => this.camera = c} />
-                {isLoading && <div className="preview-loader"></div>}
+                <video ref={this.getCameraRef} />
+                {
+                    this.state.isLoading &&
+                    <div className="preview-loader"></div>
+                }
             </div>
+        )
     }
 
-    renderRegularCameraControl(){
+    renderRegularCameraControl = () => {
         return <div
                 className="btn btn-block btn-meta-outline-secondary btn-sm mb-1"
-                onClick={() => this.handleCamera()}
+                onClick={this.handleCamera}
             >
                 <i className="meta-icon-photo"/>
                 Take from camera
             </div>
     }
-    
+
     renderImagePreview() {
-        const {isLoading, imageSrc} = this.state;
         const {fields} = this.props;
-        
-        if(isLoading)
+
+        if(this.state.isLoading)
             return <Placeholder><Loader /></Placeholder>
-        else if(imageSrc)
+        else if(this.state.imageSrc)
             return (
                 <div className="image-preview">
                     <img
-                        src={imageSrc}
+                        src={this.state.imageSrc}
                         alt="image"
                         className="img-fluid"
                     />
@@ -217,11 +250,12 @@ class Image extends Component{
             return <Placeholder>{fields[0].emptyText}</Placeholder>
     }
 
-    render(){
-        const { imageSrc, usingCamera } = this.state;
-        const { fields, readonly } = this.props;
+    getImageInputRef = imageInput => {
+        this.imageInput = imageInput
+    }
 
-        return(
+    render () {
+        return (
             <div
                 className="form-control-label image-widget"
                 onKeyDown={this.handleKeyDown}
@@ -229,36 +263,50 @@ class Image extends Component{
             >
                 {this.renderImagePreview()}
 
-                {usingCamera && this.renderVideoPreview()}
+                {
+                    this.state.usingCamera &&
+                    this.renderVideoPreview()
+                }
 
-                {!readonly && <div
-                    className=" image-source-options"
-                >
-                    <label
-                        className="btn btn-meta-outline-secondary btn-sm mb-1"
-                    >
-                        <input
-                            className="input"
-                            type="file"
-                            onChange={(e) => this.handleUploadFile(e)}
-                            ref={c => this.imageInput = c}
-                        />
-                        <div className="text-content">
-                            <i className="meta-icon-upload" />
-                            Upload a photo
-                        </div>
-                    </label>
-                    {this.isCameraAvailable() &&
-                        this.renderRegularCameraControl()
-                    }
-                    {imageSrc && <div
-                            className="btn btn-meta-outline-secondary btn-sm"
-                            onClick={() => this.handleClear()}
+                {
+                    !this.props.readonly &&
+                    (
+                        <div
+                            className=" image-source-options"
                         >
-                            <i className="meta-icon-close-alt"/>
-                            Clear
-                        </div>}
-                </div>}
+                            <label
+                                className="btn btn-meta-outline-secondary btn-sm mb-1"
+                            >
+                                <input
+                                    className="input"
+                                    type="file"
+                                    onChange={this.handleUploadFile}
+                                    ref={this.getImageInputRef}
+                                />
+                                <div className="text-content">
+                                    <i className="meta-icon-upload" />
+                                    Upload a photo
+                                </div>
+                            </label>
+                            {
+                                this.isCameraAvailable() &&
+                                this.renderRegularCameraControl()
+                            }
+                            {
+                                this.state.imageSrc
+                                && (
+                                    <div
+                                        className="btn btn-meta-outline-secondary btn-sm"
+                                        onClick={this.handleClear}
+                                    >
+                                        <i className="meta-icon-close-alt"/>
+                                        Clear
+                                    </div>
+                                )
+                            }
+                        </div>
+                    )
+                }
             </div>
         )
     }

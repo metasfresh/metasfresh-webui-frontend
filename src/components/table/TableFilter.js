@@ -16,9 +16,11 @@ class TableFilter extends Component {
     }
 
     toggleTooltip = (key = null) => {
-        this.setState({
-            isTooltipShow: key
-        });
+        this.setState(
+            () => ({
+                isTooltipShow: key
+            })
+        )
     }
 
     render() {

@@ -78,11 +78,14 @@ class Modal extends Component {
             waitingFetch &&
             prevProps.indicator !== indicator
         ) {
-            this.setState({
-                waitingFetch: false
-            }, () => {
+            this.setState(
+                () => ({
+                    waitingFetch: false
+                }),
+                () => {
                 this.handleStart();
-            })
+                }
+            )
         }
     }
 
@@ -168,49 +171,63 @@ class Modal extends Component {
             scrollTop = document.documentElement.scrollTop;
         }
 
-        this.setState({
-            scrolled: scrollTop > 0
-        });
+        this.setState(
+            () => ({
+                scrolled: scrollTop > 0
+            })
+        )
     }
 
     setFetchOnTrue = () => {
-        this.setState({
-            waitingFetch: true
-        });
+        this.setState(
+            () => ({
+                waitingFetch: true
+            })
+        )
     }
 
     handleStart = () => {
         const {dispatch, layout, windowType, indicator} = this.props;
 
         if(indicator === 'pending'){
-            this.setState({
-                waitingFetch: true,
-                pending: true
-            });
+            this.setState(
+                () => ({
+                    waitingFetch: true,
+                    pending: true
+                })
+            )
 
             return;
         }
 
-        this.setState({
-            pending: true
-        }, () => {
-            startProcess(
-                windowType, layout.pinstanceId
-            ).then(response => {
-                this.setState({
-                    pending: false
-                }, () => {
-                    dispatch(handleProcessResponse(
-                        response, windowType, layout.pinstanceId,
-                        () => this.removeModal()
-                    ));
+        this.setState(
+            () => ({
+                pending: true
+            }),
+            () => {
+                startProcess(
+                    windowType, layout.pinstanceId
+                ).then(response => {
+                    this.setState(
+                        () => ({
+                            pending: false
+                        }),
+                        () => {
+                            dispatch(handleProcessResponse(
+                                response, windowType, layout.pinstanceId,
+                                () => this.removeModal()
+                            ));
+                        }
+                    );
+                }).catch(() => {
+                    this.setState(
+                        () => ({
+                            pending: false
+                        })
+                    )
                 });
-            }).catch(() => {
-                this.setState({
-                    pending: false
-                });
-            });
-        });
+            }
+        )
     }
 
     removeModal = () => {

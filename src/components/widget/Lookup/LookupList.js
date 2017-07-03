@@ -17,20 +17,24 @@ class LookupList extends Component {
 
     componentDidMount(){
         // needed for calculating scroll position
-        const listElementHeight = 30;
-        const listVisibleElements =
-            Math.floor(this.listScrollWrap.clientHeight / listElementHeight);
-        const shouldListScrollUpdate =
-            listVisibleElements > this.items.childNodes.length;
+        const listElementHeight = 30
 
-        this.setState({
-            listElementHeight: listElementHeight,
-            listVisibleElements: listVisibleElements,
-            shouldListScrollUpdate: shouldListScrollUpdate
-        });
+        const listVisibleElements =
+            Math.floor(this.listScrollWrap.clientHeight / listElementHeight)
+
+        const shouldListScrollUpdate =
+            listVisibleElements > this.items.childNodes.length
+
+        this.setState(
+            () => ({
+                listElementHeight,
+                listVisibleElements,
+                shouldListScrollUpdate
+            })
+        )
     }
 
-    componentWillReceiveProps(nextProps){
+    componentWillReceiveProps = nextProps => {
         const {
             shouldListScrollUpdate, listElementHeight, listVisibleElements
         } = this.state;
@@ -62,7 +66,6 @@ class LookupList extends Component {
     }
 
     getDropdownComponent = (index, item) => {
-        const {handleSelect, selected} = this.props;
         const name = item[Object.keys(item)[0]];
         const key = Object.keys(item)[0];
 
@@ -71,9 +74,9 @@ class LookupList extends Component {
                 key={key}
                 className={
                     'input-dropdown-list-option ' +
-                    (selected === index ?
+                    (this.props.selected === index ?
                         'input-dropdown-list-option-key-on' : '') }
-                onClick={() => {handleSelect(item)}}
+                onClick={() => {this.props.handleSelect(item)}}
             >
                 <p className="input-dropdown-item-title">{name}</p>
             </div>
@@ -86,28 +89,29 @@ class LookupList extends Component {
     }
 
     renderNew = () => {
-        const {selected, handleAddNew, newRecordCaption} = this.props;
         return (
             <div className={
                 'input-dropdown-list-option input-dropdown-list-option-alt '  +
-                (selected === 'new' ? 'input-dropdown-list-option-key-on' : '')
+                (
+                    this.props.selected === 'new'
+                    ? 'input-dropdown-list-option-key-on'
+                    : ''
+                )
             }
-                onClick={handleAddNew}
+                onClick={this.props.handleAddNew}
             >
-                <p>{newRecordCaption}</p>
+                <p>{this.props.newRecordCaption}</p>
             </div>
         )
     }
 
-    renderEmpty = () => {
-        return (
+    renderEmpty = () => (
+        <div className="input-dropdown-list-header">
             <div className="input-dropdown-list-header">
-                <div className="input-dropdown-list-header">
-                    No results found
-                </div>
+                No results found
             </div>
-        )
-    }
+        </div>
+    )
 
     renderLoader = () => {
         return (
@@ -127,6 +131,14 @@ class LookupList extends Component {
         )
     }
 
+    getListScrollWrapRef = listScrollWrap => {
+        this.listScrollWrap = listScrollWrap
+    }
+
+    getItemsDivRef = div => {
+        this.items = div
+    }
+
     render() {
         const {
             loading, list, creatingNewDisabled, newRecordCaption
@@ -135,11 +147,13 @@ class LookupList extends Component {
         return (
             <div
                 className="input-dropdown-list"
-                ref={c => this.listScrollWrap = c}
+                ref={this.getListScrollWrapRef}
             >
                 {(loading && list.length === 0) && this.renderLoader()}
                 {(!loading && list.length === 0) && this.renderEmpty()}
-                <div ref={(c) => this.items = c}>
+                <div
+                    ref={this.getItemsDivRef}
+                >
                     {list.map((item, index) =>
                         this.getDropdownComponent(index, item))
                     }

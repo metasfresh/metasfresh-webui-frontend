@@ -23,10 +23,16 @@ class TableContextMenu extends Component {
         }
     }
 
-    componentDidMount() {
-        const {x, y, fieldName, docId} = this.props;
-        this.setPosition(x, y, fieldName, this.contextMenu);
-        docId && this.getReferences();
+    componentDidMount = () => {
+        this.setPosition(
+            this.props.x,
+            this.props.y,
+            this.props.fieldName,
+            this.contextMenu
+        )
+
+        this.props.docId &&
+        this.getReferences()
     }
 
     getPosition = (dir, pos, element) => {
@@ -45,36 +51,57 @@ class TableContextMenu extends Component {
     }
 
     setPosition = (x, y, fieldName, elem) => {
-        this.setState({
-            contextMenu: {
-                x: this.getPosition('x', x, elem),
-                y: this.getPosition('y', y, elem),
-                fieldName
-            }
-        });
+        this.setState(
+            () => ({
+                contextMenu: {
+                    x: this.getPosition('x', x, elem),
+                    y: this.getPosition('y', y, elem),
+                    fieldName
+                }
+            })
+        )
     }
 
     getReferences = () => {
-        const {docId, tabId, type, selected} = this.props;
-
-        referencesRequest('window', type, docId, tabId, selected[0])
+        referencesRequest(
+            'window',
+            this.props.type,
+            this.props.docId,
+            this.props.tabId,
+            this.props.selected[0]
+        )
         .then(response => {
-            this.setState({
-                references: response.data.references
-
-            });
-        });
+            this.setState(
+                () => ({
+                    references: response.data.references
+                })
+            )
+        })
     }
 
     handleReferenceClick = (refType, filter) => {
-        const {
-            dispatch, type, docId
-        } = this.props;
-        dispatch(setFilter(filter, refType));
-        window.open('/window/' + refType +
-            '?refType=' + type +
-            '&refId=' + docId,
-            '_blank');
+        this.props
+            .dispatch(
+                setFilter(filter, refType)
+            )
+
+        window.open(
+            [
+                '/window/',
+                refType,
+                '?refType=',
+                this.props.type,
+                '&refId=',
+                this.props.docId
+            ].join(''),
+            '_blank'
+        )
+    }
+
+    getContextMenu = contextMenu => {
+        this.contextMenu = contextMenu;
+        contextMenu &&
+        contextMenu.focus()
     }
 
     render() {
@@ -82,6 +109,7 @@ class TableContextMenu extends Component {
             blur, selected, mainTable, handleAdvancedEdit, handleOpenNewTab,
             handleDelete, handleZoomInto
         } = this.props;
+
         const {contextMenu, references} = this.state;
 
         const isSelectedOne = selected.length === 1;
@@ -89,7 +117,7 @@ class TableContextMenu extends Component {
         return (
                 <div
                     className="context-menu context-menu-open panel-bordered panel-primary"
-                    ref={(c) => {this.contextMenu = c; c && c.focus()}}
+                    ref={this.getContextMenu}
                     style={{
                         left: contextMenu.x,
                         top: contextMenu.y

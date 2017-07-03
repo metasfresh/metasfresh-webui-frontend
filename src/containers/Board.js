@@ -40,17 +40,15 @@ class Board extends Component {
     componentWillUnmount = () => {
         disconnectWS.call(this);
     }
-    
-    laneCardsChanged = (event) => {
+
+    laneCardsChanged = event => {
         const {board} = this.state;
         const {laneId, cardIds} = event;
         const laneIndex = board.lanes.findIndex(lane => lane.laneId === laneId);
-        const lane = board.lanes[laneIndex];
-        
-        
+
         const prom = Promise.all(
             cardIds.map(id => getRequest('board', board.boardId, 'card', id)));
-            
+
         prom.then(res => {
             const cards = res.map(item => item.data);
             this.addCards(laneIndex, cards);
@@ -58,33 +56,41 @@ class Board extends Component {
     }
 
     init = () => {
-        const {boardId} = this.props;
+        getData('board', this.props.boardId)
+        .then(res => {
+            this.setState(
+                () => ({
+                    board: res.data
+                }),
+                () => {
+                    connectWS
+                    .call(this, res.data.websocketEndpoint, msg => {
+                        msg.events  // TODO: Why does .map?
+                        .map(event => { // maybe here better forEach?
+                            switch(event.changeType){
+                                case 'laneCardsChanged':
+                                    this.laneCardsChanged(event)
 
-        getData('board', boardId).then(res => {
-            this.setState({
-                board: res.data
-            }, () => {
-                connectWS.call(this, res.data.websocketEndpoint, msg => {
-                    msg.events.map(event => {
-                        switch(event.changeType){
-                            case 'laneCardsChanged':
-                                this.laneCardsChanged(event);
-                                break;
-                        }
+                                    break;
+                            }
+                        })
                     })
+                }
+            )
+        })
+        .catch(() => {
+            this.setState(
+                () => ({
+                    board: 404
                 })
-            })
-        }).catch(err => {
-            this.setState({
-                board: 404
-            })
+            )
         })
     }
 
     handleDrop = (card, targetLaneId) => {
         const {board} = this.state;
         this.clearTargetIndicator();
-        
+
         if(card.initLaneId === 0) {
             // Adding card
             addCard(board.boardId, targetLaneId, card.id, card.index);
@@ -108,53 +114,63 @@ class Board extends Component {
     }
 
     handleHover = (card, targetLaneId, targetIndex) => {
-        this.setState({
-            targetIndicator: {
-                laneId: targetLaneId,
-                index: targetIndex
-            }
-        });
+        this.setState(
+            () => ({
+                targetIndicator: {
+                    laneId: targetLaneId,
+                    index: targetIndex
+                }
+            })
+        )
     }
 
     clearTargetIndicator = () => {
-        this.setState({
-            targetIndicator: {
-                laneId: undefined,
-                index: undefined
-            }
-        });
+        this.setState(
+            () => ({
+                targetIndicator: {
+                    laneId: undefined,
+                    index: undefined
+                }
+            })
+        )
     }
 
     removeCard = (laneIndex, cardIndex) => {
-        this.setState(prev => update(prev, {
-            board: {
-                lanes: {
-                    [laneIndex]: {
-                        cards: {$splice: [[cardIndex, 1]]}
+        this.setState(
+            state => update(state, {
+                board: {
+                    lanes: {
+                        [laneIndex]: {
+                            cards: {$splice: [[cardIndex, 1]]}
+                        }
                     }
                 }
-            }
-        }))
+            })
+        )
     }
 
     addCards = (laneIndex, cards) => {
-        this.setState(prev => update(prev, {
-            board: {
-                lanes: {
-                    [laneIndex]: {
-                        cards: {$set: cards}
+        this.setState(
+            state => update(state, {
+                board: {
+                    lanes: {
+                        [laneIndex]: {
+                            cards: {
+                                $set: cards
+                            }
+                        }
                     }
                 }
-            }
-        }));
+            })
+        )
     }
 
-    handleCaptionClick = (docPath) => {
+    handleCaptionClick = docPath => {
         if(!docPath) return;
 
         const url = '/window/' + docPath.windowId +
             (docPath.documentId ? '/' + docPath.documentId : '');
-        
+
         window.open(url, '_blank');
     }
 
@@ -173,11 +189,33 @@ class Board extends Component {
         });
     }
 
-    setSidenavViewId = (id) => {this.setState({sidenavViewId: id})}
+    setSidenavViewId = id => {
+        this.setState(
+            () => ({
+                sidenavViewId: id
+            })
+        )
+    }
+
+    sideNavFalse = () => {
+        this.setState(
+            () => ({
+                sidenav: false
+            })
+        )
+    }
+
+    sideNavTrue = () => {
+        this.setState(
+            () => ({
+                sidenav: true
+            })
+        )
+    }
 
     render() {
         const {
-            modal, rawModal, breadcrumb, indicator, dispatch
+            modal, rawModal, breadcrumb, indicator
         } = this.props;
 
         const {
@@ -194,7 +232,7 @@ class Board extends Component {
                     <Sidenav
                         boardId={board.boardId}
                         viewId={sidenavViewId}
-                        onClickOutside={() => this.setState({sidenav: false})}
+                        onClickOutside={this.sideNavFalse}
                         setViewId={this.setSidenavViewId}
                     />
                 )}
@@ -207,7 +245,7 @@ class Board extends Component {
                         >
                             <button
                                 className="btn btn-meta-outline-secondary btn-sm float-xs-right"
-                                onClick={() => this.setState({sidenav: true})}
+                                onClick={this.sideNavTrue}
                             >
                                 Add new
                             </button>

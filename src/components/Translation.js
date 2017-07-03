@@ -13,21 +13,41 @@ class Translation extends Component {
             reRender: false
         }
     }
-    
+
     componentDidMount = () => {
-        getMessages().then(response => {
+        getMessages()
+        .then(response => {
             counterpart.registerTranslations('lang', response.data);
+
             counterpart.setLocale('lang');
-            this.setState({reRender:true},
-                () => this.setState({reRender:false}));
-            counterpart.setMissingEntryGenerator(function(key) {
-                console.error('Missing translation: ' + key); 
-                return '';
+
+            this.setState(
+                () => ({
+                    reRender:true
+                }),
+                () => {
+                    this.setState(
+                        () => ({
+                            reRender:false
+                        })
+                    )
+                }
+            )
+
+            counterpart.setMissingEntryGenerator(key => {
+                console.error('Missing translation: ' + key)
+
+                return ''
             });
         });
     }
 
-    render = () => !this.state.reRender && this.props.children;
+    render() {
+      return (
+          !this.state.reRender &&
+          this.props.children
+      )
+    }
 }
 
 export default Translation;

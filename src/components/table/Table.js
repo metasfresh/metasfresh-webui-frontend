@@ -99,9 +99,11 @@ class Table extends Component {
             JSON.stringify(prevProps.defaultSelected) !==
             JSON.stringify(defaultSelected)
         ){
-            this.setState({
-                selected: defaultSelected
-            })
+            this.setState(
+                () => ({
+                    selected: defaultSelected
+                })
+            )
         }
     }
 
@@ -109,7 +111,7 @@ class Table extends Component {
         return { shortcuts: shortcutManager }
     }
 
-    getIndentData = (selectFirst) => {
+    getIndentData = selectFirst => {
         const {
             rowData, tabid, indentSupported, collapsible, expandedDepth,
             keyProperty
@@ -122,57 +124,66 @@ class Table extends Component {
                 rowsData = rowsData.concat(mapIncluded(item));
             })
 
-            this.setState({
-                rows: rowsData,
-                pendingInit: !rowsData,
-                collapsedParentsRows: [],
-                collapsedRows: []
-            }, () => {
-                const {rows} = this.state;
+            this.setState(
+                () => ({
+                    rows: rowsData,
+                    pendingInit: !rowsData,
+                    collapsedParentsRows: [],
+                    collapsedRows: []
+                }),
+                state => {
+                  if(selectFirst){
+                      this.selectOneProduct(state.rows[0].id);
+                      document.getElementsByClassName('js-table')[0].focus();
+                  }
 
-                if(selectFirst){
-                    this.selectOneProduct(rows[0].id);
-                    document.getElementsByClassName('js-table')[0].focus();
+                  let mapCollapsed = [];
+                  if(collapsible){
+
+                      state.rows &&
+                      !!state.rows.length &&
+                      state.rows
+                      .map(row => {
+                          if (
+                              row.indent.length >= expandedDepth &&
+                              row.includedDocuments
+                          ) {
+                              mapCollapsed = mapCollapsed
+                                  .concat(collapsedMap(row))
+
+                              this.setState(
+                                  prev => ({
+                                      collapsedParentsRows:
+                                          prev.collapsedParentsRows
+                                              .concat(row[keyProperty])
+                                  })
+                              )
+                          }
+                          if(row.indent.length > expandedDepth){
+                              this.setState(
+                                  prev => ({
+                                      collapsedRows:
+                                          prev.collapsedRows
+                                              .concat(row[keyProperty])
+                                  })
+                              )
+                          }
+                      })
                 }
 
-                let mapCollapsed = [];
-                if(collapsible){
-
-                    rows && !!rows.length && rows.map(row => {
-                        if(
-                            row.indent.length >= expandedDepth &&
-                            row.includedDocuments
-                        ){
-                            mapCollapsed = mapCollapsed.concat(
-                                collapsedMap(row)
-                            );
-                            this.setState(prev => ({
-                                collapsedParentsRows:
-                                    prev.collapsedParentsRows.concat(
-                                        row[keyProperty]
-                                    )
-                            }));
-                        }
-                        if(row.indent.length > expandedDepth){
-                            this.setState(prev => ({
-                                collapsedRows:
-                                    prev.collapsedRows.concat(
-                                        row[keyProperty]
-                                    )
-                            }));
-                        }
+                this.setState(
+                    () => ({
+                        collapsedArrayMap: mapCollapsed
                     })
-                }
-
-                this.setState({
-                    collapsedArrayMap: mapCollapsed
-                });
+                )
             })
         } else {
-            this.setState({
-                rows: rowData[tabid],
-                pendingInit: !rowData[tabid]
-            });
+            this.setState(
+                () => ({
+                    rows: rowData[tabid],
+                    pendingInit: !rowData[tabid]
+                })
+            )
         }
     }
 
@@ -194,59 +205,85 @@ class Table extends Component {
         this.selectRangeProduct(leafsIds);
     }
 
-    changeListen = (listenOnKeys) => {
-        this.setState({
-            listenOnKeys: !!listenOnKeys
-        })
+    changeListen = listenOnKeys => {
+        this.setState(
+            () => ({
+                listenOnKeys: !!listenOnKeys
+            })
+        )
     }
 
     selectProduct = (id, idFocused, idFocusedDown) => {
-        const {dispatch, type, disconnectFromState} = this.props;
+        this.setState(
+            state => ({
+                selected: state.selected.concat([id])
+            }),
+            () => {
+                !this.props.disconnectFromState &&
+                this.props.dispatch(
+                  selectTableItems(this.state.selected, this.props.type)
+                )
 
-        this.setState(prevState => ({
-            selected: prevState.selected.concat([id])
-        }), () => {
-            const {selected} = this.state;
-            !disconnectFromState && dispatch(selectTableItems(selected, type))
-            this.triggerFocus(idFocused, idFocusedDown);
-        })
+                this.triggerFocus(idFocused, idFocusedDown)
+            }
+        )
     }
 
-    selectRangeProduct = (ids) => {
-        this.setState({
-            selected: ids
-        });
+    selectRangeProduct = selected => {
+        this.setState(
+            () => ({
+                selected
+            })
+        )
     }
 
     selectAll = () => {
-        const {keyProperty} = this.props;
-        const {rows} = this.state;
-        const property = keyProperty ? keyProperty : 'rowId';
-        const toSelect = rows.map((item) => item[property]);
+        const property = this.props.keyProperty
+            ? this.props.keyProperty
+            : 'rowId'
 
-        this.selectRangeProduct(toSelect);
+        const toSelect = this.state.rows
+            .map(item =>
+                item[property]
+            )
+
+        this.selectRangeProduct(toSelect)
     }
 
     selectOneProduct = (id, idFocused, idFocusedDown, cb) => {
-        this.setState({
-            selected: [id]
-        }, () => {
-            this.triggerFocus(idFocused, idFocusedDown);
-            cb && cb();
-        })
+        this.setState(
+            () => ({
+                selected: [id]
+            }),
+            () => {
+                this.triggerFocus(idFocused, idFocusedDown)
+
+                cb &&
+                cb()
+            }
+        )
     }
 
-    deselectProduct = (id) => {
-        const index = this.state.selected.indexOf(id);
-        this.setState(update(this.state, {
-            selected: {$splice: [[index, 1]]}
-        }))
+    deselectProduct = id => {
+        const index = this.state.selected.indexOf(id)
+
+        this.setState(
+            state => update(state, {
+                selected: {
+                    $splice: [[index, 1]]
+                }
+            })
+        )
     }
 
-    deselectAllProducts = (cb) => {
-        this.setState({
-            selected: []
-        }, cb && cb());
+    deselectAllProducts = cb => {
+        this.setState(
+            () => ({
+                selected: []
+            }),
+            cb &&
+            cb()
+        )
     }
 
     triggerFocus = (idFocused, idFocusedDown) => {
@@ -282,17 +319,18 @@ class Table extends Component {
     }
 
     handleKeyDown = (e) => {
-        const {selected, rows, listenOnKeys, collapsedArrayMap} = this.state;
+        const {
+            selected, rows, listenOnKeys, collapsedArrayMap
+        } = this.state;
 
         if(!listenOnKeys){
             return;
         }
 
         const selectRange = e.shiftKey;
-        const {keyProperty, mainTable, readonly} = this.props;
 
         const {
-            onDoubleClick, closeOverlays
+            keyProperty, mainTable, readonly, onDoubleClick, closeOverlays
         } = this.props;
 
         const nodeList =
@@ -401,11 +439,17 @@ class Table extends Component {
     }
 
     closeContextMenu = () => {
-        this.setState({
-            contextMenu: Object.assign({}, this.state.contextMenu, {
-                open: false
+        this.setState(
+            state => ({
+                contextMenu: Object.assign(
+                    {},
+                    state.contextMenu,
+                    {
+                        open: false
+                    }
+                )
             })
-        })
+        )
     }
 
     handleClick = (e, id) => {
@@ -436,11 +480,10 @@ class Table extends Component {
     }
 
     handleRightClick = (e, id, fieldName) => {
-        const {selected} = this.state;
         const {clientX, clientY} = e;
         e.preventDefault();
 
-        if(selected.indexOf(id) > -1){
+        if(this.state.selected.indexOf(id) > -1){
             this.setContextMenu(clientX, clientY, fieldName);
         }else{
             this.selectOneProduct(id, null, null, () => {
@@ -449,18 +492,23 @@ class Table extends Component {
         }
     }
 
-    setContextMenu = (clientX, clientY, fieldName) => {
-        this.setState({
-            contextMenu: Object.assign({}, this.state.contextMenu, {
-                x: clientX,
-                y: clientY,
-                open: true,
-                fieldName
+    setContextMenu = (x, y, fieldName) => {
+        this.setState(
+            state => ({
+                contextMenu: Object.assign(
+                    {},
+                    state.contextMenu,
+                    {
+                    x,
+                    y,
+                    open: true,
+                    fieldName
+                })
             })
-        });
+        )
     }
 
-    getProductRange = (id) => {
+    getProductRange = id => {
         const {rowData, tabid, keyProperty} = this.props;
         let arrayIndex;
 
@@ -481,65 +529,93 @@ class Table extends Component {
     }
 
     handleBatchEntryToggle = () => {
-        const {isBatchEntry} = this.state;
-
-        this.setState({
-            isBatchEntry: !isBatchEntry
-        });
+        this.setState(
+            state => ({
+                isBatchEntry: !state.isBatchEntry
+            })
+        )
     }
 
     openModal = (windowType, tabId, rowId) => {
-        const {dispatch} = this.props;
-        dispatch(openModal('Add new', windowType, 'window', tabId, rowId));
+        this.props.dispatch(
+            openModal(
+                'Add new',
+                windowType,
+                'window',
+                tabId,
+                rowId
+            )
+        )
     }
 
     handleAdvancedEdit = (type, tabId, selected) => {
-        const {dispatch} = this.props;
-
-        dispatch(openModal(
-            'Advanced edit', type, 'window', tabId, selected[0], true
-        ));
+        this.props.dispatch(
+            openModal(
+                'Advanced edit',
+                type,
+                'window',
+                tabId,
+                selected[0], true
+            )
+        )
     }
 
-    handleOpenNewTab = (selected) => {
-        const {type} = this.props;
+    handleOpenNewTab = selected => {
         for(let i = 0; i < selected.length; i++){
-            window.open('/window/' + type + '/' + selected[i], '_blank');
+            window.open(
+                '/window/' + this.props.type + '/' + selected[i],
+                '_blank'
+            )
         }
     }
 
     handleDelete = () => {
-        this.setState({
-            promptOpen: true
-        })
+        this.setState(
+            () => ({
+                promptOpen: true
+            })
+        )
     }
 
     handlePromptCancelClick = () => {
-        this.setState({
-            promptOpen: false
-        })
+        this.setState(
+            () => ({
+                promptOpen: false
+            })
+        )
     }
 
-    handlePromptSubmitClick = (selected) => {
+    handlePromptSubmitClick = selected => {
         const {
             dispatch, type, docId, updateDocList, tabid
         } = this.props;
 
-        this.setState({
-            promptOpen: false,
-            selected: []
-        }, () => {
-            deleteRequest(
-                'window', type, docId ? docId : null, docId ? tabid : null,
-                selected
-            ).then(response => {
-                if(docId){
-                    dispatch(deleteLocal(tabid, selected, 'master', response))
-                } else {
-                    updateDocList();
-                }
-            });
-        });
+        this.setState(
+            () => ({
+                promptOpen: false,
+                selected: []
+            }),
+            () => {
+                deleteRequest(
+                    'window', type, docId ? docId : null, docId ? tabid : null,
+                    selected
+                )
+                .then(response => {
+                    if(docId){
+                        dispatch(
+                            deleteLocal(
+                                tabid,
+                                selected,
+                                'master',
+                                response
+                            )
+                        )
+                    } else {
+                        updateDocList();
+                    }
+                })
+            }
+        )
     }
 
     getSelectedRows = () => {
@@ -591,15 +667,19 @@ class Table extends Component {
 
     handleZoomInto = (fieldName) => {
         const {entity, type, docId, tabid, viewId} = this.props;
-        const {selected} = this.state;
 
         getZoomIntoWindow(
             entity, type, docId, (entity === 'window' ? tabid : viewId),
-            selected[0], fieldName
-        ).then(res => {
-            res && res.data && window.open('/window/' +
-                   res.data.documentPath.windowId + '/' +
-                   res.data.documentPath.documentId, '_blank');
+            this.state.selected[0], fieldName
+        )
+        .then(res => {
+            res &&
+            res.data &&
+            window.open(
+                '/window/' + res.data.documentPath.windowId +
+                '/' + res.data.documentPath.documentId,
+                '_blank'
+            )
         })
     }
 
@@ -630,48 +710,80 @@ class Table extends Component {
 
     handleRowCollapse = (node, collapsed) => {
         const {keyProperty} = this.props;
-        const {
-            collapsedParentsRows, collapsedRows, collapsedArrayMap
-        } = this.state;
 
-        this.setState({
-            collapsedArrayMap: collapsedMap(node, collapsed, collapsedArrayMap)
-        });
+        this.setState(
+            state => ({
+                collapsedArrayMap: collapsedMap(
+                    node,
+                    collapsed,
+                    state.collapsedArrayMap
+                )
+            })
+        )
 
         if(collapsed){
-            this.setState(prev => ({
-                collapsedParentsRows:
-                    update(prev.collapsedParentsRows,
-                        {$splice: [[
-                            prev.collapsedParentsRows
+            this.setState(
+                state => ({
+                    collapsedParentsRows: update(
+                        state.collapsedParentsRows,
+                        {
+                            $splice: [[
+                                state.collapsedParentsRows
                                 .indexOf(node[keyProperty]), 1
                             ]]
-                        })
-            }));
+                        }
+                    )
+                })
+            )
         }else{
-            if(collapsedParentsRows.indexOf(node[keyProperty]) > -1) return;
-            this.setState(prev => ({
-                collapsedParentsRows:
-                    prev.collapsedParentsRows.concat(node[keyProperty])
-            }));
+            if(
+                this.state.collapsedParentsRows.indexOf(node[keyProperty]) > -1
+            ) {
+                return
+            }
+
+            this.setState(
+                state => ({
+                    collapsedParentsRows:
+                        state.collapsedParentsRows.concat(node[keyProperty])
+                })
+            )
         }
 
-        node.includedDocuments && node.includedDocuments.map(node => {
+        node.includedDocuments &&
+        node.includedDocuments
+        .map(node => {
             if(collapsed){
-                this.setState(prev => ({
-                    collapsedRows: update(prev.collapsedRows, {
-                        $splice: [[
-                            prev.collapsedRows.indexOf(node[keyProperty]), 1
-                        ]]
+                this.setState(
+                    state => ({
+                        collapsedRows: update(
+                            state.collapsedRows,
+                            {
+                                $splice: [[
+                                    state.collapsedRows
+                                        .indexOf(node[keyProperty]), 1
+                                ]]
+                            }
+                        )
                     })
-                }));
+                )
             }else{
-                if(collapsedRows.indexOf(node[keyProperty]) > -1) return;
-                this.setState(prev => ({
-                    collapsedRows: prev.collapsedRows.concat(node[keyProperty])
-                }));
+                if (
+                    this.state.collapsedRows
+                        .indexOf(node[keyProperty]) > -1
+                ) {
+                    return
+                }
+
+                this.setState(
+                    prev => ({
+                        collapsedRows: prev.collapsedRows
+                            .concat(node[keyProperty])
+                    })
+                )
+
                 node.includedDocuments &&
-                    this.handleRowCollapse(node, collapsed);
+                this.handleRowCollapse(node, collapsed);
             }
         })
     }

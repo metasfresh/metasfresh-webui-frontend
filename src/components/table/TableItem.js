@@ -15,13 +15,17 @@ class TableItem extends Component {
     }
 
     handleEditProperty = (e, property, callback) => {
-        const { activeCell } = this.state;
         const elem = document.activeElement;
 
-        if(activeCell !== elem && !elem.className.includes('js-input-field')) {
-            this.setState({
-                activeCell: elem
-            })
+        if (
+            this.state.activeCell !== elem &&
+            !elem.className.includes('js-input-field')
+        ) {
+            this.setState(
+                () => ({
+                    activeCell: elem
+                })
+            )
         }
 
         this.editProperty(e, property, callback);
@@ -33,66 +37,77 @@ class TableItem extends Component {
             !document.activeElement.className.includes('cell-disabled') ||
             document.activeElement.className.includes('cell-readonly')
         ) {
-            this.setState({
-                edited: property
-            }, ()=>{
-                if(callback){
-                    const elem =
-                        document
-                            .activeElement
-                            .getElementsByClassName('js-input-field')[0];
+            this.setState(
+                () => ({
+                    edited: property
+                }),
+                ()=>{
+                    if (callback) {
+                        const elem =
+                            document
+                                .activeElement
+                                .getElementsByClassName('js-input-field')[0];
 
-                    if(elem){
-                        elem.focus();
-                    }
+                        if(elem){
+                            elem.focus();
+                        }
 
-                    const disabled =
-                        document.activeElement.querySelector('.input-disabled');
-                    const readonly =
-                        document.activeElement.querySelector('.input-readonly');
+                        const disabled =
+                            document.activeElement
+                                .querySelector('.input-disabled');
+                        const readonly =
+                            document.activeElement
+                                .querySelector('.input-readonly');
 
-                    if(disabled || readonly) {
-                        changeListenOnTrue();
-                        this.handleEditProperty(e);
+                        if(disabled || readonly) {
+                            changeListenOnTrue();
 
-                    } else {
-                        changeListenOnFalse();
+                            this.handleEditProperty(e);
+
+                        } else {
+                            changeListenOnFalse();
+                        }
                     }
                 }
-            })
+            )
         }
     }
 
     listenOnKeysTrue = () => {
-        this.setState({
-            listenOnKeys: true
-        });
+        this.setState(
+            () => ({
+                listenOnKeys: true
+            })
+        )
     }
 
     listenOnKeysFalse = () => {
-        this.setState({
-            listenOnKeys: false
-        });
+        this.setState(
+            () => ({
+                listenOnKeys: false
+            })
+        )
     }
 
     handleKey = (e, property) => {
-        const { edited, listenOnKeys} = this.state;
-        if(listenOnKeys){
-            if(e.key === 'Enter' && !edited) {
+        if(this.state.listenOnKeys){
+            if (e.key === 'Enter' && !this.state.edited) {
                 this.handleEditProperty(e, property, true);
-            } else if (e.key === 'Enter' && edited) {
+            } else if (e.key === 'Enter' && this.state.edited) {
                 this.closeTableField(e);
             }
         }
     }
 
-    closeTableField = (e) => {
-        const { changeListenOnTrue } = this.props;
-        const {activeCell} = this.state;
-        this.handleEditProperty(e);
-        this.listenOnKeysTrue();
-        changeListenOnTrue();
-        activeCell && activeCell.focus();
+    closeTableField = e => {
+        this.handleEditProperty(e)
+
+        this.listenOnKeysTrue()
+
+        this.props.changeListenOnTrue()
+
+        this.state.activeCell &&
+        this.state.activeCell.focus()
     }
 
     renderCells = (cols, cells) => {
@@ -141,13 +156,17 @@ class TableItem extends Component {
     }
 
     updateRow = () => {
-        this.setState({
+        this.setState(
+            () => ({
                 updatedRow: true
-            }, () => {
+            }),
+            () => {
                 setTimeout(() => {
-                    this.setState({
-                        updatedRow: false
-                    })
+                    this.setState(
+                        () => ({
+                            updatedRow: false
+                        })
+                    )
                 }, 1000);
             }
         )

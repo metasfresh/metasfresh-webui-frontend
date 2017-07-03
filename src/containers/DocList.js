@@ -52,22 +52,28 @@ class DocList extends Component {
         dispatch(updateUri(pathname, query, prop, value));
     }
 
-    setModalTitle = (title) => {
-        this.setState({
-            modalTitle: title
-        })
+    setModalTitle = modalTitle => {
+        this.setState(
+            () => ({
+                modalTitle
+            })
+        )
     }
 
-    setModalDescription = (desc) => {
-        this.setState({
-            modalDescription: desc
-        })
+    setModalDescription = modalDescription => {
+        this.setState(
+            () => ({
+                modalDescription
+            })
+        )
     }
 
-    setNotFound = (isNotFound) => {
-        this.setState({
-            notfound: isNotFound
-        })
+    setNotFound = notfound => {
+        this.setState(
+            () => ({
+                notfound
+            })
+        )
     }
 
     render() {

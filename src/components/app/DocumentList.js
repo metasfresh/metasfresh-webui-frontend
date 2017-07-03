@@ -103,12 +103,12 @@ class DocumentList extends Component {
                 defaultViewId !== this.props.defaultViewId) ||
             refId !== this.props.refId
         ) {
-            this.setState({
+            this.setState(() => ({
                 data:null,
                 layout:null,
                 filters: null,
                 viewId: null
-            }, () => {
+            }), () => {
                 !disconnectFromState && dispatch(selectTableItems([], null))
                 this.fetchLayoutAndData();
             });
@@ -118,27 +118,27 @@ class DocumentList extends Component {
             defaultSort != this.props.defaultSort &&
             defaultSort != sort
         ){
-            this.setState({
+            this.setState(() => ({
                 sort: defaultSort
-            });
+            }));
         }
 
         if(
             defaultPage != this.props.defaultPage &&
             defaultPage != page
         ){
-            this.setState({
+            this.setState(() => ({
                 page: defaultPage || 1
-            });
+            }));
         }
 
         if(
             defaultViewId != this.props.defaultViewId &&
             defaultViewId != viewId
         ) {
-            this.setState({
+            this.setState(() => ({
                 viewId: defaultViewId
-            });
+            }));
         }
 
         /*
@@ -155,13 +155,13 @@ class DocumentList extends Component {
                 // In case of preventing cached selection restore
                 cachedSelection && !disconnectFromState &&
                     dispatch(selectTableItems(cachedSelection, windowType))
-                this.setState({
+                this.setState(() => ({
                     cachedSelection: undefined
-                })
+                }))
             }else{
-                this.setState({
+                this.setState(() => ({
                     cachedSelection: selected
-                })
+                }))
             }
         }
 
@@ -176,11 +176,14 @@ class DocumentList extends Component {
             includedView && includedView.windowType && includedView.viewId
         ){
             // There is no need to restore cached selection in that case
-            this.setState({
-                cachedSelection: null
-            }, () => {
-                dispatch(setListIncludedView());
-            })
+            this.setState(
+              () => ({
+                  cachedSelection: null
+              }),
+              () => {
+                  dispatch(setListIncludedView());
+              }
+            )
         }
     }
 
@@ -197,7 +200,7 @@ class DocumentList extends Component {
                     'documentView', windowType, viewId, changedIds.join()
                 ).then(response => {
                     response.data.map(row => {
-                        this.setState({
+                        this.setState(() => ({
                             data: Object.assign(this.state.data, {}, {
                                 result: this.state.data.result.map(
                                     resultRow =>
@@ -205,7 +208,7 @@ class DocumentList extends Component {
                                             row : resultRow
                                 )
                             })
-                        })
+                        }))
                     })
                 });
             }
@@ -248,9 +251,9 @@ class DocumentList extends Component {
     }
 
     setClickOutsideLock = (value) => {
-        this.setState({
+        this.setState(() => ({
             clickOutsideLock: !!value
-        })
+        }))
     }
     
     clearStaticFilters = () => {
@@ -273,9 +276,9 @@ class DocumentList extends Component {
         initLayout(
             'documentView', windowType, null, null, null, null, type, true
         ).then(response => {
-            this.mounted && this.setState({
+            this.mounted && this.setState(() => ({
                 layout: response.data
-            }, () => {
+            }), () => {
                 if(viewId && !isNewFilter){
                     this.browseView();
                 }else{
@@ -290,10 +293,10 @@ class DocumentList extends Component {
         }).catch(() => {
             // We have to always update that fields to refresh that view!
             // Check the shouldComponentUpdate method
-            this.setState({
+            this.setState(() => ({
                 data: 'notfound',
                 layout: 'notfound'
-            }, () => {
+            }), () => {
                 setNotFound && setNotFound(true);
             })
         })
@@ -324,10 +327,10 @@ class DocumentList extends Component {
         createViewRequest(
             windowType, type, this.pageLength, filters, refType, refId
         ).then(response => {
-            this.mounted && this.setState({
+            this.mounted && this.setState(() => ({
                 data: response.data,
                 viewId: response.data.viewId
-            }, () => {
+            }), () => {
                 this.getData(response.data.viewId, page, sort);
             })
         })
@@ -343,10 +346,10 @@ class DocumentList extends Component {
         filterViewRequest(
             windowType, viewId, filters
         ).then(response => {
-            this.mounted && this.setState({
+            this.mounted && this.setState(() => ({
                 data: response.data,
                 viewId: response.data.viewId
-            }, () => {
+            }), () => {
                 this.getData(response.data.viewId, page, sort);
             })
         })
@@ -371,14 +374,18 @@ class DocumentList extends Component {
         ).then(response => {
             dispatch(indicatorState('saved'));
 
-            this.mounted && this.setState(Object.assign({}, {
-                data: response.data,
-                filters: response.data.filters
-            }, refresh && {
-                refresh: Date.now()
-            }), () => {
-                this.connectWS(response.data.viewId);
-            })
+            this.mounted &&
+            this.setState(
+              () => Object.assign({}, {
+                  data: response.data,
+                  filters: response.data.filters
+              }, refresh && {
+                  refresh: Date.now()
+              }),
+              () => {
+                  this.connectWS(response.data.viewId);
+              }
+            )
         });
     }
 
@@ -403,11 +410,14 @@ class DocumentList extends Component {
                 currentPage = index;
         }
 
-        this.setState({
-            page: currentPage
-        }, () => {
-            this.getData(viewId, currentPage, sort);
-        });
+        this.setState(
+          () => ({
+              page: currentPage
+          }),
+          () => {
+              this.getData(viewId, currentPage, sort);
+          }
+        );
     }
 
     getSortingQuery = (asc, field) => (asc ? '+' : '-') + field;
@@ -415,22 +425,28 @@ class DocumentList extends Component {
     sortData = (asc, field, startPage) => {
         const {viewId, page} = this.state;
 
-        this.setState({
-            sort: this.getSortingQuery(asc, field)
-        }, () => {
-            this.getData(
-                viewId, startPage ? 1 : page, this.getSortingQuery(asc, field)
-            );
-        });
+        this.setState(
+          () => ({
+              sort: this.getSortingQuery(asc, field)
+          }),
+          () => {
+              this.getData(
+                  viewId, startPage ? 1 : page, this.getSortingQuery(asc, field)
+              );
+          }
+        );
     }
 
     handleFilterChange = (filters) => {
-        this.setState({
-            filters: filters,
-            page: 1
-        }, () => {
-            this.fetchLayoutAndData(true);
-        })
+        this.setState(
+          () => ({
+              filters: filters,
+              page: 1
+          }),
+          () => {
+              this.fetchLayoutAndData(true);
+          }
+        )
     }
 
     // END OF MANAGING SORT, PAGINATION, FILTERS -------------------------------

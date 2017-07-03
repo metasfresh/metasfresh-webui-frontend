@@ -79,14 +79,15 @@ class Subheader extends Component {
     }
 
     handleClickOutside = () => {
-        const { closeSubheader } = this.props;
-        closeSubheader();
+        this.props.closeSubheader()
     }
 
-    toggleAttachmentDelete = (value) => {
-        this.setState({
-            attachmentHovered: value
-        })
+    toggleAttachmentDelete = attachmentHovered => {
+        this.setState(
+            () => ({
+                attachmentHovered
+            })
+        )
     }
 
     getColumnActiveElem = () => {
@@ -100,18 +101,19 @@ class Subheader extends Component {
 
     getItemActiveElem = () => {
         const active = document.activeElement;
-        if(
-            active.classList.contains('js-subheader-column')
-        ) {
+
+        if (active.classList.contains('js-subheader-column')) {
             return active.childNodes[1];
         } else {
             return active;
         }
     }
 
-    handleUpdateBreadcrumb = (nodes) => {
-        const {dispatch} = this.props;
-        nodes.map(node => dispatch(updateBreadcrumb(node)));
+    handleUpdateBreadcrumb = nodes => {
+        nodes
+            .map(node =>
+                this.props.dispatch(updateBreadcrumb(node))
+            )
     }
 
     renderNavColumn = () => {

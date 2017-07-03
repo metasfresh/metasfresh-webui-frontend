@@ -10,12 +10,18 @@ class Tooltips extends Component {
     }
 
     componentDidMount() {
-        const {delay} = this.props;
-        this.timeout = setTimeout(() => {
-            this.setState({
-                opacity: 1
-            })
-        }, delay?delay:1000);
+        this.timeout = setTimeout(
+            () => {
+                this.setState(
+                    () => ({
+                        opacity: 1
+                    })
+                )
+            },
+            this.props.delay
+            ? this.props.delay
+            : 1000
+        )
     }
 
     componentWillUnmount() {
@@ -24,12 +30,12 @@ class Tooltips extends Component {
 
     render() {
         const {
-                name, action, type, extraClass,
-                tooltipOnFirstlevelPositionLeft
-        } = this.props;
-        const {opacity} = this.state;
+            name, action, type, extraClass,
+            tooltipOnFirstlevelPositionLeft
+        } = this.props
+
         return (
-            <div style={{opacity: opacity}}>
+            <div style={{opacity: this.state.opacity}}>
                 <div
                     className={
                         'tooltip-wrapp ' +

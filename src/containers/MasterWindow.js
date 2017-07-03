@@ -116,15 +116,19 @@ class MasterWindow extends Component {
         e.returnValue = '';
     }
 
-    closeModalCallback = (isNew) => {
+    closeModalCallback = isNew => {
         if(isNew){
-            this.setState({
+            this.setState(
+                () => ({
                     newRow: true
-                }, () => {
+                }),
+                () => {
                     setTimeout(() => {
-                        this.setState({
-                            newRow: false
-                        })
+                        this.setState(
+                            () => ({
+                                newRow: false
+                            })
+                        )
                     }, 1000);
                 }
             )
@@ -149,13 +153,18 @@ class MasterWindow extends Component {
     }
 
     handleDragStart = () => {
-        this.setState({
-            dropzoneFocused: true
-        }, () => {
-            this.setState({
-                dropzoneFocused: false
-            })
-        })
+        this.setState(
+            () => ({
+                dropzoneFocused: true
+            }),
+            () => {
+                this.setState(
+                    () => ({
+                        dropzoneFocused: false
+                    })
+                )
+            }
+        )
     }
 
     handleRejectDropped(droppedFiles){
@@ -171,16 +180,20 @@ class MasterWindow extends Component {
         ))
     }
 
-    setModalTitle = (title) => {
-        this.setState({
-            modalTitle: title
-        })
+    setModalTitle = modalTitle => {
+        this.setState(
+            () => ({
+                modalTitle
+            })
+        )
     }
 
-    handleDeletedStatus = (param) => {
-        this.setState({
-            isDeleted: param
-        })
+    handleDeletedStatus = isDeleted => {
+        this.setState(
+            () => ({
+                isDeleted
+            })
+        )
     }
 
     sort = (asc, field, startPage, page, tabId) => {

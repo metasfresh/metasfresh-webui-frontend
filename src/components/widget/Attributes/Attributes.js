@@ -66,43 +66,54 @@ class Attributes extends Component {
         getAttributesInstance(
             attributeType, tmpId, docType, dataId, tabId, rowId, fieldName,
             entity
-        ).then(response => {
+        )
+        .then(response => {
             const {id, fieldsByName} = response.data;
 
-            this.setState({
-                data: parseToDisplay(fieldsByName)
-            });
+            this.setState(
+                () => ({
+                    data: parseToDisplay(fieldsByName)
+                })
+            )
 
             return initLayout(attributeType, id);
-        }).then(response => {
+        })
+        .then(response => {
             const {elements} = response.data;
 
-            this.setState({
-                layout: elements
-            });
-        }).then(() => {
-            this.setState({
-                dropdown: true
-            });
+            this.setState(
+                () => ({
+                    layout: elements
+                })
+            )
+        })
+        .then(() => {
+            this.setState(
+                () => ({
+                    dropdown: true
+                })
+            )
         });
     }
 
-    handleToggle = (option) => {
-        const {handleBackdropLock} = this.props;
+    handleToggle = option => {
+        this.setState(
+            () => ({
+                data: null,
+                layout: null,
+                dropdown: null
+            }),
+            () => {
+                //Method is disabling outside click in parents
+                //elements if there is some
+                this.props.handleBackdropLock &&
+                this.props.handleBackdropLock(!!option);
 
-        this.setState({
-            data: null,
-            layout: null,
-            dropdown: null
-        }, () => {
-            //Method is disabling outside click in parents
-            //elements if there is some
-            handleBackdropLock && handleBackdropLock(!!option);
-
-            if(option){
-                this.handleInit();
+                if (option) {
+                    this.handleInit();
+                }
             }
-        })
+        )
     }
 
     handleCompletion = () => {
@@ -122,7 +133,8 @@ class Attributes extends Component {
             return;
         }
 
-        completeRequest(attributeType, attrId).then(response => {
+        completeRequest(attributeType, attrId)
+        .then(response => {
             patch(response.data);
             this.handleToggle(false);
         });

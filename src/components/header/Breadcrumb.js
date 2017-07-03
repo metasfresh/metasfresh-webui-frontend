@@ -18,18 +18,19 @@ class Breadcrumb extends Component {
         }
     }
 
-    linkToPage = (page) => {
-        const {dispatch} = this.props;
-        dispatch(push('/window/' + page));
+    linkToPage = page => {
+        this.props.dispatch(push('/window/' + page));
     }
 
-    toggleTooltip = (tooltip) => {
-        this.setState({
-            tooltipOpen: tooltip
-        })
+    toggleTooltip = tooltipOpen => {
+        this.setState(
+            () => ({
+                tooltipOpen
+            })
+        )
     }
 
-    toggleTooltipOnFirstLevel = (showTooltip) => {
+    toggleTooltipOnFirstLevel = tooltipOnFirstlevel => {
         const breadcrumbWrapper =
             document.getElementsByClassName('header-breadcrumb-wrapper')[0];
         const breadcrumbWrapperLeft =
@@ -39,20 +40,22 @@ class Breadcrumb extends Component {
         const elemWidth = elem && elem.offsetWidth;
         const elemLeft = elem && elem.getBoundingClientRect().left;
 
-        const tooltipPositionLeft =
-            elemLeft + 0.5*elemWidth - breadcrumbWrapperLeft;
-
-        this.setState({
-            tooltipOnFirstlevel: showTooltip,
-            tooltipOnFirstlevelPositionLeft: tooltipPositionLeft
-        })
+        this.setState(
+            () => ({
+                tooltipOnFirstlevel,
+                tooltipOnFirstlevelPositionLeft:
+                  elemLeft + (elemWidth / 2) - breadcrumbWrapperLeft
+            })
+        )
     }
 
     closeTooltips = () => {
-        this.setState({
-            tooltipOpen: false,
-            tooltipOnFirstlevel: false
-        })
+        this.setState(
+            () => ({
+                tooltipOpen: false,
+                tooltipOnFirstlevel: false
+            })
+        )
     }
 
     handleClick = (e, menu) => {

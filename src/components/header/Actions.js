@@ -24,22 +24,31 @@ class Actions extends Component {
         } = this.props;
 
         if(!windowType || docId === 'notfound' || notfound){
-            this.setState({
-                data: []
-            })
+            this.setState(
+                () => ({
+                    data: []
+                })
+            )
+
             return;
         }
 
         actionsRequest(
             entity, windowType, docId, rowId
-        ).then((response) => {
-            this.setState({
-                data: response.data.actions
-            });
-        }).catch(() => {
-            this.setState({
-                data: []
-            })
+        )
+        .then(response => {
+            this.setState(
+                () => ({
+                    data: response.data.actions
+                })
+            )
+        })
+        .catch(() => {
+            this.setState(
+                () => ({
+                    data: []
+                })
+            )
         })
     }
 

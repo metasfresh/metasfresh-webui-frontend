@@ -27,82 +27,115 @@ class Lookup extends Component {
         }
     }
 
-    componentDidMount() {
-        this.checkIfDefaultValue();
+    componentDidMount = () => {
+        this.checkIfDefaultValue()
     }
 
     handleClickOutside = () => {
-        this.setState({
-            fireClickOutside: true,
-            property: ''
-        }, () => {
-            this.setState({
-                fireClickOutside: false
+        this.setState(
+            () => ({
+                fireClickOutside: true,
+                property: ''
+            }),
+            () => {
+                this.setState(
+                    () => ({
+                        fireClickOutside: false
+                    })
+                )
+            }
+        )
+    }
+
+    handleInputEmptyStatus = isInputEmpty => {
+        this.setState(
+            () => ({
+                isInputEmpty
             })
-        })
+        )
     }
 
-    handleInputEmptyStatus = (isEmpty) => {
-        this.setState({
-            isInputEmpty: isEmpty
-        })
-    }
+    setNextProperty = prop => {
+        this.props.defaultValue
+        .map((item, index)=>{
+            const nextIndex = index + 1
 
-    setNextProperty = (prop)=> {
-        const {defaultValue, properties} = this.props;
+            if(
+                nextIndex < this.props.defaultValue.length &&
+                this.props.defaultValue[index].field === prop
+            ) {
+                this.setState(
+                    () => ({
+                        property: this.props.properties[nextIndex].field
+                    })
+                )
 
-        defaultValue.map((item, index)=>{
-            const nextIndex = index+1;
-            if(nextIndex<defaultValue.length &&
-                defaultValue[index].field === prop){
-                this.setState({
-                    property: properties[nextIndex].field
-                })
-                return;
-            } else if(defaultValue[defaultValue.length-1].field === prop){
-                this.setState({
-                    property: ''
-                })
+                return
+            } else if (
+                this.props
+                    .defaultValue[this.props.defaultValue.length-1]
+                    .field === prop
+            ) {
+                this.setState(
+                    () => ({
+                        property: ''
+                    })
+                )
             }
         })
     }
 
     checkIfDefaultValue = () => {
-        const {defaultValue} = this.props;
-        defaultValue.map(item => {
+        this.props.defaultValue
+        .map(item => {
             if(item.value){
-                this.setState({
-                    isInputEmpty: false
-                })
+                this.setState(
+                    () => ({
+                        isInputEmpty: false
+                    })
+                )
             }
         });
     }
 
     openDropdownList = () => {
-        this.setState({
-            fireDropdownList: true
-        }, () => {
-            this.setState({
-                fireDropdownList: false
-            })
-        })
+        this.setState(
+            () => ({
+                fireDropdownList: true
+            }),
+            () => {
+                this.setState(
+                    () => ({
+                        fireDropdownList: false
+                    })
+                )
+            }
+        )
     }
 
     resetLocalClearing = () => {
-        this.setState({
-            localClearing: false
-        })
+        this.setState(
+            () => ({
+                localClearing: false
+            })
+        )
     }
 
     handleClear = () => {
-        const {onChange, properties} = this.props;
-        onChange(properties, null, false);
-        this.setState({
-            isInputEmpty: true,
-            property: '',
-            initialFocus: true,
-            localClearing: true
-        });
+        this.props.onChange(this.props.properties, null, false)
+
+        this.setState(
+            () => ({
+                isInputEmpty: true,
+                property: '',
+                initialFocus: true,
+                localClearing: true
+            })
+        )
+    }
+
+    getDropDownRef = dropdown => {
+        this.dropdown = dropdown
     }
 
     render() {
@@ -121,7 +154,7 @@ class Lookup extends Component {
 
         return (
             <div
-                ref={(c) => this.dropdown = c}
+                ref={this.getDropDownRef}
                 className={
                     'input-dropdown-container lookup-wrapper input-' +
                     (rank ? rank : 'primary') +
@@ -140,73 +173,75 @@ class Lookup extends Component {
             >
 
             {
-                properties && properties.map((item, index) => {
-                        const disabled = isInputEmpty && index != 0;
-                        if(item.source === 'lookup' ||
-                            item.widgetType === 'Lookup'){
-                            return <RawLookup
-                                key={index}
-                                defaultValue={
-                                    getItemsByProperty(defaultValue,
-                                            'field', item.field)[0].value
+                properties &&
+                properties
+                .map((item, index) => {
+                    const disabled = isInputEmpty && index != 0;
+                    if(item.source === 'lookup' ||
+                        item.widgetType === 'Lookup'){
+                        return <RawLookup
+                            key={index}
+                            defaultValue={
+                                getItemsByProperty(defaultValue,
+                                        'field', item.field)[0].value
+                            }
+                            mainProperty={[item]}
+                            handleInputEmptyStatus={
+                                this.handleInputEmptyStatus
+                            }
+                            resetLocalClearing={this.resetLocalClearing}
+                            initialFocus={index===0 ? initialFocus : false}
+                            setNextProperty={this.setNextProperty}
+                            lookupEmpty={isInputEmpty}
+                            fireDropdownList={fireDropdownList}
+                            {...{placeholder, readonly, tabIndex,
+                            windowType, parameterName, entity, dataId,
+                            isModal, recent, rank, updated, filterWidget,
+                            mandatory, validStatus, align, onChange, item,
+                            disabled, fireClickOutside, viewId, subentity,
+                            subentityId, autoFocus, tabId, rowId,
+                            newRecordCaption, newRecordWindowId,
+                            localClearing}}
+                        />
+
+                    } else if (item.source === 'list') {
+
+                        const objectValue = getItemsByProperty(
+                            defaultValue, 'field', item.field
+                        )[0].value;
+
+                        return <div
+                            className={
+                                'raw-lookup-wrapper ' +
+                                'raw-lookup-wrapper-bcg ' +
+                                (disabled ? 'raw-lookup-disabled':'')
                                 }
-                                mainProperty={[item]}
-                                handleInputEmptyStatus={
-                                    this.handleInputEmptyStatus
-                                }
-                                resetLocalClearing={this.resetLocalClearing}
-                                initialFocus={index===0 ? initialFocus : false}
-                                setNextProperty={this.setNextProperty}
-                                lookupEmpty={isInputEmpty}
-                                fireDropdownList={fireDropdownList}
-                                {...{placeholder, readonly, tabIndex,
-                                windowType, parameterName, entity, dataId,
-                                isModal, recent, rank, updated, filterWidget,
-                                mandatory, validStatus, align, onChange, item,
-                                disabled, fireClickOutside, viewId, subentity,
-                                subentityId, autoFocus, tabId, rowId,
-                                newRecordCaption, newRecordWindowId,
-                                localClearing}}
-                            />
-
-                        } else if (item.source === 'list') {
-
-                            const objectValue = getItemsByProperty(
-                                defaultValue, 'field', item.field
-                            )[0].value;
-
-                            return <div
-                                className={
-                                    'raw-lookup-wrapper ' +
-                                    'raw-lookup-wrapper-bcg ' +
-                                    (disabled ? 'raw-lookup-disabled':'')
+                            key={index}>
+                                <List
+                                    {...{dataId, entity, windowType,
+                                        filterWidget, tabId, rowId,
+                                        subentity, subentityId, viewId,
+                                        onChange, isInputEmpty, property
+                                    }}
+                                    properties={[item]}
+                                    lookupList={true}
+                                    autofocus={
+                                        item.field == property ?
+                                        true : false
                                     }
-                                key={index}>
-                                    <List
-                                        {...{dataId, entity, windowType,
-                                            filterWidget, tabId, rowId,
-                                            subentity, subentityId, viewId,
-                                            onChange, isInputEmpty, property
-                                        }}
-                                        properties={[item]}
-                                        lookupList={true}
-                                        autofocus={
-                                            item.field == property ?
-                                            true : false
-                                        }
-                                        defaultValue={
-                                            objectValue ?
-                                            objectValue : ''
-                                        }
-                                        initialFocus={
-                                            index===0 ? initialFocus : false
-                                        }
-                                        setNextProperty={this.setNextProperty}
-                                        mainProperty={[item]}
-                                        blur={!property?true:false}
-                                        readonly={disabled || readonly}
-                                    />
-                                </div>
+                                    defaultValue={
+                                        objectValue ?
+                                        objectValue : ''
+                                    }
+                                    initialFocus={
+                                        index===0 ? initialFocus : false
+                                    }
+                                    setNextProperty={this.setNextProperty}
+                                    mainProperty={[item]}
+                                    blur={!property?true:false}
+                                    readonly={disabled || readonly}
+                                />
+                            </div>
                         }
                 })
             }

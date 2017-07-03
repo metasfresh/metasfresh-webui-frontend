@@ -40,17 +40,21 @@ class TableQuickInput extends Component {
     }
 
     componentDidUpdate() {
-        const {data, layout, editedField} = this.state;
-        if(data && layout){
-            for(let i = 0; i < layout.length; i++){
+        if(this.state.data && this.state.layout){
+            for(let i = 0; i < this.state.layout.length; i++) {
                 const item =
-                    layout[i].fields.map(elem => data[elem.field] || -1);
+                    this.state.layout[i].fields
+                        .map(elem =>
+                            this.state.data[elem.field] || -1
+                        )
 
                 if(!item[0].value){
-                    if(editedField !== i){
-                        this.setState({
-                            editedField: i
-                        })
+                    if(this.state.editedField !== i){
+                        this.setState(
+                            () => ({
+                                editedField: i
+                            })
+                        )
                     }
 
                     break;
@@ -60,83 +64,111 @@ class TableQuickInput extends Component {
     }
 
     initQuickInput = () => {
-        const {dispatch, docType, docId, tabId, closeBatchEntry} = this.props;
-        const {layout} = this.state;
-
-        this.setState({
-            data: null
-        }, () => {
-            createInstance(
-                'window', docType, docId, tabId, 'quickInput'
-            ).then(instance => {
-                this.setState({
-                    data: parseToDisplay(instance.data.fieldsByName),
-                    id: instance.data.id,
-                    editedField: 0
-                });
-            }).catch(err => {
-                if(err.response.status === 404){
-                    dispatch(addNotification(
-                        'Batch entry error',
-                        'Batch entry is not available.', 5000, 'error'));
-                    closeBatchEntry();
-                }
-            });
-
-            !layout && initLayout(
-                'window', docType, tabId, 'quickInput', docId
-            ).then(layout => {
-                this.setState({
-                    layout: layout.data.elements
+        this.setState(
+            () => ({
+                data: null
+            }),
+            () => {
+                createInstance(
+                    'window',
+                    this.props.docType,
+                    this.props.docId,
+                    this.props.tabId,
+                    'quickInput'
+                )
+                .then(instance => {
+                    this.setState(
+                        () => ({
+                            data: parseToDisplay(instance.data.fieldsByName),
+                            id: instance.data.id,
+                            editedField: 0
+                        })
+                    )
                 })
-            });
-        });
+                .catch(err => {
+                    if(err.response.status === 404){
+                        this.props.dispatch(
+                            addNotification(
+                                'Batch entry error',
+                                'Batch entry is not available.', 5000, 'error'
+                            )
+                        )
+
+                        this.props.closeBatchEntry();
+                    }
+                })
+
+                !this.state.layout &&
+                initLayout(
+                    'window',
+                    this.props.docType,
+                    this.props.tabId,
+                    'quickInput',
+                    this.props.docId
+                )
+                .then(layout => {
+                    this.setState(
+                        () => ({
+                            layout: layout.data.elements
+                        })
+                    )
+                })
+            }
+        )
     }
 
     handleChange = (field, value) => {
-        this.setState(prevState => ({
-            data: Object.assign({}, prevState.data, {
-                [field]: Object.assign({}, prevState.data[field], {
-                    value
+        this.setState(
+            state => ({
+                data: Object.assign({}, state.data, {
+                    [field]: Object.assign({}, state.data[field], {
+                        value
+                    })
                 })
             })
-        }))
+        )
     }
 
     handlePatch = (prop, value, callback) => {
-        const {docType, docId, tabId} = this.props;
-        const {id} = this.state;
-
         this.patchPromise = new Promise(resolve => {
             patchRequest(
-                'window', docType, docId, tabId, null, prop, value,
-                'quickInput', id
-            ).then(response => {
+                'window',
+                this.props.docType,
+                this.props.docId,
+                this.props.tabId,
+                null,
+                prop,
+                value,
+                'quickInput',
+                this.state.id
+            )
+            .then(response => {
                 const fields = response.data[0] && response.data[0].fieldsByName
 
                 fields && Object.keys(fields).map(fieldName => {
 
-                    this.setState(prevState => ({
-                        data: Object.assign({}, prevState.data, {
-                            [fieldName]: Object.assign({},
-                                prevState.data[fieldName],
-                                fields[fieldName]
-                            )
-                        })
-                    }), () => {
-                        if(callback){
-                            callback();
+                    this.setState(
+                        prevState => ({
+                            data: Object.assign({}, prevState.data, {
+                                [fieldName]: Object.assign({},
+                                    prevState.data[fieldName],
+                                    fields[fieldName]
+                                )
+                            })
+                        }),
+                        () => {
+                            if(callback){
+                                callback();
+                            }
+                            resolve();
                         }
-                        resolve();
-                    });
+                    )
                 })
             })
         });
     }
 
     renderFields = (layout, data, dataId, attributeType, quickInputId) => {
-        const {tabId, docType} = this.props;
-
         if(data && layout){
             return layout.map((item, id) => {
                 const widgetData =
@@ -145,8 +177,8 @@ class TableQuickInput extends Component {
                     entity={attributeType}
                     subentity="quickInput"
                     subentityId={quickInputId}
-                    tabId={tabId}
-                    windowType={docType}
+                    tabId={this.props.tabId}
+                    windowType={this.props.docType}
                     widgetType={item.widgetType}
                     fields={item.fields}
                     dataId={dataId}

@@ -48,13 +48,15 @@ class DataLayoutWrapper extends Component {
         ).then(response => {
             const preparedData = parseToDisplay(response.data[0].fieldsByName);
             preparedData && Object.keys(preparedData).map(key => {
-                this.setState(prevState => ({
-                    data: Object.assign({}, prevState.data, {
-                        [key]: Object.assign(
-                            {}, prevState.data[key], preparedData[key]
-                        )
+                this.setState(
+                    state => ({
+                        data: Object.assign({}, state.data, {
+                            [key]: Object.assign(
+                                {}, state.data[key], preparedData[key]
+                            )
+                        })
                     })
-                }))
+                )
             })
         });
 
@@ -62,21 +64,28 @@ class DataLayoutWrapper extends Component {
     }
 
     setData = (data, dataId, cb) => {
-        const preparedData = parseToDisplay(data);
-        this.mounted && this.setState({
-            data: preparedData,
-            dataId: dataId
-        }, () => {
-            cb && cb();
-        });
+        this.mounted &&
+        this.setState(
+            () => ({
+                data: parseToDisplay(data),
+                dataId
+            }),
+            () => {
+                cb && cb();
+            }
+        )
     }
 
     setLayout = (layout, cb) => {
-        this.mounted && this.setState({
-            layout: layout
-        }, () => {
-            cb && cb();
-        });
+        this.mounted &&
+        this.setState(
+            () => ({
+                layout: layout
+            }),
+            () => {
+                cb && cb();
+            }
+        )
     }
 
     render() {

@@ -12,30 +12,45 @@ class BookmarkButton extends Component {
         }
     }
 
-    componentWillReceiveProps = (next) => {
+    componentWillReceiveProps = next => {
         if(next.isBookmark !== this.props.isBookmark){
-            this.setState({
-                isBookmark: next.isBookmark
-            })
+            this.setState(
+                () => ({
+                    isBookmark: next.isBookmark
+                })
+            )
         }
     }
 
     toggleBookmarkButton = () => {
-        this.setState(prev => ({
-            isBookmarkButtonShowed: !prev.isBookmarkButtonShowed
-        }));
+        this.setState(
+            state => ({
+                isBookmarkButtonShowed: !state.isBookmarkButtonShowed
+            })
+        )
     }
 
     handleClick = () => {
-        const {dispatch, nodeId, updateData} = this.props;
-        const {isBookmark} = this.state;
-
         patchRequest(
-            'menu', null, null, null, null, 'favorite', !isBookmark, 'node',
-            nodeId
-        ).then(response => {
-            this.setState({isBookmark: !isBookmark})
-            updateData && updateData(response.data);
+            'menu',
+            null,
+            null,
+            null,
+            null,
+            'favorite',
+            !this.state.isBookmark,
+            'node',
+            this.props.nodeId
+        )
+        .then(response => {
+            this.setState(
+                state => ({
+                    isBookmark: !state.isBookmark
+                })
+            )
+
+            this.props.updateData &&
+            this.props.updateData(response.data)
         });
     }
 

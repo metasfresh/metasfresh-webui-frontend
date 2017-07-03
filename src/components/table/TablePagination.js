@@ -13,64 +13,80 @@ class TablePagination extends Component {
         }
     }
 
-    handleValue = (e) => {
-        e.preventDefault();
-        this.setState({
-            value: e.target.value ? e.target.value : ''
-        })
+    handleValue = e => {
+        e.preventDefault()
+
+        this.setState(
+            () => ({
+                value: e.target.value
+                ? e.target.value
+                : ''
+            })
+        )
     }
 
     handleSubmit = (e, value, pages) => {
-        const {handleChangePage, deselect} = this.props;
-        if(e.key === 'Enter'){
+        if (e.key === 'Enter') {
             e.preventDefault();
 
-            if(value <= pages && value > 0){
-                handleChangePage(Number(value));
-                deselect();
-                this.setState({
-                    value: '',
-                    secondDotsState: false,
-                    firstDotsState: false
-                });
+            if (value <= pages && value > 0) {
+                this.props.handleChangePage(Number(value))
+
+                this.props.deselect()
+
+                this.setState(
+                    () => ({
+                        value: '',
+                        secondDotsState: false,
+                        firstDotsState: false
+                    })
+                )
             }
 
         }
     }
 
     handleFirstDotsState = () => {
-        const {firstDotsState} = this.state;
-        this.setState({
-            firstDotsState: !firstDotsState
-        }, () => {
-            if(!firstDotsState){
-                this.goToPage.focus();
+        this.setState(
+            state => ({
+                firstDotsState: !state.firstDotsState
+            }),
+            () => {
+                if(!this.state.firstDotsState){
+                    this.goToPage.focus();
+                }
             }
-        });
+        )
     }
 
     handleSecondDotsState = () => {
-        const {secondDotsState} = this.state;
-        this.setState({
-            secondDotsState: !secondDotsState
-        }, () => {
-            if(!secondDotsState) {
-                this.goToPage.focus();
+        this.setState(
+            state => ({
+                secondDotsState: !state.secondDotsState
+            }),
+            () => {
+                if(!this.state.secondDotsState) {
+                    this.goToPage.focus();
+                }
             }
-        });
+        )
     }
 
-    handleSelectWholePage = (value) => {
-        this.setState({
-            selectedWholePage: value
-        })
+    handleSelectWholePage = selectedWholePage => {
+        this.setState(
+            () => ({
+                selectedWholePage
+            })
+        )
     }
 
     resetGoToPage = () => {
-        this.setState({
-            secondDotsState: false,
-            firstDotsState: false
-        })
+        this.setState(
+            () => ({
+                secondDotsState: false,
+                firstDotsState: false
+            })
+        )
     }
 
     renderGoToPage = (pages, value) => {

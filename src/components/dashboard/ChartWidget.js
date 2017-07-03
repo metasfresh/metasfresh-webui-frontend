@@ -15,16 +15,22 @@ export class ChartWidget extends Component {
     }
 
     handleClickOutside = () => {
-        this.setState({
-            toggleWidgetMenu: false
-        })
+        this.setState(
+            () => ({
+                toggleWidgetMenu: false
+            })
+        )
     }
 
     toggleMenu = (opt) => {
         const { toggleWidgetMenu } = this.state;
-        this.setState({
-            toggleWidgetMenu: typeof opt === 'boolean' ? opt : !toggleWidgetMenu
-        })
+        this.setState(
+            () => ({
+                toggleWidgetMenu: typeof opt === 'boolean'
+                ? opt
+                : !toggleWidgetMenu
+            })
+        )
     }
 
     render() {
@@ -45,7 +51,7 @@ export class ChartWidget extends Component {
             <div>
                 <div
                     className={
-                        "draggable-widget-header " +
+                        'draggable-widget-header ' +
                         (editmode ? 'draggable-widget-edited ' : '')
                     }
                     onDoubleClick={!editmode && (() => {
@@ -85,15 +91,18 @@ export class ChartWidget extends Component {
                 </div>
 
                 <div className="draggable-widget-body">
-                    {!framework ? <RawChart
-                        {...{
-                            index, chartType, caption, fields, groupBy,
-                            pollInterval, height, isMaximized, id, noData
-                        }}
-                        responsive={true}
-                        chartTitle={text}
-                    /> : 
-                        <div>{chartType}</div>
+                    {
+                        framework
+                        ? <div>{chartType}</div>
+                        : <RawChart {
+                              ...{
+                                  index, chartType, caption, fields, groupBy,
+                                  pollInterval, height, isMaximized, id, noData
+                              }
+                          }
+                          responsive={true}
+                          chartTitle={text}
+                        />
                     }
                 </div>
             </div>

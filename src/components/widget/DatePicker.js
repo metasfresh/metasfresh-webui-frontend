@@ -12,48 +12,49 @@ class DatePicker extends Component {
     }
 
     componentDidMount() {
-        const {handleBackdropLock} = this.props;
-        handleBackdropLock && handleBackdropLock(true);
+        this.props.handleBackdropLock &&
+        this.props.handleBackdropLock(true);
     }
 
-    handleBlur = (date) => {
-        const {patch, handleBackdropLock} = this.props;
-        const {cache} = this.state;
-
-        if(JSON.stringify(cache) !== (
-            date !== '' ? JSON.stringify(date && date.toDate()) : ''
-        )){
-            patch(date);
+    handleBlur = date => {
+        if (
+            JSON.stringify(this.state.cache) !== (
+              date !== ''
+              ? JSON.stringify(date && date.toDate())
+              : ''
+            )
+        ) {
+            this.props.patch(date)
         }
 
-        this.handleClose();
+        this.handleClose()
 
-        handleBackdropLock && handleBackdropLock(false);
+        this.props.handleBackdropLock &&
+        this.props.handleBackdropLock(false)
     }
 
     handleFocus = () => {
-        const {value} = this.props;
-        this.setState({
-            cache: value,
-            open: true
-        });
+        this.setState(
+            () => ({
+                cache: this.props.value,
+                open: true
+            })
+        )
     }
 
     handleClose = () => {
-        this.setState({
-            open: false
-        });
-    }
-
-    handleClickOutside = () => {
-        this.handleClose();
+        this.setState(
+            () => ({
+                open: false
+            })
+        )
     }
 
     renderDay = (props, currentDate) => {
         return (
             <td
                 {...props}
-                onDoubleClick={() => this.handleClose()}
+                onDoubleClick={this.handleClose}
             >
                 {currentDate.date()}
             </td>
