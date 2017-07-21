@@ -186,7 +186,9 @@ class DocumentList extends Component {
             this.setState({
                 cachedSelection: null
             }, () => {
-                dispatch(setListIncludedView());
+                if (includedView.windowType === 'pickingSlot') {
+                    dispatch(setListIncludedView());
+                }
             })
         }
     }
