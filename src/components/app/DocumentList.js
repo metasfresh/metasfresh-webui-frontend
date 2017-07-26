@@ -55,7 +55,7 @@ class DocumentList extends Component {
             viewId: defaultViewId,
             page: defaultPage || 1,
             sort: defaultSort,
-            filters: [],
+            filters: null,
 
             clickOutsideLock: false,
             refresh: null,
@@ -449,10 +449,11 @@ class DocumentList extends Component {
     }
 
     handleFilterChange = (filter, add = true) => {
+        const stateFilter = this.state.filters || [];
         if (add) {
             this.setState({
                 filters: this.uniqueFilters([
-                    filter, ...this.state.filters
+                    filter, ...stateFilter
                 ], 'filterId'),
                 page: 1
             }, () => {
@@ -460,7 +461,7 @@ class DocumentList extends Component {
             });
         } else {
             this.setState({
-                filters: this.state.filters.filter(item => {
+                filters: stateFilter.filter(item => {
                     return item.filterId !== filter.filterId;
                 }),
                 page: 1
