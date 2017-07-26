@@ -55,7 +55,7 @@ class DocumentList extends Component {
             viewId: defaultViewId,
             page: defaultPage || 1,
             sort: defaultSort,
-            filters: null,
+            filters: [],
 
             clickOutsideLock: false,
             refresh: null,
@@ -434,13 +434,40 @@ class DocumentList extends Component {
         });
     }
 
-    handleFilterChange = (filters) => {
-        this.setState({
-            filters: filters,
-            page: 1
-        }, () => {
-            this.fetchLayoutAndData(true);
-        })
+    uniqueFilters = (array, key) => {
+        const keys = array.map(k => k[key]);
+        const uniqObject = keys.reduce((curr, next) => {
+            if (!curr[next])
+                curr[next] = true;
+            return curr;
+        }, {});
+        const uniqKeys = Object.keys(uniqObject);
+
+        return uniqKeys.map((k) => {
+            return array.filter(i => i[key] === k)[0];
+        });
+    }
+
+    handleFilterChange = (filter, add = true) => {
+        if (add) {
+            this.setState({
+                filters: this.uniqueFilters([
+                    filter, ...this.state.filters
+                ], 'filterId'),
+                page: 1
+            }, () => {
+                this.fetchLayoutAndData(true);
+            });
+        } else {
+            this.setState({
+                filters: this.state.filters.filter(item => {
+                    return item.filterId !== filter.filterId;
+                }),
+                page: 1
+            }, () => {
+                this.fetchLayoutAndData(true);
+            });
+        }
     }
 
     // END OF MANAGING SORT, PAGINATION, FILTERS -------------------------------
