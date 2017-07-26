@@ -49,19 +49,19 @@ class Filters extends Component {
                     Object.assign({}, filter, {
                         parameters: this.parseToPatch(filter.parameters)
                     }) : filter;
-                this.setFilterActive([parsedFilter]);
+                this.setFilterActive(parsedFilter);
                 cb && cb();
             }
         });
     }
 
-    setFilterActive = (filter) => {
+    setFilterActive = (filter, add = true) => {
         const {updateDocList} = this.props;
 
         this.setState({
             filter: filter
         }, () => {
-            updateDocList(filter);
+            updateDocList(filter, add);
         })
     }
 
@@ -76,7 +76,7 @@ class Filters extends Component {
     }
 
     clearFilters = () => {
-        this.setFilterActive(null)
+        this.setFilterActive(this.state.filter, false);
     }
 
     dropdownToggled = () => {
