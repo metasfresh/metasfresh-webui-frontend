@@ -236,20 +236,31 @@ export function loginSuccess(auth) {
 
         getUserSession().then(session => {
             dispatch(userSessionInit(session.data));
+
             languageSuccess(Object.keys(session.data.language)[0]);
-            initNumeralLocales(Object.keys(session.data.language)[0], session.data.locale);
+            initNumeralLocales(
+                Object.keys(session.data.language)[0], session.data.locale
+            );
+
             auth.initSessionClient(session.data.websocketEndpoint, msg => {
                 const me = JSON.parse(msg.body);
+
                 dispatch(userSessionUpdate(me));
-                me.language && languageSuccess(Object.keys(me.language)[0]);
-                me.locale && initNumeralLocales(Object.keys(me.language)[0], me.locale);
+
+                me.language && languageSuccess(
+                    Object.keys(me.language)[0]
+                );
+
+                me.locale && initNumeralLocales(
+                    Object.keys(me.language)[0], me.locale
+                );
+
                 getNotifications().then(response => {
                     dispatch(getNotificationsSuccess(
                         response.data.notifications,
                         response.data.unreadCount
                     ));
                 });
-                
 /*
                 getMessages().then(response => {
                     counterpart.registerTranslations('lang', response.data);
@@ -322,7 +333,8 @@ function initNumeralLocales (lang, locale) {
 
 export function languageSuccess(lang) {
     localStorage.setItem(LOCAL_LANG, lang);
-    Moment.locale(lang);    
+
+    Moment.locale(lang);
 
     axios.defaults.headers.common['Accept-Language'] = lang;
 }
@@ -483,7 +495,8 @@ function forceUpdateIfPending(internalInstance) {
 
         if (typeof publicInstance.forceUpdate === 'function') {
             publicInstance.forceUpdate();
-        } else if (updater && typeof updater.enqueueForceUpdate === 'function') {
+        }
+        else if (updater && typeof updater.enqueueForceUpdate === 'function') {
             updater.enqueueForceUpdate(publicInstance);
         }
     }

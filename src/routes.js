@@ -4,6 +4,7 @@ import {push} from 'react-router-redux';
 
 import Login from './containers/Login.js';
 import Board from './containers/Board.js';
+import PluginHost from './containers/PluginHost.js';
 import Dashboard from './containers/Dashboard.js';
 import MasterWindow from './containers/MasterWindow.js';
 import DocList from './containers/DocList.js';
@@ -92,6 +93,13 @@ export const getRoutes = (store, auth) => {
                             boardId={nextState.params.boardId}
                         />
                     }
+                />
+                <Route path="/plugin/:pluginName"
+                       component={(nextState) =>
+                           <PluginHost
+                               pluginName={nextState.params.pluginName}
+                           />
+                       }
                 />
                 <Route path="/inbox" component={InboxAll} />
                 <Route path="/logout" onEnter={logout} />
