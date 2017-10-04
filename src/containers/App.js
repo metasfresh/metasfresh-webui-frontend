@@ -11,6 +11,9 @@ import { syncHistoryWithStore, push } from 'react-router-redux';
 import { Router, browserHistory } from 'react-router';
 
 import Auth from '../services/Auth';
+
+import PluginsRegistry from '../services/PluginsRegistry';
+
 import Translation from '../components/Translation';
 
 import NotificationHandler
@@ -38,6 +41,10 @@ export default class App extends Component {
         super();
 
         this.auth = new Auth();
+
+        this.pluginsRegistry = new PluginsRegistry(this);
+        window.META_HOST_APP = this;
+        this.sendReadyEvent();
 
         axios.defaults.withCredentials = true;
         axios.defaults.headers.common['Content-Type'] = 'application/json';
@@ -115,11 +122,58 @@ export default class App extends Component {
             const valuesFlatten = values.map(item => Object.keys(item)[0]);
             const lang = valuesFlatten.indexOf(navigator.language) > -1 ?
                 navigator.language : defaultValue;
-                
+
             languageSuccess(lang);
         });
-        
+
         counterpart.setMissingEntryGenerator(() => '');
+    }
+
+    sendReadyEvent() {
+        let event = new Event('HOST_APP_READY');
+        event.hostApp = this;
+        document.dispatchEvent(event);
+    }
+
+    getRegistry() {
+        return this.pluginsRegistry;
+    }
+
+    getStore() {
+        return store;
+    }
+
+    getHistory() {
+        return history;
+    }
+
+    translate(key, options) {
+        return counterpart.translate(key, options);
+    }
+
+    unloadPlugin(pluginName) {
+        this.pluginsRegistry.unload(pluginName);
+    }
+
+    register(pluginName, pluginFactory, pluginPriority = 100) {
+        this.pluginsRegistry.register(
+            pluginName,
+            pluginFactory,
+            pluginPriority
+        );
+    }
+
+    notify(eventName, eventDetails = {}) {
+        if (eventName) {
+            this.handlePluginNotification(eventName, eventDetails);
+        }
+    }
+
+    handlePluginNotification(eventName) {
+        switch (eventName) {
+            default:
+                return true;
+        }
     }
 
     render() {
