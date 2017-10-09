@@ -140,7 +140,7 @@ class QuickActions extends Component {
         this.setState({
             loading: true
         });
-*/
+        */
 
         if (windowType && viewId && selected) {
             quickActionsRequest(windowType, viewId, selected)

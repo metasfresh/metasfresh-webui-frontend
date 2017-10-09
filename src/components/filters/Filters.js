@@ -35,7 +35,7 @@ class Filters extends Component {
     // SETTING FILTERS  --------------------------------------------------------
 
     /*
-     *   This method should update docList
+     * This method should update docList
      */
     applyFilters = (filter, cb) => {
         const valid = this.isFilterValid(filter);
@@ -85,8 +85,8 @@ class Filters extends Component {
     };
 
     /*
-     *  Mehod to lock backdrop, to do not close on click onClickOutside
-     *  widgets that are bigger than filter wrapper
+     * Mehod to lock backdrop, to do not close on click onClickOutside
+     * widgets that are bigger than filter wrapper
      */
     handleShow = value => {
         this.setState({

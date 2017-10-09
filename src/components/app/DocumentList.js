@@ -343,7 +343,7 @@ class DocumentList extends Component {
     };
 
     /*
-     *  If viewId exist, than browse that view.
+     * If viewId exist, than browse that view.
      */
     browseView = refresh => {
         const { viewId, page, sort } = this.state;

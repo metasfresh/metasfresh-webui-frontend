@@ -80,7 +80,8 @@ class Header extends Component {
             /*
             dispatch(replace(''));
             dispatch(replace(pathname));
-*/
+            */
+
             // Need to reload page completely when current locale gets changed
             window.location.reload(false);
         }

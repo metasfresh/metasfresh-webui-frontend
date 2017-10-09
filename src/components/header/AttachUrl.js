@@ -80,9 +80,6 @@ class AttachUrl extends Component {
         const { handleClose } = this.props;
         const { url, name, nameFromUrl } = this.state;
 
-        // TODO: increase max-len or find another way to avoid this
-        // (following this rule here decreases this JSX' readability)
-        /* eslint-disable max-len */
         return (
             <div className="screen-freeze">
                 <div className="panel panel-modal panel-attachurl panel-modal-primary">
@@ -145,7 +142,6 @@ class AttachUrl extends Component {
                 </div>
             </div>
         );
-        /* eslint-enable max-len */
     }
 }
 

@@ -54,8 +54,8 @@ export default class App extends Component {
                 }
 
                 /*
-             * Authorization error
-             */
+                 * Authorization error
+                 */
                 if (error.response.status == 401) {
                     store.dispatch(setProcessSaved());
                     logoutSuccess(this.auth);

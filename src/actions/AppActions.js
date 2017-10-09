@@ -266,7 +266,7 @@ export function loginSuccess(auth) {
             counterpart.registerTranslations('lang', response.data);
             counterpart.setLocale('lang');
         });
-*/
+        */
 
         getUserSession().then(session => {
             dispatch(userSessionInit(session.data));
@@ -297,7 +297,7 @@ export function loginSuccess(auth) {
                     counterpart.registerTranslations('lang', response.data);
                     counterpart.setLocale('lang');
                 });
-*/
+                */
             });
         });
 
