@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import counterpart from 'counterpart';
 
 import Window from '../Window';
@@ -10,7 +10,7 @@ import OverlayField from './OverlayField';
 import keymap from '../../keymap.js';
 import ModalContextShortcuts from '../shortcuts/ModalContextShortcuts';
 import { ShortcutManager } from 'react-shortcuts';
-import Tooltips from '../tooltips/Tooltips.js'
+import Tooltips from '../tooltips/Tooltips.js';
 const shortcutManager = new ShortcutManager(keymap);
 
 import {
@@ -22,17 +22,13 @@ import {
     patch
 } from '../../actions/WindowActions';
 
-import {
-    processNewRecord
-} from '../../actions/GenericActions';
+import { processNewRecord } from '../../actions/GenericActions';
 
 class Modal extends Component {
     constructor(props) {
         super(props);
 
-        const {
-            rowId, dataId
-        } = this.props;
+        const { rowId, dataId } = this.props;
 
         this.state = {
             scrolled: false,
@@ -42,7 +38,7 @@ class Modal extends Component {
             pending: false,
             waitingFetch: false,
             isTooltipShow: false
-        }
+        };
     }
 
     componentDidMount() {
@@ -62,28 +58,26 @@ class Modal extends Component {
         this.removeEventListeners();
     }
 
-    componentDidUpdate (prevProps) {
-        const {
-            windowType, indicator
-        } = this.props;
+    componentDidUpdate(prevProps) {
+        const { windowType, indicator } = this.props;
 
-        const {waitingFetch} = this.state;
+        const { waitingFetch } = this.state;
 
-        if(prevProps.windowType !== windowType){
+        if (prevProps.windowType !== windowType) {
             this.init();
         }
 
         // Case when we have to trigger pending start request
         // in due to some pending patches that are required.
-        if(
-            waitingFetch &&
-            prevProps.indicator !== indicator
-        ) {
-            this.setState({
-                waitingFetch: false
-            }, () => {
-                this.handleStart();
-            })
+        if (waitingFetch && prevProps.indicator !== indicator) {
+            this.setState(
+                {
+                    waitingFetch: false
+                },
+                () => {
+                    this.handleStart();
+                }
+            );
         }
     }
 
@@ -91,11 +85,11 @@ class Modal extends Component {
         this.setState({
             isTooltipShow: key
         });
-    }
+    };
 
     getChildContext = () => {
-        return { shortcuts: shortcutManager }
-    }
+        return { shortcuts: shortcutManager };
+    };
 
     initEventListeners = () => {
         const modalContent = document.querySelector('.js-panel-modal-content');
@@ -103,27 +97,43 @@ class Modal extends Component {
         if (modalContent) {
             modalContent.addEventListener('scroll', this.handleScroll);
         }
-    }
+    };
 
     removeEventListeners = () => {
-        const modalContent = document.querySelector('.js-panel-modal-content')
+        const modalContent = document.querySelector('.js-panel-modal-content');
 
         if (modalContent) {
             modalContent.removeEventListener('scroll', this.handleScroll);
         }
-    }
+    };
 
     init = () => {
         const {
-            dispatch, windowType, dataId, tabId, rowId, modalType, selected,
-            relativeType, isAdvanced, modalViewId, modalViewDocumentIds
+            dispatch,
+            windowType,
+            dataId,
+            tabId,
+            rowId,
+            modalType,
+            selected,
+            relativeType,
+            isAdvanced,
+            modalViewId,
+            modalViewDocumentIds
         } = this.props;
 
-        switch(modalType){
+        switch (modalType) {
             case 'window':
-                dispatch(createWindow(
-                    windowType, dataId, tabId, rowId, true, isAdvanced
-                )).catch(err => {
+                dispatch(
+                    createWindow(
+                        windowType,
+                        dataId,
+                        tabId,
+                        rowId,
+                        true,
+                        isAdvanced
+                    )
+                ).catch(err => {
                     this.handleClose();
                     throw err;
                 });
@@ -135,91 +145,102 @@ class Modal extends Component {
                 // - with selected : on gridviews
                 dispatch(
                     createProcess(
-                        windowType, modalViewId, relativeType,
+                        windowType,
+                        modalViewId,
+                        relativeType,
                         modalViewDocumentIds || (dataId ? [dataId] : selected),
-                        tabId, rowId
+                        tabId,
+                        rowId
                     )
                 ).catch(err => {
                     this.handleClose();
-                    if(err.toString() !== 'Error: close_modal'){
+                    if (err.toString() !== 'Error: close_modal') {
                         throw err;
                     }
                 });
                 break;
         }
-    }
+    };
 
     closeModal = () => {
         const {
-            dispatch, closeCallback, dataId, windowType, relativeType,
-            relativeDataId, triggerField
+            dispatch,
+            closeCallback,
+            dataId,
+            windowType,
+            relativeType,
+            relativeDataId,
+            triggerField
         } = this.props;
-        const {isNew, isNewDoc} = this.state;
+        const { isNew, isNewDoc } = this.state;
 
-        if(isNewDoc) {
-            processNewRecord(
-                'window', windowType, dataId
-            ).then(response => {
-                dispatch(patch(
-                    'window', relativeType, relativeDataId, null, null,
-                    triggerField, {[response.data]: ''}
-                )).then(() => {
+        if (isNewDoc) {
+            processNewRecord('window', windowType, dataId).then(response => {
+                dispatch(
+                    patch(
+                        'window',
+                        relativeType,
+                        relativeDataId,
+                        null,
+                        null,
+                        triggerField,
+                        { [response.data]: '' }
+                    )
+                ).then(() => {
                     this.removeModal();
-                })
+                });
             });
-        }else{
+        } else {
             closeCallback && closeCallback(isNew);
             this.removeModal();
         }
-    }
+    };
 
     removeModal = () => {
-        const {dispatch, rawModalVisible} = this.props;
+        const { dispatch, rawModalVisible } = this.props;
 
         dispatch(closeModal());
 
-        if (!rawModalVisible){
+        if (!rawModalVisible) {
             document.body.style.overflow = 'auto';
         }
-    }
+    };
 
     handleClose = () => {
-        const {
-            modalSaveStatus, modalType
-        } = this.props;
+        const { modalSaveStatus, modalType } = this.props;
 
-        if(modalType === 'process') {
+        if (modalType === 'process') {
             return this.closeModal();
         }
 
-        if(modalSaveStatus || window.confirm('Do you really want to leave?')){
+        if (modalSaveStatus || window.confirm('Do you really want to leave?')) {
             this.closeModal();
         }
-    }
+    };
 
-    handleScroll = (event) => {
+    handleScroll = event => {
         const target = event.srcElement;
         let scrollTop = target && target.body.scrollTop;
 
-        if(!scrollTop){
+        if (!scrollTop) {
             scrollTop = document.documentElement.scrollTop;
         }
 
         this.setState({
             scrolled: scrollTop > 0
         });
-    }
+    };
 
     setFetchOnTrue = () => {
         this.setState({
             waitingFetch: true
         });
-    }
+    };
 
     handleStart = () => {
-        const {dispatch, layout, windowType, indicator} = this.props;
+        const { dispatch, layout, windowType, indicator } = this.props;
 
-        if(indicator === 'pending'){
+        if (indicator === 'pending') {
             this.setState({
                 waitingFetch: true,
                 pending: true
@@ -228,37 +249,53 @@ class Modal extends Component {
             return;
         }
 
-        this.setState({
-            pending: true
-        }, () => {
-            startProcess(
-                windowType, layout.pinstanceId
-            ).then(response => {
-                this.setState({
-                    pending: false
-                }, () => {
-                    dispatch(handleProcessResponse(
-                        response, windowType, layout.pinstanceId,
-                        () => this.removeModal()
-                    ));
-                });
-            }).catch(() => {
-                this.setState({
-                    pending: false
-                });
-            });
-        });
-    }
+        this.setState(
+            {
+                pending: true
+            },
+            () => {
+                startProcess(windowType, layout.pinstanceId)
+                    .then(response => {
+                        this.setState(
+                            {
+                                pending: false
+                            },
+                            () => {
+                                dispatch(
+                                    handleProcessResponse(
+                                        response,
+                                        windowType,
+                                        layout.pinstanceId,
+                                        () => this.removeModal()
+                                    )
+                                );
+                            }
+                        );
+                    })
+                    .catch(() => {
+                        this.setState({
+                            pending: false
+                        });
+                    });
+            }
+        );
+    };
 
     renderModalBody = () => {
         const {
-            data, layout, tabId, rowId, dataId, modalType, windowType,
+            data,
+            layout,
+            tabId,
+            rowId,
+            dataId,
+            modalType,
+            windowType,
             isAdvanced
         } = this.props;
 
-        const {pending} = this.state;
+        const { pending } = this.state;
 
-        switch(modalType){
+        switch (modalType) {
             case 'window':
                 return (
                     <Window
@@ -272,7 +309,7 @@ class Modal extends Component {
                         isAdvanced={isAdvanced}
                         tabsInfo={null}
                     />
-                )
+                );
             case 'process':
                 return (
                     <Process
@@ -281,137 +318,188 @@ class Modal extends Component {
                         type={windowType}
                         disabled={pending}
                     />
-                )
+                );
         }
-    }
+    };
 
     renderPanel = () => {
         const {
-            data, modalTitle, modalType, isDocumentNotSaved, layout
+            data,
+            modalTitle,
+            modalType,
+            isDocumentNotSaved,
+            layout
         } = this.props;
 
-        const {
-            scrolled, pending, isNewDoc, isTooltipShow
-        } = this.state;
+        const { scrolled, pending, isNewDoc, isTooltipShow } = this.state;
 
-        return(
-            Object.keys(data).length > 0 && <div
-                className="screen-freeze js-not-unselect"
-            >
-            <div className="panel panel-modal panel-modal-primary">
-                <div
-                    className={
-                        'panel-modal-header ' +
-                        (scrolled ? 'header-shadow': '')
-                    }
-                >
-                    <span className="panel-modal-header-title">
-                        {modalTitle ? modalTitle : layout.caption}
-                    </span>
-                    <div className="items-row-2">
-                        {isNewDoc && <button
+        return (
+            Object.keys(data).length > 0 && (
+                <div className="screen-freeze js-not-unselect">
+                    <div className="panel panel-modal panel-modal-primary">
+                        <div
                             className={
-                                `btn btn-meta-outline-secondary
-                                btn-distance-3 btn-md `+
-                                (pending ? 'tag-disabled disabled ' : '')
+                                'panel-modal-header ' +
+                                (scrolled ? 'header-shadow' : '')
                             }
-                            onClick={this.removeModal}
-                            tabIndex={0}
-                            onMouseEnter={() =>
-                                this.toggleTooltip(keymap.MODAL_CONTEXT.CANCEL)
-                            }
-                            onMouseLeave={this.toggleTooltip}
                         >
-                            {counterpart.translate('modal.actions.cancel')}
-                            {isTooltipShow === keymap.MODAL_CONTEXT.CANCEL &&
-                                <Tooltips
-                                    name={keymap.MODAL_CONTEXT.CANCEL}
-                                    action={counterpart.translate('modal.actions.cancel')}
-                                    type={''}
-                                />
-                            }
-                        </button>}
-                        <button
-                            className={
-                                `btn btn-meta-outline-secondary
-                                btn-distance-3 btn-md `+
-                                (pending ? 'tag-disabled disabled ' : '')
-                            }
-                            onClick={this.handleClose}
-                            tabIndex={0}
-                            onMouseEnter={() =>
-                                this.toggleTooltip(modalType === 'process' ? keymap.MODAL_CONTEXT.CANCEL : keymap.MODAL_CONTEXT.APPLY)
-                            }
-                            onMouseLeave={this.toggleTooltip}
-                        >
-                            {modalType === 'process' ? 
-                                counterpart.translate('modal.actions.cancel') : 
-                                counterpart.translate('modal.actions.done')
-                            }
-                            {isTooltipShow === (modalType === 'process' ? keymap.MODAL_CONTEXT.CANCEL : keymap.MODAL_CONTEXT.APPLY) &&
-                                <Tooltips
-                                    name={modalType === 'process' ? keymap.MODAL_CONTEXT.CANCEL : keymap.MODAL_CONTEXT.APPLY}
-                                    action={modalType === 'process' ? 
-                                        counterpart.translate('modal.actions.cancel') : 
-                                        counterpart.translate('modal.actions.done')
+                            <span className="panel-modal-header-title">
+                                {modalTitle ? modalTitle : layout.caption}
+                            </span>
+                            <div className="items-row-2">
+                                {isNewDoc && (
+                                    <button
+                                        className={
+                                            `btn btn-meta-outline-secondary
+                                btn-distance-3 btn-md ` +
+                                            (pending
+                                                ? 'tag-disabled disabled '
+                                                : '')
+                                        }
+                                        onClick={this.removeModal}
+                                        tabIndex={0}
+                                        onMouseEnter={() =>
+                                            this.toggleTooltip(
+                                                keymap.MODAL_CONTEXT.CANCEL
+                                            )}
+                                        onMouseLeave={this.toggleTooltip}
+                                    >
+                                        {counterpart.translate(
+                                            'modal.actions.cancel'
+                                        )}
+                                        {isTooltipShow ===
+                                            keymap.MODAL_CONTEXT.CANCEL && (
+                                            <Tooltips
+                                                name={
+                                                    keymap.MODAL_CONTEXT.CANCEL
+                                                }
+                                                action={counterpart.translate(
+                                                    'modal.actions.cancel'
+                                                )}
+                                                type={''}
+                                            />
+                                        )}
+                                    </button>
+                                )}
+                                <button
+                                    className={
+                                        `btn btn-meta-outline-secondary
+                                btn-distance-3 btn-md ` +
+                                        (pending
+                                            ? 'tag-disabled disabled '
+                                            : '')
                                     }
-                                    type={''}
-                                />
-                            }
-                        </button>
-                        {modalType === 'process' &&
-                            <button
-                                className={
-                                    `btn btn-meta-primary btn-distance-3
+                                    onClick={this.handleClose}
+                                    tabIndex={0}
+                                    onMouseEnter={() =>
+                                        this.toggleTooltip(
+                                            modalType === 'process'
+                                                ? keymap.MODAL_CONTEXT.CANCEL
+                                                : keymap.MODAL_CONTEXT.APPLY
+                                        )}
+                                    onMouseLeave={this.toggleTooltip}
+                                >
+                                    {modalType === 'process'
+                                        ? counterpart.translate(
+                                              'modal.actions.cancel'
+                                          )
+                                        : counterpart.translate(
+                                              'modal.actions.done'
+                                          )}
+                                    {isTooltipShow ===
+                                        (modalType === 'process'
+                                            ? keymap.MODAL_CONTEXT.CANCEL
+                                            : keymap.MODAL_CONTEXT.APPLY) && (
+                                        <Tooltips
+                                            name={
+                                                modalType === 'process'
+                                                    ? keymap.MODAL_CONTEXT
+                                                          .CANCEL
+                                                    : keymap.MODAL_CONTEXT.APPLY
+                                            }
+                                            action={
+                                                modalType === 'process'
+                                                    ? counterpart.translate(
+                                                          'modal.actions.cancel'
+                                                      )
+                                                    : counterpart.translate(
+                                                          'modal.actions.done'
+                                                      )
+                                            }
+                                            type={''}
+                                        />
+                                    )}
+                                </button>
+                                {modalType === 'process' && (
+                                    <button
+                                        className={
+                                            `btn btn-meta-primary btn-distance-3
                                     btn-md ` +
-                                    (pending ? 'tag-disabled disabled' : '')
-                                }
-                                onClick={this.handleStart}
-                                tabIndex={0}
-                                onMouseEnter={() =>
-                                    this.toggleTooltip(keymap.MODAL_CONTEXT.APPLY)
-                                }
-                                onMouseLeave={this.toggleTooltip}
-                            >
-                                {counterpart.translate('modal.actions.start')}
-                                {isTooltipShow === keymap.MODAL_CONTEXT.APPLY &&
-                                    <Tooltips
-                                        name={keymap.MODAL_CONTEXT.APPLY}
-                                        action={counterpart.translate('modal.actions.start')}
-                                        type={''}
-                                    />
-                                }
-                            </button>
-                        }
+                                            (pending
+                                                ? 'tag-disabled disabled'
+                                                : '')
+                                        }
+                                        onClick={this.handleStart}
+                                        tabIndex={0}
+                                        onMouseEnter={() =>
+                                            this.toggleTooltip(
+                                                keymap.MODAL_CONTEXT.APPLY
+                                            )}
+                                        onMouseLeave={this.toggleTooltip}
+                                    >
+                                        {counterpart.translate(
+                                            'modal.actions.start'
+                                        )}
+                                        {isTooltipShow ===
+                                            keymap.MODAL_CONTEXT.APPLY && (
+                                            <Tooltips
+                                                name={
+                                                    keymap.MODAL_CONTEXT.APPLY
+                                                }
+                                                action={counterpart.translate(
+                                                    'modal.actions.start'
+                                                )}
+                                                type={''}
+                                            />
+                                        )}
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                        <Indicator {...{ isDocumentNotSaved }} />
+                        <div
+                            className={`panel-modal-content js-panel-modal-content
+                        container-fluid`}
+                            ref={c => {
+                                c && c.focus();
+                            }}
+                        >
+                            {this.renderModalBody()}
+                        </div>
+                        <ModalContextShortcuts
+                            apply={
+                                modalType === 'process'
+                                    ? this.handleStart
+                                    : this.handleClose
+                            }
+                            cancel={
+                                modalType === 'process'
+                                    ? this.handleClose
+                                    : isNewDoc ? this.removeModal : ''
+                            }
+                        />
                     </div>
                 </div>
-                <Indicator {...{isDocumentNotSaved}}/>
-                <div
-                    className={
-                        `panel-modal-content js-panel-modal-content
-                        container-fluid`
-                    }
-                    ref={c => { c && c.focus()}}
-                >
-                    {this.renderModalBody()}
-                </div>
-                <ModalContextShortcuts
-                    apply={modalType === 'process' ? this.handleStart : this.handleClose}
-                    cancel={modalType === 'process' ? this.handleClose : isNewDoc ? this.removeModal : ''}
-                />
-            </div>
-        </div>
-        )
-    }
+            )
+        );
+    };
 
     renderOverlay = () => {
-       const {
-            data, layout, windowType
-        } = this.props;
+        const { data, layout, windowType } = this.props;
 
-        const {pending} = this.state;
+        const { pending } = this.state;
 
-        return(
+        return (
             <OverlayField
                 type={windowType}
                 disabled={pending}
@@ -420,32 +508,26 @@ class Modal extends Component {
                 handleSubmit={this.setFetchOnTrue}
                 closeOverlay={this.removeModal}
             />
-        )
-    }
+        );
+    };
 
     render() {
-        const {
-            layout
-        } = this.props;
+        const { layout } = this.props;
 
         return (
             <div>
-                {
-                    (!layout.layoutType || layout.layoutType === 'panel') &&
-                    this.renderPanel()
-                }
-                {
-                    layout.layoutType === 'singleOverlayField' &&
-                    this.renderOverlay()
-                }
+                {(!layout.layoutType || layout.layoutType === 'panel') &&
+                    this.renderPanel()}
+                {layout.layoutType === 'singleOverlayField' &&
+                    this.renderOverlay()}
             </div>
-        )
+        );
     }
 }
 
 Modal.childContextTypes = {
     shortcuts: PropTypes.object.isRequired
-}
+};
 
 Modal.propTypes = {
     dispatch: PropTypes.func.isRequired
@@ -453,4 +535,4 @@ Modal.propTypes = {
 
 Modal = connect()(Modal);
 
-export default Modal
+export default Modal;

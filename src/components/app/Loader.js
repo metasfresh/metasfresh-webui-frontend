@@ -8,20 +8,18 @@ class Loader extends Component {
 
     render() {
         return (
-            <div
-                className="order-list-loader text-xs-center"
-            >
+            <div className="order-list-loader text-xs-center">
                 <ReactCSSTransitionGroup
                     transitionName="rotate"
                     transitionEnterTimeout={1000}
                     transitionLeaveTimeout={1000}
                 >
                     <div className="rotate icon-rotate">
-                        <i className="meta-icon-settings"/>
+                        <i className="meta-icon-settings" />
                     </div>
                 </ReactCSSTransitionGroup>
             </div>
-        )
+        );
     }
 }
 

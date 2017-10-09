@@ -2,7 +2,7 @@ import * as types from '../constants/ActionTypes';
 import update from 'immutability-helper';
 
 const initialState = {
-	notifications: {},
+    notifications: {},
     me: {},
     isLogged: false,
     enableTutorial: false,
@@ -11,32 +11,32 @@ const initialState = {
         notifications: [],
         unreadCount: 0
     }
-}
+};
 
 export default function appHandler(state = initialState, action) {
-    switch(action.type){
+    switch (action.type) {
         case types.USER_SESSION_INIT:
             return Object.assign({}, state, {
                 me: action.me
-            })
+            });
         case types.USER_SESSION_UPDATE:
             return Object.assign({}, state, {
                 me: Object.assign({}, state.me, action.me)
-            })
+            });
         case types.LOGIN_SUCCESS:
             return Object.assign({}, state, {
                 isLogged: true
-            })
+            });
 
         case types.LOGOUT_SUCCESS:
             return Object.assign({}, state, {
                 isLogged: false
-            })
+            });
 
         case types.ENABLE_TUTORIAL:
             return Object.assign({}, state, {
                 enableTutorial: action.flag
-            })
+            });
 
         // NOTIFICATION ACTIONS
         case types.ADD_NOTIFICATION:
@@ -48,17 +48,22 @@ export default function appHandler(state = initialState, action) {
                         shortMsg: action.shortMsg,
                         time: action.time,
                         notifType: action.notifType,
-                        count: state.notifications[action.title] ?
-                            state.notifications[action.title].count + 1 : 0
+                        count: state.notifications[action.title]
+                            ? state.notifications[action.title].count + 1
+                            : 0
                     }
                 })
             });
 
         case types.SET_NOTIFICATION_PROGRESS:
             let notifications = Object.assign({}, state.notifications, {
-                [action.key]: Object.assign({}, state.notifications[action.key], {
-                    progress: action.progress
-                })
+                [action.key]: Object.assign(
+                    {},
+                    state.notifications[action.key],
+                    {
+                        progress: action.progress
+                    }
+                )
             });
 
             return Object.assign({}, state, {
@@ -67,12 +72,13 @@ export default function appHandler(state = initialState, action) {
 
         case types.DELETE_NOTIFICATION:
             return Object.assign({}, state, {
-                notifications: Object.keys(state.notifications)
-                    .reduce((res, key) => {
-                        if(key !== action.key) {
-                            res[key] = state.notifications[key];
-                        }
-                        return res;
+                notifications: Object.keys(
+                    state.notifications
+                ).reduce((res, key) => {
+                    if (key !== action.key) {
+                        res[key] = state.notifications[key];
+                    }
+                    return res;
                 }, {})
             });
 
@@ -92,42 +98,49 @@ export default function appHandler(state = initialState, action) {
         case types.NEW_NOTIFICATION:
             return update(state, {
                 inbox: {
-                    notifications: {$unshift: [action.notification]},
-                    unreadCount: {$set: action.unreadCount}
+                    notifications: { $unshift: [action.notification] },
+                    unreadCount: { $set: action.unreadCount }
                 }
-            })
+            });
         case types.REMOVE_NOTIFICATION:
             return update(state, {
                 inbox: {
-                    notifications: { $set:
-                        state.inbox.notifications.filter(item =>
-                            item.id !== action.notification
-                        )},
-                    unreadCount: {$set: action.unreadCount}
+                    notifications: {
+                        $set: state.inbox.notifications.filter(
+                            item => item.id !== action.notification
+                        )
+                    },
+                    unreadCount: { $set: action.unreadCount }
                 }
-            })
+            });
         case types.UPDATE_NOTIFICATION:
             return update(state, {
                 inbox: {
-                    notifications: { $set:
-                        state.inbox.notifications.map(item =>
-                            item.id === action.notification.id ?
-                                Object.assign({}, item, action.notification) :
-                                item
-                    )},
-                    unreadCount: {$set: action.unreadCount}
+                    notifications: {
+                        $set: state.inbox.notifications.map(
+                            item =>
+                                item.id === action.notification.id
+                                    ? Object.assign(
+                                          {},
+                                          item,
+                                          action.notification
+                                      )
+                                    : item
+                        )
+                    },
+                    unreadCount: { $set: action.unreadCount }
                 }
-            })
+            });
         case types.SET_PROCESS_STATE_PENDING:
             return Object.assign({}, state, {
                 processStatus: 'pending'
-            })
+            });
         case types.SET_PROCESS_STATE_SAVED:
             return Object.assign({}, state, {
                 processStatus: 'saved'
-            })
+            });
 
         default:
-            return state
+            return state;
     }
 }

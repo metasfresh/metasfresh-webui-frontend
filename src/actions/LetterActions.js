@@ -1,14 +1,12 @@
 import axios from 'axios';
 
 export function createLetter(windowId, documentId) {
-    return axios.post(
-        config.API_URL + '/letter', {
-            'documentPath': {
-                'documentId': documentId,
-                'windowId': windowId
-            }
+    return axios.post(config.API_URL + '/letter', {
+        documentPath: {
+            documentId: documentId,
+            windowId: windowId
         }
-    );
+    });
 }
 
 export function completeLetter(letterId) {

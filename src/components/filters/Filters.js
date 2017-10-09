@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {push} from 'react-router-redux';
+import { push } from 'react-router-redux';
 import counterpart from 'counterpart';
 import FiltersFrequent from './FiltersFrequent';
 import FiltersNotFrequent from './FiltersNotFrequent';
@@ -13,25 +13,25 @@ class Filters extends Component {
             filter: null,
             notValidFields: null,
             widgetShown: false
-        }
+        };
     }
 
     componentWillReceiveProps(props) {
-        const {filtersActive} = props;
+        const { filtersActive } = props;
 
         this.init(filtersActive ? filtersActive : null);
     }
 
     componentDidMount() {
-        const {filtersActive} = this.props;
+        const { filtersActive } = this.props;
         filtersActive && this.init(filtersActive);
     }
 
-    init = (filter) => {
+    init = filter => {
         this.setState({
             filter: filter
-        })
-    }
+        });
+    };
 
     // SETTING FILTERS  --------------------------------------------------------
 
@@ -41,118 +41,132 @@ class Filters extends Component {
     applyFilters = (filter, cb) => {
         const valid = this.isFilterValid(filter);
 
-        this.setState({
-            notValidFields: !valid
-        }, () => {
-            if (valid) {
-                const parsedFilter = filter.parameters ?
-                    Object.assign({}, filter, {
-                        parameters: this.parseToPatch(filter.parameters)
-                    }) : filter;
+        this.setState(
+            {
+                notValidFields: !valid
+            },
+            () => {
+                if (valid) {
+                    const parsedFilter = filter.parameters
+                        ? Object.assign({}, filter, {
+                              parameters: this.parseToPatch(filter.parameters)
+                          })
+                        : filter;
 
-                this.setFilterActive(parsedFilter);
+                    this.setFilterActive(parsedFilter);
 
-                cb && cb();
+                    cb && cb();
+                }
             }
-        });
-    }
+        );
+    };
 
-    setFilterActive = (filterToAdd) => {
+    setFilterActive = filterToAdd => {
         const { updateDocList } = this.props;
         const { filter } = this.state;
 
         let newFilter;
         if (filter) {
-            newFilter = filter.filter( (item) => item.filterId !== filterToAdd.filterId );
+            newFilter = filter.filter(
+                item => item.filterId !== filterToAdd.filterId
+            );
             newFilter.push(filterToAdd);
-        }
-        else {
+        } else {
             newFilter = [filterToAdd];
         }
 
-        this.setState({
-            filter: newFilter
-        }, () => {
-            updateDocList(newFilter);
-        })
-    }
+        this.setState(
+            {
+                filter: newFilter
+            },
+            () => {
+                updateDocList(newFilter);
+            }
+        );
+    };
 
     /*
      *  Mehod to lock backdrop, to do not close on click onClickOutside
      *  widgets that are bigger than filter wrapper
      */
-    handleShow = (value) => {
+    handleShow = value => {
         this.setState({
             widgetShown: value
-        })
-    }
+        });
+    };
 
-    clearFilters = (filterToClear) => {
+    clearFilters = filterToClear => {
         const { updateDocList } = this.props;
         const { filter } = this.state;
 
         if (filter) {
-            let newFilter = filter.filter( (item) => item.filterId !== filterToClear.filterId );
+            let newFilter = filter.filter(
+                item => item.filterId !== filterToClear.filterId
+            );
 
-            this.setState({
-                filter: newFilter
-            }, () => {
-                updateDocList(newFilter);
-            })
+            this.setState(
+                {
+                    filter: newFilter
+                },
+                () => {
+                    updateDocList(newFilter);
+                }
+            );
         }
-    }
+    };
 
     dropdownToggled = () => {
         this.setState({
             notValidFields: false
-        })
-    }
+        });
+    };
 
     // PARSING FILTERS ---------------------------------------------------------
 
-    sortFilters = (data) => {
+    sortFilters = data => {
         return {
             frequentFilters: data.filter(filter => filter.frequent),
-            notFrequentFilters: data.filter(filter =>
-                !filter.frequent && !filter.static),
+            notFrequentFilters: data.filter(
+                filter => !filter.frequent && !filter.static
+            ),
             staticFilters: data.filter(filter => filter.static)
-        }
-    }
+        };
+    };
 
-    isFilterValid = (filters) => {
+    isFilterValid = filters => {
         if (filters.parameters) {
-            return !(filters.parameters.filter(
+            return !filters.parameters.filter(
                 item => item.mandatory && !item.value
-            ).length);
+            ).length;
         }
 
         return true;
-    }
+    };
 
-    parseToPatch = (params) => {
+    parseToPatch = params => {
         return params.map(param =>
             Object.assign({}, param, {
                 value: param.value === '' ? null : param.value
             })
-        )
-    }
+        );
+    };
 
     // RENDERING FILTERS -------------------------------------------------------
 
     render() {
-        const {filterData, windowType, viewId} = this.props;
+        const { filterData, windowType, viewId } = this.props;
         const {
-            frequentFilters, notFrequentFilters, staticFilters
+            frequentFilters,
+            notFrequentFilters,
+            staticFilters
         } = this.sortFilters(filterData);
-        const {notValidFields, widgetShown, filter} = this.state;
+        const { notValidFields, widgetShown, filter } = this.state;
 
         return (
             <div className="filter-wrapper js-not-unselect">
-                <span>{counterpart.translate(
-                    'window.filters.caption'
-                )}: </span>
+                <span>{counterpart.translate('window.filters.caption')}: </span>
                 <div className="filter-wrapper">
-                    {!!frequentFilters.length &&
+                    {!!frequentFilters.length && (
                         <FiltersFrequent
                             windowType={windowType}
                             data={frequentFilters}
@@ -165,8 +179,8 @@ class Filters extends Component {
                             active={filter}
                             dropdownToggled={this.dropdownToggled}
                         />
-                    }
-                    {!!notFrequentFilters.length &&
+                    )}
+                    {!!notFrequentFilters.length && (
                         <FiltersNotFrequent
                             windowType={windowType}
                             data={notFrequentFilters}
@@ -179,15 +193,15 @@ class Filters extends Component {
                             active={filter}
                             dropdownToggled={this.dropdownToggled}
                         />
-                    }
+                    )}
                 </div>
             </div>
-        )
+        );
     }
 }
 
 Filters.propTypes = {
     windowType: PropTypes.string.isRequired
-}
+};
 
 export default Filters;

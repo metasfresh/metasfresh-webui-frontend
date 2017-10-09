@@ -22,27 +22,35 @@ module.exports = {
         })
     ],
     module: {
-        loaders: [{
-            test: /\.jsx?$/,
-            loaders: ['babel'],
-            include: path.join(__dirname, 'src')
-        }, {
-            test: /\.(jpg|png|svg|eot|woff|woff2|ttf|gif)$/,
-            loader: 'file?name=[path][name].[hash].[ext]'
-        }, {
-            test: /\.css$/,
-            loaders: ['style-loader','css-loader','postcss-loader']
-        }, {
-            test: /\.html$/,
-            loader: 'html'
-        }
-    ]},
+        loaders: [
+            {
+                test: /\.jsx?$/,
+                loaders: ['babel'],
+                include: path.join(__dirname, 'src')
+            },
+            {
+                test: /\.(jpg|png|svg|eot|woff|woff2|ttf|gif)$/,
+                loader: 'file?name=[path][name].[hash].[ext]'
+            },
+            {
+                test: /\.css$/,
+                loaders: ['style-loader', 'css-loader', 'postcss-loader']
+            },
+            {
+                test: /\.html$/,
+                loader: 'html'
+            }
+        ]
+    },
     postcss: () => [
-        require('postcss-import')({ addDependencyTo: webpack, path: ['node_modules'] }),
+        require('postcss-import')({
+            addDependencyTo: webpack,
+            path: ['node_modules']
+        }),
         require('postcss-color-function'),
         require('postcss-url')(),
-        require('autoprefixer')({ browsers: [ 'last 2 versions' ] }),
-        require('precss')(),
+        require('autoprefixer')({ browsers: ['last 2 versions'] }),
+        require('precss')()
     ],
     resolve: {
         extensions: ['', '.js', '.json']

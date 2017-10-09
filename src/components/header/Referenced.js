@@ -1,18 +1,14 @@
 import React, { Component } from 'react';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import {push} from 'react-router-redux';
+import { push } from 'react-router-redux';
 import counterpart from 'counterpart';
 
 import Loader from '../app/Loader';
 
-import {
-    referencesRequest
-} from '../../actions/GenericActions';
+import { referencesRequest } from '../../actions/GenericActions';
 
-import {
-    setFilter
-} from '../../actions/ListActions';
+import { setFilter } from '../../actions/ListActions';
 
 class Referenced extends Component {
     constructor(props) {
@@ -20,58 +16,58 @@ class Referenced extends Component {
 
         this.state = {
             data: null
-        }
+        };
     }
 
     componentDidMount = () => {
-        const {windowType, docId} = this.props;
+        const { windowType, docId } = this.props;
 
-        referencesRequest('window', windowType, docId)
-            .then(response => {
-                this.setState({
+        referencesRequest('window', windowType, docId).then(response => {
+            this.setState(
+                {
                     data: response.data.groups
-                }, () => {
+                },
+                () => {
                     this.referenced && this.referenced.focus();
-                })
-            });
-    }
+                }
+            );
+        });
+    };
 
     handleReferenceClick = (type, filter) => {
-        const {
-            dispatch, windowType, docId
-        } = this.props;
+        const { dispatch, windowType, docId } = this.props;
         dispatch(setFilter(filter, type));
-        dispatch(push(
-            '/window/' + type +
-            '?refType=' + windowType +
-            '&refId=' + docId
-        ));
-    }
+        dispatch(
+            push(
+                '/window/' + type + '?refType=' + windowType + '&refId=' + docId
+            )
+        );
+    };
 
-    handleKeyDown = (e) => {
+    handleKeyDown = e => {
         const active = document.activeElement;
 
         const keyHandler = (e, dir) => {
             const sib = dir ? 'nextSibling' : 'previousSibling';
             e.preventDefault();
-            if(active.classList.contains('js-subheader-item')){
-                if(!active[sib]){
+            if (active.classList.contains('js-subheader-item')) {
+                if (!active[sib]) {
                     return;
                 }
-                if(active[sib].classList.contains('js-subheader-item')){
+                if (active[sib].classList.contains('js-subheader-item')) {
                     active[sib].focus();
-                }else{
+                } else {
                     active[sib][sib] && active[sib][sib].focus();
                 }
-            }else{
+            } else {
                 active.getElementsByClassName('js-subheader-item')[0].focus();
             }
-        }
+        };
 
-        switch(e.key){
+        switch (e.key) {
             case 'ArrowDown':
                 keyHandler(e, true);
-                break
+                break;
             case 'ArrowUp':
                 keyHandler(e, false);
                 break;
@@ -80,45 +76,49 @@ class Referenced extends Component {
                 document.activeElement.click();
                 break;
         }
-    }
+    };
 
     renderData = () => {
-        const {data} = this.state;
+        const { data } = this.state;
 
-        return (data && data.length) ?
-            data.map((item) => {
-                return [<div className="subheader-caption">
-                    {item.caption}
-                </div>].concat(item.references.map((ref, refKey) => <div
-                        className="subheader-item js-subheader-item"
-                        onClick={() => {
-                            this.handleReferenceClick(
-                                ref.documentType, ref.filter
-                            )
-                        }}
-                        key={refKey}
-                        tabIndex={0}
-                    >
-                        {ref.caption}
-                    </div>
-                ))}
-        ) : <div className="subheader-item subheader-item-disabled">
-            {counterpart.translate('window.sideList.referenced.empty')}
-        </div>
-    }
+        return data && data.length ? (
+            data.map(item => {
+                return [
+                    <div className="subheader-caption">{item.caption}</div>
+                ].concat(
+                    item.references.map((ref, refKey) => (
+                        <div
+                            className="subheader-item js-subheader-item"
+                            onClick={() => {
+                                this.handleReferenceClick(
+                                    ref.documentType,
+                                    ref.filter
+                                );
+                            }}
+                            key={refKey}
+                            tabIndex={0}
+                        >
+                            {ref.caption}
+                        </div>
+                    ))
+                );
+            })
+        ) : (
+            <div className="subheader-item subheader-item-disabled">
+                {counterpart.translate('window.sideList.referenced.empty')}
+            </div>
+        );
+    };
 
     render() {
-        const {data} = this.state;
+        const { data } = this.state;
         return (
             <div
                 onKeyDown={this.handleKeyDown}
-                ref={c => this.referenced = c}
+                ref={c => (this.referenced = c)}
                 tabIndex={0}
             >
-                {!data ?
-                    <Loader /> :
-                    this.renderData()
-                }
+                {!data ? <Loader /> : this.renderData()}
             </div>
         );
     }
@@ -128,8 +128,8 @@ Referenced.propTypes = {
     windowType: PropTypes.string.isRequired,
     docId: PropTypes.string.isRequired,
     dispatch: PropTypes.func.isRequired
-}
+};
 
 Referenced = connect()(Referenced);
 
-export default Referenced
+export default Referenced;

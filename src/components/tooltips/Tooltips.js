@@ -6,16 +6,16 @@ class Tooltips extends Component {
 
         this.state = {
             opacity: 0
-        }
+        };
     }
 
     componentDidMount() {
-        const {delay} = this.props;
+        const { delay } = this.props;
         this.timeout = setTimeout(() => {
             this.setState({
                 opacity: 1
-            })
-        }, delay?delay:1000);
+            });
+        }, delay ? delay : 1000);
     }
 
     componentWillUnmount() {
@@ -24,27 +24,30 @@ class Tooltips extends Component {
 
     render() {
         const {
-                name, action, type, extraClass,
-                tooltipOnFirstlevelPositionLeft
+            name,
+            action,
+            type,
+            extraClass,
+            tooltipOnFirstlevelPositionLeft
         } = this.props;
-        const {opacity} = this.state;
+        const { opacity } = this.state;
         return (
-            <div style={{opacity: opacity}}>
+            <div style={{ opacity: opacity }}>
                 <div
                     className={
                         'tooltip-wrapp ' +
-                        (type? 'tooltip-' + type:'') +
-                        ' ' + (extraClass? extraClass:'')
+                        (type ? 'tooltip-' + type : '') +
+                        ' ' +
+                        (extraClass ? extraClass : '')
                     }
-                    style={{left:tooltipOnFirstlevelPositionLeft+'px'}}
+                    style={{ left: tooltipOnFirstlevelPositionLeft + 'px' }}
                 >
                     <div className="tooltip-shortcut">{name}</div>
                     <div className="tooltip-name">{action}</div>
                 </div>
             </div>
-
-        )
+        );
     }
 }
 
-export default Tooltips
+export default Tooltips;

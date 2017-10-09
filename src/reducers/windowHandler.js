@@ -45,9 +45,7 @@ const initialState = {
 };
 
 export default function windowHandler(state = initialState, action) {
-
-    switch(action.type){
-
+    switch (action.type) {
         case types.NO_CONNECTION:
             return Object.assign({}, state, {
                 connectionError: action.status
@@ -137,33 +135,39 @@ export default function windowHandler(state = initialState, action) {
             return Object.assign({}, state, {
                 [action.scope]: Object.assign({}, state[action.scope], {
                     layout: Object.assign({}, state[action.scope].layout, {
-                        tabs: state[action.scope].layout.tabs.map(tab =>
-                            tab.tabId === action.tabId ?
-                            Object.assign({}, tab, {
-                                orderBy: [{
-                                    fieldName: action.field,
-                                    ascending: action.asc
-                                }]
-                            }) : tab
+                        tabs: state[action.scope].layout.tabs.map(
+                            tab =>
+                                tab.tabId === action.tabId
+                                    ? Object.assign({}, tab, {
+                                          orderBy: [
+                                              {
+                                                  fieldName: action.field,
+                                                  ascending: action.asc
+                                              }
+                                          ]
+                                      })
+                                    : tab
                         )
                     })
                 })
-            })
+            });
 
         case types.ACTIVATE_TAB:
             return update(state, {
                 [action.scope]: {
                     layout: {
-                        activeTab: {$set: action.tabId}
+                        activeTab: { $set: action.tabId }
                     }
                 }
-            })
+            });
 
         case types.ADD_ROW_DATA:
             return Object.assign({}, state, {
                 [action.scope]: Object.assign({}, state[action.scope], {
                     rowData: Object.assign(
-                        {}, state[action.scope].rowData, action.data
+                        {},
+                        state[action.scope].rowData,
+                        action.data
                     )
                 })
             });
@@ -184,8 +188,9 @@ export default function windowHandler(state = initialState, action) {
                 [action.scope]: {
                     rowData: {
                         [action.tabid]: {
-                            $set: state[action.scope].rowData[action.tabid]
-                                .filter((item) => item.rowId !== action.rowid)
+                            $set: state[action.scope].rowData[
+                                action.tabid
+                            ].filter(item => item.rowId !== action.rowid)
                         }
                     }
                 }
@@ -200,8 +205,9 @@ export default function windowHandler(state = initialState, action) {
             return update(state, {
                 [action.scope]: {
                     data: {
-                        [action.property]: {$set:
-                            Object.assign({},
+                        [action.property]: {
+                            $set: Object.assign(
+                                {},
                                 state[action.scope].data[action.property],
                                 action.item
                             )
@@ -214,28 +220,27 @@ export default function windowHandler(state = initialState, action) {
             let value;
 
             if (typeof action.value === 'string') {
-               value = action.value;
-
+                value = action.value;
             } else if (action.property === 'standardActions') {
                 // TODO: Evaluate if standardActions of type Set
                 // is worth this extra check
                 value = new Set(action.value);
-
             } else {
                 value = Object.assign(
                     {},
-                    state[action.scope] ?
-                        state[action.scope][action.property] : {},
-                    action.value,
+                    state[action.scope]
+                        ? state[action.scope][action.property]
+                        : {},
+                    action.value
                 );
             }
 
             return update(state, {
                 [action.scope]: {
                     [action.property]: {
-                        $set: value,
-                    },
-                },
+                        $set: value
+                    }
+                }
             });
         }
 
@@ -246,55 +251,59 @@ export default function windowHandler(state = initialState, action) {
             const property = action.property;
             const scState = state[scope];
 
-            if (
-                scState && scState.rowData && scState.rowData[tabid]
-            ) {
+            if (scState && scState.rowData && scState.rowData[tabid]) {
                 const scRowData = scState.rowData[tabid];
 
                 return update(state, {
                     [action.scope]: {
                         rowData: {
                             [tabid]: {
-                                $set: scRowData
-                                    .map((item, index) =>
-                                        item.rowId === rowid ? {
-                                            ...scRowData[index],
+                                $set: scRowData.map(
+                                    (item, index) =>
+                                        item.rowId === rowid
+                                            ? {
+                                                  ...scRowData[index],
 
-                                            fieldsByName: {
-                                                ...scRowData[index]
-                                                    .fieldsByName,
+                                                  fieldsByName: {
+                                                      ...scRowData[index]
+                                                          .fieldsByName,
 
-                                                [property]: {
-                                                    ...scRowData[index]
-                                                        .fieldsByName[property],
-                                                    ...action.item
-                                                }
-                                            }
-                                        } : item
-                                    )
+                                                      [property]: {
+                                                          ...scRowData[index]
+                                                              .fieldsByName[
+                                                              property
+                                                          ],
+                                                          ...action.item
+                                                      }
+                                                  }
+                                              }
+                                            : item
+                                )
                             }
                         }
                     }
                 });
-            }
-            else {
+            } else {
                 return state;
             }
-          }
+        }
 
-         case types.UPDATE_ROW_PROPERTY:
+        case types.UPDATE_ROW_PROPERTY:
             return update(state, {
                 [action.scope]: {
                     rowData: {
                         [action.tabid]: {
-                            $set: state[action.scope].rowData[action.tabid]
-                                .map((item, index) =>
-                                    item.rowId === action.rowid ? {
-                                        ...state[action.scope]
-                                            .rowData[action.tabid][index],
-                                        [action.property]: action.item
-                                    } : item
-                                )
+                            $set: state[action.scope].rowData[action.tabid].map(
+                                (item, index) =>
+                                    item.rowId === action.rowid
+                                        ? {
+                                              ...state[action.scope].rowData[
+                                                  action.tabid
+                                              ][index],
+                                              [action.property]: action.item
+                                          }
+                                        : item
+                            )
                         }
                     }
                 }
@@ -305,11 +314,11 @@ export default function windowHandler(state = initialState, action) {
                 [action.scope]: {
                     rowData: {
                         [action.tabid]: {
-                             $set: state[action.scope].rowData[action.tabid]
-                             .map(item =>
-                                item.rowId === action.rowid ?
-                                {$set : action.saveStatus}
-                                : item
+                            $set: state[action.scope].rowData[action.tabid].map(
+                                item =>
+                                    item.rowId === action.rowid
+                                        ? { $set: action.saveStatus }
+                                        : item
                             )
                         }
                     }
@@ -333,17 +342,18 @@ export default function windowHandler(state = initialState, action) {
         case types.UPDATE_DATA_INCLUDED_TABS_INFO:
             return Object.assign({}, state, {
                 [action.scope]: Object.assign({}, state[action.scope], {
-                    includedTabsInfo:
-                        Object.keys(state[action.scope].includedTabsInfo)
-                            .reduce((result, current) => {
-                                result[current] = Object.assign({},
-                                    state[action.scope]
-                                        .includedTabsInfo[current],
-                                    action.includedTabsInfo[current] ?
-                                        action.includedTabsInfo[current] : {}
-                                );
-                                return result;
-                            }, {})
+                    includedTabsInfo: Object.keys(
+                        state[action.scope].includedTabsInfo
+                    ).reduce((result, current) => {
+                        result[current] = Object.assign(
+                            {},
+                            state[action.scope].includedTabsInfo[current],
+                            action.includedTabsInfo[current]
+                                ? action.includedTabsInfo[current]
+                                : {}
+                        );
+                        return result;
+                    }, {})
                 })
             });
         // END OF SCOPED ACTIONS

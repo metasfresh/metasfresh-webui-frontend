@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {push, goBack} from 'react-router-redux';
+import { push, goBack } from 'react-router-redux';
 import counterpart from 'counterpart';
 
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import logo from '../../assets/images/metasfresh_logo_green_thumb.png';
 
 import RawList from '../widget/List/RawList';
@@ -18,116 +18,116 @@ import {
 } from '../../actions/AppActions';
 
 class LoginForm extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.state = {
             role: '',
             roleSelect: false,
             err: ''
-        }
+        };
     }
 
-    componentDidMount(){
+    componentDidMount() {
         this.login.focus();
     }
 
-    handleKeyPress = (e) => {
-        if(e.key === 'Enter'){
+    handleKeyPress = e => {
+        if (e.key === 'Enter') {
             this.handleLogin();
         }
-    }
+    };
 
-    handleOnChange = (e) => {
+    handleOnChange = e => {
         e.preventDefault();
 
         this.setState({
             err: ''
-        })
-    }
+        });
+    };
 
     handleSuccess = () => {
-        const {redirect, dispatch} = this.props;
+        const { redirect, dispatch } = this.props;
 
         getUserLang().then(response => {
             //GET language shall always return a result
             Moment.locale(Object.keys(response.data)[0]);
 
-            if(redirect){
+            if (redirect) {
                 dispatch(goBack());
-            }else{
+            } else {
                 dispatch(push('/'));
             }
-        })
+        });
+    };
 
-    }
+    checkIfAlreadyLogged(err) {
+        const { router } = this.context;
 
-    checkIfAlreadyLogged(err){
-        const {router} = this.context;
+        return localLoginRequest().then(response => {
+            if (response.data) {
+                return router.push('/');
+            }
 
-        return localLoginRequest()
-            .then(response => {
-                if (response.data){
-                    return router.push('/')
-                }
-
-                return Promise.reject(err);
-            });
+            return Promise.reject(err);
+        });
     }
 
     handleLogin = () => {
-        const {dispatch, auth} = this.props;
-        const {roleSelect, role} = this.state;
+        const { dispatch, auth } = this.props;
+        const { roleSelect, role } = this.state;
 
-        this.setState({
-            pending: true
-        }, () => {
-            if(roleSelect){
-                return loginCompletionRequest(role)
-                    .then(() => {
+        this.setState(
+            {
+                pending: true
+            },
+            () => {
+                if (roleSelect) {
+                    return loginCompletionRequest(role).then(() => {
                         dispatch(loginSuccess(auth));
                         this.handleSuccess();
-                    })
-            }
-
-            loginRequest(this.login.value, this.passwd.value)
-                .then(response =>{
-                    if(response.data.loginComplete){
-                        return this.handleSuccess();
-                    }
-                    this.setState({
-                        roleSelect: true,
-                        roles: response.data.roles,
-                        role: response.data.roles[0]
-                    })
-                })
-                .then(() => {
-                    this.setState({
-                        pending: false
-                    })
-                })
-                .catch(err => {
-                    return this.checkIfAlreadyLogged(err);
-                })
-                .catch(err => {
-                    this.setState({
-                        err: (err.response ?
-                            err.response.data.message : 
-                            counterpart.translate('login.error.fallback')),
-                        pending: false
                     });
-                })
-        });
-    }
+                }
 
-    handleRoleSelect = (option) => {
+                loginRequest(this.login.value, this.passwd.value)
+                    .then(response => {
+                        if (response.data.loginComplete) {
+                            return this.handleSuccess();
+                        }
+                        this.setState({
+                            roleSelect: true,
+                            roles: response.data.roles,
+                            role: response.data.roles[0]
+                        });
+                    })
+                    .then(() => {
+                        this.setState({
+                            pending: false
+                        });
+                    })
+                    .catch(err => {
+                        return this.checkIfAlreadyLogged(err);
+                    })
+                    .catch(err => {
+                        this.setState({
+                            err: err.response
+                                ? err.response.data.message
+                                : counterpart.translate('login.error.fallback'),
+                            pending: false
+                        });
+                    });
+            }
+        );
+    };
+
+    handleRoleSelect = option => {
         this.setState({
             role: option
         });
-    }
+    };
 
     render() {
-        const {roleSelect, roles, err, role, pending} = this.state;
+        const { roleSelect, roles, err, role, pending } = this.state;
         return (
             <div
                 className="login-form panel panel-spaced-lg panel-shadowed panel-primary"
@@ -136,10 +136,13 @@ class LoginForm extends Component {
                 <div className="text-xs-center">
                     <img src={logo} className="header-logo mt-2 mb-2" />
                 </div>
-                {roleSelect ? <div>
+                {roleSelect ? (
+                    <div>
                         <div className="form-control-label">
-                            <small>{counterpart.translate(
-                                    'login.selectRole.caption')}
+                            <small>
+                                {counterpart.translate(
+                                    'login.selectRole.caption'
+                                )}
                             </small>
                         </div>
                         <RawList
@@ -152,13 +155,10 @@ class LoginForm extends Component {
                             doNotOpenOnFocus={true}
                             mandatory={true}
                         />
-                    </div>:
+                    </div>
+                ) : (
                     <div>
-                        {
-                            err && <div className="input-error">
-                                {err}
-                            </div>
-                        }
+                        {err && <div className="input-error">{err}</div>}
                         <div>
                             <div className="form-control-label">
                                 <small>
@@ -171,16 +171,18 @@ class LoginForm extends Component {
                                 className={
                                     'input-primary input-block ' +
                                     (err ? 'input-error ' : '') +
-                                    (pending ? 'input-disabled ': '')
+                                    (pending ? 'input-disabled ' : '')
                                 }
                                 disabled={pending}
-                                ref={c => this.login = c} />
+                                ref={c => (this.login = c)}
+                            />
                         </div>
                         <div>
                             <div className="form-control-label">
                                 <small>
                                     {counterpart.translate(
-                                        'login.password.caption')}
+                                        'login.password.caption'
+                                    )}
                                 </small>
                             </div>
                             <input
@@ -192,27 +194,24 @@ class LoginForm extends Component {
                                     (pending ? 'input-disabled ' : '')
                                 }
                                 disabled={pending}
-                                ref={c => this.passwd = c}
+                                ref={c => (this.passwd = c)}
                             />
                         </div>
-
                     </div>
-                }
+                )}
                 <div className="mt-2">
-
                     <button
                         className="btn btn-sm btn-block btn-meta-success"
                         onClick={this.handleLogin}
                         disabled={pending}
                     >
-                        {roleSelect ? 
-                            counterpart.translate('login.send.caption') :
-                            counterpart.translate('login.callToAction')
-                        }
+                        {roleSelect
+                            ? counterpart.translate('login.send.caption')
+                            : counterpart.translate('login.callToAction')}
                     </button>
                 </div>
             </div>
-        )
+        );
     }
 }
 

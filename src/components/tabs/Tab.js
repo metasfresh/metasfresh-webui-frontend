@@ -1,40 +1,37 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 
-import {
-    getTab,
-    addRowData
-} from '../../actions/WindowActions';
+import { getTab, addRowData } from '../../actions/WindowActions';
 
 class Tab extends Component {
     constructor(props) {
         super(props);
 
         const {
-            dispatch, tabid, windowType, queryOnActivate, docId, orderBy
+            dispatch,
+            tabid,
+            windowType,
+            queryOnActivate,
+            docId,
+            orderBy
         } = this.props;
 
-        if(docId && queryOnActivate){
-            const query =
-                orderBy ?
-                    (orderBy[0].ascending ? '+' : '-') + orderBy[0].fieldName
-                    : '';
+        if (docId && queryOnActivate) {
+            const query = orderBy
+                ? (orderBy[0].ascending ? '+' : '-') + orderBy[0].fieldName
+                : '';
 
             getTab(tabid, windowType, docId, query).then(res => {
-                dispatch(addRowData({[tabid]: res}, 'master'));
+                dispatch(addRowData({ [tabid]: res }, 'master'));
             });
         }
     }
 
     render() {
-        const {children} = this.props;
+        const { children } = this.props;
 
-        return (
-            <div className="table-flex-wrapper">
-                {children}
-            </div>
-        );
+        return <div className="table-flex-wrapper">{children}</div>;
     }
 }
 

@@ -4,13 +4,21 @@ import { Shortcuts } from 'react-shortcuts';
 class GlobalContextShortcuts extends Component {
     constructor(props) {
         super(props);
-
     }
     handleShortcuts = (action, event) => {
         const {
-          handleMenuOverlay, openModal, handleSidelistToggle, handleUDOpen,
-          handlePrint, handleDelete, handleInboxOpen, handleEmail,
-          redirect, handleDocStatusToggle, closeOverlays, handleEditModeToggle
+            handleMenuOverlay,
+            openModal,
+            handleSidelistToggle,
+            handleUDOpen,
+            handlePrint,
+            handleDelete,
+            handleInboxOpen,
+            handleEmail,
+            redirect,
+            handleDocStatusToggle,
+            closeOverlays,
+            handleEditModeToggle
         } = this.props;
 
         switch (action) {
@@ -30,7 +38,7 @@ class GlobalContextShortcuts extends Component {
                 break;
             case 'OPEN_INBOX_MENU':
                 event.preventDefault();
-                closeOverlays('', ()=> handleInboxOpen(true));
+                closeOverlays('', () => handleInboxOpen(true));
                 break;
             case 'OPEN_SIDEBAR_MENU_0':
                 event.preventDefault();
@@ -82,32 +90,32 @@ class GlobalContextShortcuts extends Component {
                 break;
             case 'DOC_STATUS':
                 event.preventDefault();
-                if(handleDocStatusToggle) {
+                if (handleDocStatusToggle) {
                     closeOverlays('dropdown', handleDocStatusToggle);
                 }
                 break;
             case 'TOGGLE_EDIT_MODE':
                 event.preventDefault();
-                if(handleEditModeToggle){
+                if (handleEditModeToggle) {
                     handleEditModeToggle();
                 }
         }
-    }
+    };
 
     render() {
         return (
             <Shortcuts
-                name = "GLOBAL_CONTEXT"
-                handler = { this.handleShortcuts }
-                targetNodeSelector = "body"
-                isolate = { true }
-                preventDefault = { true }
-                stopPropagation = { true }
-                global = {true}
-                alwaysFireHandler = { true }
+                name="GLOBAL_CONTEXT"
+                handler={this.handleShortcuts}
+                targetNodeSelector="body"
+                isolate={true}
+                preventDefault={true}
+                stopPropagation={true}
+                global={true}
+                alwaysFireHandler={true}
             />
-        )
+        );
     }
 }
 
-export default GlobalContextShortcuts
+export default GlobalContextShortcuts;

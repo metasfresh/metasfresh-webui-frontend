@@ -1,16 +1,13 @@
 import React, { Component } from 'react';
 import counterpart from 'counterpart';
 
-import {
-    getMessages,
-    deepForceUpdate
-} from '../actions/AppActions';
+import { getMessages, deepForceUpdate } from '../actions/AppActions';
 
 class Translation extends Component {
     constructor(props) {
         super(props);
     }
-    
+
     componentWillMount = () => {
         getMessages().then(response => {
             counterpart.registerTranslations('lang', response.data);
@@ -22,7 +19,7 @@ class Translation extends Component {
 
             deepForceUpdate(this);
         });
-    }
+    };
 
     render = () => this.props.children;
 }

@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 export default class Label extends Component {
     handleClick = () => {
         this.props.onRemove(this.props.label);
-    }
+    };
 
     render() {
         return (
@@ -12,7 +12,10 @@ export default class Label extends Component {
                 <span
                     className="labels-label-remove"
                     onClick={this.handleClick}
-                > ✕</span>
+                >
+                    {' '}
+                    ✕
+                </span>
             </div>
         );
     }

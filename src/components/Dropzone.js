@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import Dropzone from 'react-dropzone';
 
 class DropzoneWrapper extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.state = {
@@ -11,16 +11,16 @@ class DropzoneWrapper extends Component {
         };
     }
 
-    handleDropFile(accepted, rejected){
+    handleDropFile(accepted, rejected) {
         const { handleDropFile, handleRejectDropped } = this.props;
 
         this.handleDragEnd();
 
-        if (accepted.length){
+        if (accepted.length) {
             handleDropFile(accepted);
         }
 
-        if (rejected.length){
+        if (rejected.length) {
             handleRejectDropped(rejected);
         }
     }
@@ -29,21 +29,24 @@ class DropzoneWrapper extends Component {
         const { handleDragStart } = this.props;
         const { dragActive } = this.state;
 
-        this.setState({
-            dragActive: true
-        }, () => {
-            dragActive && handleDragStart();
-        })
-    }
+        this.setState(
+            {
+                dragActive: true
+            },
+            () => {
+                dragActive && handleDragStart();
+            }
+        );
+    };
 
-    handleDragEnd(){
+    handleDragEnd() {
         this.setState({
             dragActive: false
-        })
+        });
     }
 
     render() {
-        const {dragActive} = this.state;
+        const { dragActive } = this.state;
 
         return (
             <Dropzone
@@ -57,8 +60,7 @@ class DropzoneWrapper extends Component {
                 onDragEnter={() => this.handleDragStart()}
                 onDragLeave={() => this.handleDragEnd()}
                 onDrop={(accepted, rejected) =>
-                    this.handleDropFile(accepted, rejected)
-                }
+                    this.handleDropFile(accepted, rejected)}
             >
                 {this.props.children}
                 <div className="document-file-dropzone-backdrop">

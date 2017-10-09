@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import onClickOutside from 'react-onclickoutside';
 import counterpart from 'counterpart';
 
-import {updateBreadcrumb, elementPathRequest} from '../../actions/MenuActions';
+import {
+    updateBreadcrumb,
+    elementPathRequest
+} from '../../actions/MenuActions';
 
 import Actions from './Actions';
 
@@ -13,19 +16,19 @@ import BookmarkButton from './BookmarkButton';
 import keymap from '../../keymap.js';
 
 class Subheader extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.state = {
             pdfSrc: null,
             elementPath: ''
-        }
+        };
     }
 
     componentDidMount() {
         document.getElementsByClassName('js-subheader-column')[0].focus();
 
-        const entity = (this.props.entity === 'board') ? 'board' : 'window';
+        const entity = this.props.entity === 'board' ? 'board' : 'window';
 
         elementPathRequest(entity, this.props.windowType).then(response => {
             this.setState({
@@ -34,14 +37,14 @@ class Subheader extends Component {
         });
     }
 
-    handleKeyDown = (e) => {
-        const {closeSubheader} = this.props;
+    handleKeyDown = e => {
+        const { closeSubheader } = this.props;
 
-        switch(e.key){
+        switch (e.key) {
             case 'ArrowDown': {
                 e.preventDefault();
                 const activeElem = this.getItemActiveElem();
-                if(activeElem.nextSibling) {
+                if (activeElem.nextSibling) {
                     activeElem.nextSibling.focus();
                 }
                 break;
@@ -49,7 +52,7 @@ class Subheader extends Component {
             case 'ArrowUp': {
                 e.preventDefault();
                 const activeEl = this.getItemActiveElem();
-                if(activeEl.previousSibling) {
+                if (activeEl.previousSibling) {
                     activeEl.previousSibling.focus();
                 }
                 break;
@@ -57,10 +60,10 @@ class Subheader extends Component {
             case 'ArrowLeft': {
                 e.preventDefault();
                 const activeColumn = this.getColumnActiveElem();
-                if(activeColumn.previousSibling) {
+                if (activeColumn.previousSibling) {
                     activeColumn.previousSibling.focus();
-                    if(this.getItemActiveElem().nextSibling) {
-                         this.getItemActiveElem().nextSibling.focus();
+                    if (this.getItemActiveElem().nextSibling) {
+                        this.getItemActiveElem().nextSibling.focus();
                     }
                 }
                 break;
@@ -68,9 +71,9 @@ class Subheader extends Component {
             case 'ArrowRight': {
                 e.preventDefault();
                 const activeCol = this.getColumnActiveElem();
-                if(activeCol.nextSibling) {
+                if (activeCol.nextSibling) {
                     activeCol.nextSibling.focus();
-                    if(this.getItemActiveElem().nextSibling){
+                    if (this.getItemActiveElem().nextSibling) {
                         this.getItemActiveElem().nextSibling.focus();
                     }
                 }
@@ -85,49 +88,47 @@ class Subheader extends Component {
                 closeSubheader();
                 break;
         }
-    }
+    };
 
     handleClickOutside = () => {
         const { closeSubheader } = this.props;
         closeSubheader();
-    }
+    };
 
-    toggleAttachmentDelete = (value) => {
+    toggleAttachmentDelete = value => {
         this.setState({
             attachmentHovered: value
-        })
-    }
+        });
+    };
 
     getColumnActiveElem = () => {
         const active = document.activeElement;
-        if(active.classList.contains('js-subheader-item')) {
+        if (active.classList.contains('js-subheader-item')) {
             return active.parentNode;
         } else {
-             return active;
+            return active;
         }
-    }
+    };
 
     getItemActiveElem = () => {
         const active = document.activeElement;
-        if(
-            active.classList.contains('js-subheader-column')
-        ) {
+        if (active.classList.contains('js-subheader-column')) {
             return active.childNodes[1];
         } else {
             return active;
         }
-    }
+    };
 
-    handleUpdateBreadcrumb = (nodes) => {
-        const {dispatch} = this.props;
+    handleUpdateBreadcrumb = nodes => {
+        const { dispatch } = this.props;
         nodes.map(node => dispatch(updateBreadcrumb(node)));
-    }
+    };
 
     handleDownloadSelected = event => {
         if (this.props.selected.length === 0) {
             event.preventDefault();
         }
-    }
+    };
 
     renderDocLink = ({ action, handler, icon, caption, hotkey }) => {
         const { closeSubheader } = this.props;
@@ -138,18 +139,16 @@ class Subheader extends Component {
                 className="subheader-item js-subheader-item"
                 tabIndex={0}
                 onClick={() => {
-                    handler()
+                    handler();
                     closeSubheader();
                 }}
             >
                 <i className={icon} />
                 {caption}
-                <span className="tooltip-inline">
-                    {hotkey}
-                </span>
+                <span className="tooltip-inline">{hotkey}</span>
             </div>
         );
-    }
+    };
 
     renderDocLinks = () => {
         const {
@@ -169,63 +168,69 @@ class Subheader extends Component {
             return false;
         }
 
-        const docLinks = ([{
-            action: 'advancedEdit',
-            handler: () => {
-                openModal(windowType, 'window', 'Advanced edit', true);
+        const docLinks = [
+            {
+                action: 'advancedEdit',
+                handler: () => {
+                    openModal(windowType, 'window', 'Advanced edit', true);
+                },
+                icon: 'meta-icon-edit',
+                caption: counterpart.translate('window.advancedEdit.caption'),
+                hotkey: keymap.GLOBAL_CONTEXT.OPEN_ADVANCED_EDIT
             },
-            icon: 'meta-icon-edit',
-            caption: counterpart.translate('window.advancedEdit.caption'),
-            hotkey: keymap.GLOBAL_CONTEXT.OPEN_ADVANCED_EDIT
-        }, {
-            action: 'clone',
-            handler: () => {
-                handleClone(windowType, dataId);
+            {
+                action: 'clone',
+                handler: () => {
+                    handleClone(windowType, dataId);
+                },
+                icon: 'meta-icon-duplicate',
+                caption: counterpart.translate('window.clone.caption'),
+                hotkey: keymap.GLOBAL_CONTEXT.CLONE_DOCUMENT
             },
-            icon: 'meta-icon-duplicate',
-            caption: counterpart.translate('window.clone.caption'),
-            hotkey: keymap.GLOBAL_CONTEXT.CLONE_DOCUMENT
-        }, {
-            action: 'email',
-            handler: () => {
-                handleEmail();
+            {
+                action: 'email',
+                handler: () => {
+                    handleEmail();
+                },
+                icon: 'meta-icon-mail',
+                caption: counterpart.translate('window.email.caption'),
+                hotkey: keymap.GLOBAL_CONTEXT.OPEN_EMAIL
             },
-            icon: 'meta-icon-mail',
-            caption: counterpart.translate('window.email.caption'),
-            hotkey: keymap.GLOBAL_CONTEXT.OPEN_EMAIL
-        }, {
-            action: 'letter',
-            handler: () => {
-                handleLetter();
+            {
+                action: 'letter',
+                handler: () => {
+                    handleLetter();
+                },
+                icon: 'meta-icon-letter',
+                caption: counterpart.translate('window.letter.caption'),
+                hotkey: keymap.GLOBAL_CONTEXT.OPEN_LETTER
             },
-            icon: 'meta-icon-letter',
-            caption: counterpart.translate('window.letter.caption'),
-            hotkey: keymap.GLOBAL_CONTEXT.OPEN_LETTER
-        }, {
-            action: 'print',
-            handler: () => {
-                handlePrint(windowType, dataId, docNo);
+            {
+                action: 'print',
+                handler: () => {
+                    handlePrint(windowType, dataId, docNo);
+                },
+                icon: 'meta-icon-print',
+                caption: counterpart.translate('window.Print.caption'),
+                hotkey: keymap.GLOBAL_CONTEXT.OPEN_PRINT_RAPORT
             },
-            icon: 'meta-icon-print',
-            caption: counterpart.translate('window.Print.caption'),
-            hotkey: keymap.GLOBAL_CONTEXT.OPEN_PRINT_RAPORT
-        }, {
-            action: 'delete',
-            handler: () => {
-                handleDelete();
-            },
-            icon: 'meta-icon-delete',
-            caption: counterpart.translate('window.Delete.caption'),
-            hotkey: keymap.GLOBAL_CONTEXT.DELETE_DOCUMENT
-        }]
+            {
+                action: 'delete',
+                handler: () => {
+                    handleDelete();
+                },
+                icon: 'meta-icon-delete',
+                caption: counterpart.translate('window.Delete.caption'),
+                hotkey: keymap.GLOBAL_CONTEXT.DELETE_DOCUMENT
+            }
+        ]
             .filter(docLink => standardActions.has(docLink.action))
             .map(docLink => {
                 return this.renderDocLink(docLink);
-            })
-        );
+            });
 
         return docLinks;
-    }
+    };
 
     renderNavColumn = () => {
         const {
@@ -239,25 +244,23 @@ class Subheader extends Component {
             windowType
         } = this.props;
 
-        const {
-            elementPath
-        } = this.state;
+        const { elementPath } = this.state;
 
         let currentNode = elementPath;
         if (currentNode && currentNode.children) {
             do {
-                currentNode = currentNode.children[currentNode.children.length - 1];
-            } while (currentNode && currentNode.children && (currentNode.type !== 'window'));
+                currentNode =
+                    currentNode.children[currentNode.children.length - 1];
+            } while (
+                currentNode &&
+                currentNode.children &&
+                currentNode.type !== 'window'
+            );
         }
 
         return (
-            <div
-                className="subheader-column js-subheader-column"
-                tabIndex={0}
-            >
-                <div
-                    className="subheader-header"
-                >
+            <div className="subheader-column js-subheader-column" tabIndex={0}>
+                <div className="subheader-header">
                     <BookmarkButton
                         isBookmark={currentNode && currentNode.favorite}
                         nodeId={currentNode && currentNode.nodeId}
@@ -265,90 +268,122 @@ class Subheader extends Component {
                         updateData={this.handleUpdateBreadcrumb}
                     >
                         <span
-                            title={
-                                currentNode ? currentNode.caption : siteName
-                            }
-                            className="subheader-title">
-                                {currentNode ? currentNode.caption : siteName}
+                            title={currentNode ? currentNode.caption : siteName}
+                            className="subheader-title"
+                        >
+                            {currentNode ? currentNode.caption : siteName}
                         </span>
                     </BookmarkButton>
                 </div>
                 <div className="subheader-break" />
-                {windowType && <div
-                    className="subheader-item js-subheader-item"
-                    tabIndex={0}
-                    onClick={() => { redirect(
-                        '/window/'+ windowType + '/new'
-                    ); closeSubheader()}
-                }>
-                    <i className="meta-icon-report-1" />
-                    {counterpart.translate('window.new.caption')}
-                    <span className="tooltip-inline">
-                        {keymap.GLOBAL_CONTEXT.NEW_DOCUMENT}
-                    </span>
-                </div>}
-                {windowType && query && query.viewId && (
-                    <a
+                {windowType && (
+                    <div
                         className="subheader-item js-subheader-item"
-                        href={`${config.API_URL}/documentView/${windowType}/${query.viewId}/export/excel?selectedIds=${selected.join(',')}`}
-                        download
-                        onClick={this.handleDownloadSelected}
-                        style={{
-                            opacity: selected.length === 0 ? '0.5' : 1
+                        tabIndex={0}
+                        onClick={() => {
+                            redirect('/window/' + windowType + '/new');
+                            closeSubheader();
                         }}
                     >
-                        {counterpart.translate('window.downloadSelected.caption')}{selected.length === 0 && ` (${counterpart.translate('window.downloadSelected.nothingSelected')})`}
-                    </a>
+                        <i className="meta-icon-report-1" />
+                        {counterpart.translate('window.new.caption')}
+                        <span className="tooltip-inline">
+                            {keymap.GLOBAL_CONTEXT.NEW_DOCUMENT}
+                        </span>
+                    </div>
                 )}
+                {windowType &&
+                    query &&
+                    query.viewId && (
+                        <a
+                            className="subheader-item js-subheader-item"
+                            href={`${config.API_URL}/documentView/${windowType}/${query.viewId}/export/excel?selectedIds=${selected.join(
+                                ','
+                            )}`}
+                            download
+                            onClick={this.handleDownloadSelected}
+                            style={{
+                                opacity: selected.length === 0 ? '0.5' : 1
+                            }}
+                        >
+                            {counterpart.translate(
+                                'window.downloadSelected.caption'
+                            )}
+                            {selected.length === 0 &&
+                                ` (${counterpart.translate(
+                                    'window.downloadSelected.nothingSelected'
+                                )})`}
+                        </a>
+                    )}
                 {this.renderDocLinks()}
-                {editmode !== undefined && <div
-                    key={editmode}
-                    className="subheader-item js-subheader-item"
-                    tabIndex={0}
-                    onClick={() => {handleEditModeToggle(); closeSubheader()}}
-                >
-                    <i className="meta-icon-settings" />
-                    {editmode ?
-                        counterpart.translate('window.closeEditMode') :
-                        counterpart.translate('window.openEditMode')
-                    }
-                    <span className="tooltip-inline">
-                        {keymap.GLOBAL_CONTEXT.TOGGLE_EDIT_MODE}
-                    </span>
-                </div>}
+                {editmode !== undefined && (
+                    <div
+                        key={editmode}
+                        className="subheader-item js-subheader-item"
+                        tabIndex={0}
+                        onClick={() => {
+                            handleEditModeToggle();
+                            closeSubheader();
+                        }}
+                    >
+                        <i className="meta-icon-settings" />
+                        {editmode
+                            ? counterpart.translate('window.closeEditMode')
+                            : counterpart.translate('window.openEditMode')}
+                        <span className="tooltip-inline">
+                            {keymap.GLOBAL_CONTEXT.TOGGLE_EDIT_MODE}
+                        </span>
+                    </div>
+                )}
             </div>
-        )
-    }
+        );
+    };
 
     renderActionsColumn = () => {
         const {
-            windowType, dataId, selected, selectedWindowType, entity, query,
-            openModal, openModalRow, closeSubheader, notfound, activeTab
+            windowType,
+            dataId,
+            selected,
+            selectedWindowType,
+            entity,
+            query,
+            openModal,
+            openModalRow,
+            closeSubheader,
+            notfound,
+            activeTab
         } = this.props;
 
         return (
             <Actions
                 key={1}
                 {...{
-                    windowType, entity, openModal, openModalRow, closeSubheader, notfound
+                    windowType,
+                    entity,
+                    openModal,
+                    openModalRow,
+                    closeSubheader,
+                    notfound
                 }}
                 docId={dataId ? dataId : query && query.viewId}
                 rowId={selectedWindowType === windowType ? selected : []}
                 activeTab={activeTab}
-                activeTabSelected={(activeTab && selected && (selected.length === 1)) ? selected: []}
+                activeTabSelected={
+                    activeTab && selected && selected.length === 1
+                        ? selected
+                        : []
+                }
             />
         );
-
-    }
+    };
 
     render() {
-
         return (
             <div
                 className="subheader-container overlay-shadow subheader-open js-not-unselect"
                 tabIndex={0}
                 onKeyDown={this.handleKeyDown}
-                ref={(c)=> this.subHeader = c}
+                ref={c => (this.subHeader = c)}
             >
                 <div className="container-fluid-subheader container-fluid">
                     <div className="subheader-row">
@@ -357,7 +392,7 @@ class Subheader extends Component {
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 }
 

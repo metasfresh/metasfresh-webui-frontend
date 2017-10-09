@@ -6,7 +6,7 @@ class BlankPage extends Component {
     }
 
     render() {
-        const {what} = this.props;
+        const { what } = this.props;
 
         return (
             <div className="blank-page">

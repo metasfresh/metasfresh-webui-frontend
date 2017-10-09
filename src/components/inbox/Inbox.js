@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
-import {push} from 'react-router-redux';
+import { connect } from 'react-redux';
+import { push } from 'react-router-redux';
 import counterpart from 'counterpart';
 
 import onClickOutside from 'react-onclickoutside';
@@ -17,47 +17,51 @@ import {
 } from '../../actions/AppActions';
 
 class Inbox extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
     }
 
     handleClickOutside = () => {
-        const {close} = this.props;
+        const { close } = this.props;
 
         close && close();
-    }
+    };
 
-    handleClick = (item) => {
-        const {dispatch, close} = this.props;
-        if(item.target){
-            switch(item.target.targetType){
+    handleClick = item => {
+        const { dispatch, close } = this.props;
+        if (item.target) {
+            switch (item.target.targetType) {
                 case 'window':
-                    dispatch(push(
-                        '/window/' + item.target.documentType + '/' +
-                        item.target.documentId
-                    ));
+                    dispatch(
+                        push(
+                            '/window/' +
+                                item.target.documentType +
+                                '/' +
+                                item.target.documentId
+                        )
+                    );
                     break;
             }
         }
-        if(!item.read){
+        if (!item.read) {
             markAsRead(item.id);
         }
         close && close();
-    }
+    };
 
     handleMarkAllAsRead = () => {
-        const {close} = this.props;
+        const { close } = this.props;
 
         markAllAsRead();
 
         close && close();
-    }
+    };
 
     handleShowAll = () => {
-        const {close, dispatch} = this.props;
+        const { close, dispatch } = this.props;
         dispatch(push('/inbox'));
         close && close();
-    }
+    };
 
     handleDelete = (e, item) => {
         const { dispatch } = this.props;
@@ -65,29 +69,31 @@ class Inbox extends Component {
         e.preventDefault();
         e.stopPropagation();
 
-        deleteUserNotification(item.id).then( () => {});
-    }
+        deleteUserNotification(item.id).then(() => {});
+    };
 
     componentDidUpdate() {
-        const {open} = this.props;
-        const inboxWrapper =
-            document.getElementsByClassName('js-inbox-wrapper')[0];
-        if(inboxWrapper && open){
+        const { open } = this.props;
+        const inboxWrapper = document.getElementsByClassName(
+            'js-inbox-wrapper'
+        )[0];
+        if (inboxWrapper && open) {
             inboxWrapper.focus();
         }
     }
 
-    handleKeyDown = (e) => {
-        const {close} = this.props;
+    handleKeyDown = e => {
+        const { close } = this.props;
         const inboxItem = document.getElementsByClassName('js-inbox-item')[0];
-        switch(e.key){
+        switch (e.key) {
             case 'ArrowDown':
                 e.preventDefault();
                 if (
-                    document.activeElement.classList
-                        .contains('js-inbox-wrapper')
+                    document.activeElement.classList.contains(
+                        'js-inbox-wrapper'
+                    )
                 ) {
-                    if(inboxItem){
+                    if (inboxItem) {
                         inboxItem.focus();
                     }
                 }
@@ -97,83 +103,86 @@ class Inbox extends Component {
                 close && close();
                 break;
         }
-    }
+    };
 
     render() {
-        const {open, inbox, all, close} = this.props;
+        const { open, inbox, all, close } = this.props;
         return (
             <div
                 className="js-inbox-wrapper"
-                onKeyDown={(e) => this.handleKeyDown(e)}
+                onKeyDown={e => this.handleKeyDown(e)}
                 tabIndex={0}
             >
-                {(all || open) && <div className={
-                    (all ? 'inbox-all ': 'inbox')
-                }>
-                    <div className={
-                        'inbox-body ' +
-                        (!all ? 'breadcrumbs-shadow' : '')
-                    }
-
-                    >
+                {(all || open) && (
+                    <div className={all ? 'inbox-all ' : 'inbox'}>
                         <div
-                            className="inbox-header"
-                        >
-                            <span className="inbox-header-title">{
-                                counterpart.translate('window.inbox.caption')
-                            }</span>
-                            <span
-                                onClick={this.handleMarkAllAsRead}
-                                className="inbox-link"
-                            >
-                                {counterpart.translate(
-                                    'window.markAsRead.caption'
-                                )}
-                            </span>
-                        </div>
-                        <div className={
-                            (!all ? 'inbox-list' : '')
-                        }>
-                            {inbox && inbox.notifications.map((item, id) =>
-                                <InboxItem
-                                    key={id}
-                                    item={item}
-                                    close={close}
-                                    onClick={() => this.handleClick(item)}
-                                    onDelete={(e) => this.handleDelete(e, item)}
-                                />
-                            )}
-                            {inbox && inbox.notifications.length == 0 &&
-                                <div className="inbox-item inbox-item-empty">
-                                    {counterpart.translate(
-                                        'window.inbox.empty'
-                                    )}
-                                </div>
+                            className={
+                                'inbox-body ' +
+                                (!all ? 'breadcrumbs-shadow' : '')
                             }
-                        </div>
-                        <div
-                            className="inbox-footer"
                         >
-                            {!all && <div
-                                onClick={this.handleShowAll}
-                                className="inbox-link text-xs-center"
-                            >
-                                {counterpart.translate(
-                                    'window.allInbox.caption'
-                                )} &gt;&gt;
-                            </div>}
+                            <div className="inbox-header">
+                                <span className="inbox-header-title">
+                                    {counterpart.translate(
+                                        'window.inbox.caption'
+                                    )}
+                                </span>
+                                <span
+                                    onClick={this.handleMarkAllAsRead}
+                                    className="inbox-link"
+                                >
+                                    {counterpart.translate(
+                                        'window.markAsRead.caption'
+                                    )}
+                                </span>
+                            </div>
+                            <div className={!all ? 'inbox-list' : ''}>
+                                {inbox &&
+                                    inbox.notifications.map((item, id) => (
+                                        <InboxItem
+                                            key={id}
+                                            item={item}
+                                            close={close}
+                                            onClick={() =>
+                                                this.handleClick(item)}
+                                            onDelete={e =>
+                                                this.handleDelete(e, item)}
+                                        />
+                                    ))}
+                                {inbox &&
+                                    inbox.notifications.length == 0 && (
+                                        <div className="inbox-item inbox-item-empty">
+                                            {counterpart.translate(
+                                                'window.inbox.empty'
+                                            )}
+                                        </div>
+                                    )}
+                            </div>
+                            <div className="inbox-footer">
+                                {!all && (
+                                    <div
+                                        onClick={this.handleShowAll}
+                                        className="inbox-link text-xs-center"
+                                    >
+                                        {counterpart.translate(
+                                            'window.allInbox.caption'
+                                        )}{' '}
+                                        &gt;&gt;
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>}
+                )}
             </div>
-        )
+        );
     }
 }
 
 Inbox.propTypes = {
-	dispatch: PropTypes.func.isRequired
+    dispatch: PropTypes.func.isRequired
 };
 
-Inbox = connect()(onClickOutside(Inbox))
+Inbox = connect()(onClickOutside(Inbox));
 
 export default Inbox;

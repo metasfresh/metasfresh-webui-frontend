@@ -1,6 +1,6 @@
 import React from 'react';
-import {Route, IndexRoute, NoMatch} from 'react-router';
-import {push} from 'react-router-redux';
+import { Route, IndexRoute, NoMatch } from 'react-router';
+import { push } from 'react-router-redux';
 
 import Login from './containers/Login.js';
 import Board from './containers/Board.js';
@@ -19,31 +19,30 @@ import {
     enableTutorial
 } from './actions/AppActions';
 
-import {
-    createWindow
-} from './actions/WindowActions';
+import { createWindow } from './actions/WindowActions';
 
 let hasTutorial = false;
 
 export const getRoutes = (store, auth) => {
     const authRequired = (nextState, replace, callback) => {
-        hasTutorial = (
-            nextState && nextState.location && nextState.location.query &&
-            (typeof nextState.location.query.tutorial !== 'undefined')
-        );
+        hasTutorial =
+            nextState &&
+            nextState.location &&
+            nextState.location.query &&
+            typeof nextState.location.query.tutorial !== 'undefined';
 
-        if( !localStorage.isLogged ){
-            localLoginRequest().then((resp) => {
-                if(resp.data){
+        if (!localStorage.isLogged) {
+            localLoginRequest().then(resp => {
+                if (resp.data) {
                     store.dispatch(loginSuccess(auth));
                     callback(null, nextState.location.pathname);
-                }else{
+                } else {
                     //redirect tells that there should be
                     //step back in history after login
                     store.dispatch(push('/login?redirect=true'));
                 }
-            })
-        }else{
+            });
+        } else {
             if (hasTutorial) {
                 store.dispatch(enableTutorial());
             }
@@ -57,53 +56,59 @@ export const getRoutes = (store, auth) => {
     };
 
     const logout = () => {
-        logoutRequest().then(()=>
-            logoutSuccess(auth)
-        ).then(()=>
-            store.dispatch(push('/login'))
-        );
+        logoutRequest()
+            .then(() => logoutSuccess(auth))
+            .then(() => store.dispatch(push('/login')));
     };
 
     return (
         <Route path="/">
             <Route onEnter={authRequired}>
                 <IndexRoute component={Dashboard} />
-                <Route path="/window/:windowType"
-                    component={(nextState) =>
+                <Route
+                    path="/window/:windowType"
+                    component={nextState => (
                         <DocList
                             query={nextState.location.query}
                             windowType={nextState.params.windowType}
                         />
-                    }
-                />
-                <Route path="/window/:windowType/:docId"
-                    component={MasterWindow}
-                    onEnter={(nextState) => store.dispatch(
-                        createWindow(
-                            nextState.params.windowType, nextState.params.docId
-                        )
                     )}
                 />
+                <Route
+                    path="/window/:windowType/:docId"
+                    component={MasterWindow}
+                    onEnter={nextState =>
+                        store.dispatch(
+                            createWindow(
+                                nextState.params.windowType,
+                                nextState.params.docId
+                            )
+                        )}
+                />
                 <Route path="/sitemap" component={NavigationTree} />
-                <Route path="/board/:boardId"
-                    component={(nextState) =>
+                <Route
+                    path="/board/:boardId"
+                    component={nextState => (
                         <Board
                             query={nextState.location.query}
                             boardId={nextState.params.boardId}
                         />
-                    }
+                    )}
                 />
                 <Route path="/inbox" component={InboxAll} />
                 <Route path="/logout" onEnter={logout} />
             </Route>
-            <Route path="/login" component={nextState =>
-                <Login
-                    redirect={nextState.location.query.redirect}
-                    logged={localStorage.isLogged}
-                    {...{auth}}
-                />
-            } />
+            <Route
+                path="/login"
+                component={nextState => (
+                    <Login
+                        redirect={nextState.location.query.redirect}
+                        logged={localStorage.isLogged}
+                        {...{ auth }}
+                    />
+                )}
+            />
             <Route path="*" component={NoMatch} />
         </Route>
-    )
-}
+    );
+};

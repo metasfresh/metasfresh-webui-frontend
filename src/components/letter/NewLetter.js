@@ -1,14 +1,10 @@
 import React, { Component } from 'react';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import counterpart from 'counterpart';
 
-import {
-    addNotification
-} from '../../actions/AppActions';
+import { addNotification } from '../../actions/AppActions';
 
-import {
-    patchRequest
-} from '../../actions/GenericActions';
+import { patchRequest } from '../../actions/GenericActions';
 
 import {
     createLetter,
@@ -16,10 +12,10 @@ import {
     getTemplates
 } from '../../actions/LetterActions';
 
-import RawList from '../widget/List/RawList'
+import RawList from '../widget/List/RawList';
 
 class NewLetter extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.state = {
@@ -27,24 +23,26 @@ class NewLetter extends Component {
             cached: {},
             templates: [],
             template: {}
-        }
+        };
     }
 
     componentWillMount = () => {
         const { windowId, docId, handleCloseLetter } = this.props;
 
-        createLetter(windowId, docId).then(res => {
-            this.setState({
-                ...res.data,
-                init: true,
-                cached: res.data
-            })
+        createLetter(windowId, docId)
+            .then(res => {
+                this.setState({
+                    ...res.data,
+                    init: true,
+                    cached: res.data
+                });
 
-            this.getTemplates();
-        }).catch(() => {
-            handleCloseLetter();
-        });
-    }
+                this.getTemplates();
+            })
+            .catch(() => {
+                handleCloseLetter();
+            });
+    };
 
     getTemplates = () => {
         getTemplates().then(res => {
@@ -52,13 +50,13 @@ class NewLetter extends Component {
                 templates: res.data.values
             });
         });
-    }
+    };
 
     handleChange = ({ target: { value: message } }) => {
         this.setState({
             message
         });
-    }
+    };
 
     handleBlur = ({ target: { value: message } }) => {
         const { letterId } = this.state;
@@ -78,7 +76,7 @@ class NewLetter extends Component {
                 cached: response.data
             });
         });
-    }
+    };
 
     complete = () => {
         const { letterId } = this.state;
@@ -87,11 +85,16 @@ class NewLetter extends Component {
         completeLetter(letterId).then(() => {
             handleCloseLetter();
 
-            dispatch(addNotification(
-                'Letter', 'Letter has been sent.', 5000, 'success'
-            ));
+            dispatch(
+                addNotification(
+                    'Letter',
+                    'Letter has been sent.',
+                    5000,
+                    'success'
+                )
+            );
         });
-    }
+    };
 
     handleTemplate = option => {
         const { letterId, template } = this.state;
@@ -106,12 +109,12 @@ class NewLetter extends Component {
             property: 'templateId',
             value: option
         }).then(response => {
-           this.setState({
-               ...response.data,
+            this.setState({
+                ...response.data,
                 template: option
             });
         });
-    }
+    };
 
     render() {
         const { handleCloseLetter } = this.props;
@@ -135,14 +138,15 @@ class NewLetter extends Component {
                                 className="input-icon input-icon-lg letter-icon-print"
                                 onClick={handleCloseLetter}
                             >
-                                <i className="meta-icon-print"/>
+                                <i className="meta-icon-print" />
                             </a>
                             {templates.length > 0 && (
                                 <div className="letter-templates">
                                     <RawList
                                         rank="primary"
                                         list={templates}
-                                        onSelect={option => this.handleTemplate(option)}
+                                        onSelect={option =>
+                                            this.handleTemplate(option)}
                                         selected={template}
                                     />
                                 </div>
@@ -151,7 +155,7 @@ class NewLetter extends Component {
                                 className="input-icon input-icon-lg letter-icon-close"
                                 onClick={handleCloseLetter}
                             >
-                                <i className="meta-icon-close-1"/>
+                                <i className="meta-icon-close-1" />
                             </div>
                         </div>
                     </div>
@@ -172,7 +176,7 @@ class NewLetter extends Component {
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 }
 

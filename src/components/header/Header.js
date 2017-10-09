@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
-import {push, replace} from 'react-router-redux';
+import { connect } from 'react-redux';
+import { push, replace } from 'react-router-redux';
 import counterpart from 'counterpart';
 
 import logo from '../../assets/images/metasfresh_logo_green_thumb.png';
@@ -18,10 +18,7 @@ import Prompt from '../app/Prompt';
 import NewEmail from '../email/NewEmail';
 import NewLetter from '../letter/NewLetter';
 
-import {
-    openModal,
-    closeModal
-} from '../../actions/WindowActions';
+import { openModal, closeModal } from '../../actions/WindowActions';
 
 import {
     deleteRequest,
@@ -35,7 +32,7 @@ import { ShortcutManager } from 'react-shortcuts';
 const shortcutManager = new ShortcutManager(keymap);
 
 class Header extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.state = {
@@ -52,7 +49,7 @@ class Header extends Component {
             prompt: {
                 open: false
             }
-        }
+        };
     }
 
     componentDidMount() {
@@ -64,154 +61,162 @@ class Header extends Component {
         this.removeEventListeners();
     }
 
-    componentWillUpdate = (nextProps) => {
-        const {dropzoneFocused} = this.props;
-        if(
+    componentWillUpdate = nextProps => {
+        const { dropzoneFocused } = this.props;
+        if (
             nextProps.dropzoneFocused !== dropzoneFocused &&
             nextProps.dropzoneFocused
-        ){
+        ) {
             this.closeOverlays();
         }
-    }
+    };
 
-    componentDidUpdate = (prevProps) => {
-        const {dispatch, pathname} = this.props;
-        if(
+    componentDidUpdate = prevProps => {
+        const { dispatch, pathname } = this.props;
+        if (
             prevProps.me.language !== undefined &&
             JSON.stringify(prevProps.me.language) !==
-            JSON.stringify(this.props.me.language)
+                JSON.stringify(this.props.me.language)
         ) {
-/*
+            /*
             dispatch(replace(''));
             dispatch(replace(pathname));
 */
             // Need to reload page completely when current locale gets changed
             window.location.reload(false);
         }
-    }
+    };
 
     getChildContext = () => {
-        return { shortcuts: shortcutManager }
-    }
+        return { shortcuts: shortcutManager };
+    };
 
     initEventListeners = () => {
         document.addEventListener('scroll', this.handleScroll);
-    }
+    };
 
     removeEventListeners = () => {
         document.removeEventListener('scroll', this.handleScroll);
-    }
+    };
 
-    handleInboxOpen = (state) => {
+    handleInboxOpen = state => {
         this.setState({
             isInboxOpen: !!state
         });
-    }
+    };
 
-    handleUDOpen = (state) => {
+    handleUDOpen = state => {
         this.setState({
             isUDOpen: !!state
-        })
-    }
+        });
+    };
 
     handleMenuOverlay = (e, nodeId) => {
-        const {isSubheaderShow, isSideListShow} = this.state;
+        const { isSubheaderShow, isSideListShow } = this.state;
         e && e.preventDefault();
 
         let toggleBreadcrumb = () => {
-            this.setState({
-                menuOverlay: nodeId
-            }, () => {
-                if(nodeId !== '') {
-                    this.setState({
-                        isMenuOverlayShow: true
-                    });
-                } else {
-                    this.setState({
-                        isMenuOverlayShow: false
-                    });
+            this.setState(
+                {
+                    menuOverlay: nodeId
+                },
+                () => {
+                    if (nodeId !== '') {
+                        this.setState({
+                            isMenuOverlayShow: true
+                        });
+                    } else {
+                        this.setState({
+                            isMenuOverlayShow: false
+                        });
+                    }
                 }
-            });
-        }
+            );
+        };
 
-        if(!isSubheaderShow && !isSideListShow){
+        if (!isSubheaderShow && !isSideListShow) {
             toggleBreadcrumb();
         }
-    }
+    };
 
-    handleScroll = (event) => {
+    handleScroll = event => {
         const target = event.srcElement;
         let scrollTop = target && target.body.scrollTop;
 
-        if(!scrollTop){
+        if (!scrollTop) {
             scrollTop = document.documentElement.scrollTop;
         }
 
-        if(scrollTop > 0) {
+        if (scrollTop > 0) {
             this.setState({
                 scrolled: true
-            })
+            });
         } else {
             this.setState({
                 scrolled: false
-            })
+            });
         }
-    }
+    };
 
     handleDashboardLink = () => {
-        const {dispatch} = this.props;
+        const { dispatch } = this.props;
         dispatch(push('/'));
-    }
+    };
 
-    toggleScrollScope = (open) => {
-        if(!open){
+    toggleScrollScope = open => {
+        if (!open) {
             document.body.style.overflow = 'auto';
-        }else{
+        } else {
             document.body.style.overflow = 'hidden';
         }
-    }
+    };
 
-    toggleTooltip = (tooltip) => {
+    toggleTooltip = tooltip => {
         this.setState({
             tooltipOpen: tooltip
         });
-    }
+    };
 
     openModal = (windowType, type, caption, isAdvanced) => {
-        const {dispatch, query} = this.props;
-        dispatch(openModal(
-            caption, windowType, type, null, null, isAdvanced,
-            query && query.viewId
-        ));
-    }
+        const { dispatch, query } = this.props;
+        dispatch(
+            openModal(
+                caption,
+                windowType,
+                type,
+                null,
+                null,
+                isAdvanced,
+                query && query.viewId
+            )
+        );
+    };
 
     openModalRow = (windowType, type, caption, tabId, rowId) => {
         const { dispatch } = this.props;
 
-        dispatch(openModal(
-            caption, windowType, type, tabId, rowId
-        ));
-    }
+        dispatch(openModal(caption, windowType, type, tabId, rowId));
+    };
 
     handlePrint = (windowType, docId, docNo) => {
         openFile(
-            'window', windowType, docId, 'print',
+            'window',
+            windowType,
+            docId,
+            'print',
             windowType + '_' + (docNo ? docNo : docId) + '.pdf'
         );
-    }
+    };
 
     handleClone = (windowType, docId) => {
         const { dispatch } = this.props;
 
-        duplicateRequest('window', windowType, docId)
-            .then( (response) => {
-                if (response && response.data && response.data.id) {
-                    dispatch(
-                        push(`/window/${windowType}/${response.data.id}`)
-                    );
-                }
-            });
-    }
+        duplicateRequest('window', windowType, docId).then(response => {
+            if (response && response.data && response.data.id) {
+                dispatch(push(`/window/${windowType}/${response.data.id}`));
+            }
+        });
+    };
 
     handleDelete = () => {
         this.setState({
@@ -219,31 +224,31 @@ class Header extends Component {
                 open: true
             })
         });
-    }
+    };
 
     handleEmail = () => {
         this.setState({
             isEmailOpen: true
         });
-    }
+    };
 
     handleLetter = () => {
         this.setState({
             isLetterOpen: true
         });
-    }
+    };
 
     handleCloseEmail = () => {
         this.setState({
             isEmailOpen: false
         });
-    }
+    };
 
     handleCloseLetter = () => {
         this.setState({
             isLetterOpen: false
         });
-    }
+    };
 
     handlePromptCancelClick = () => {
         this.setState({
@@ -251,111 +256,140 @@ class Header extends Component {
                 open: false
             })
         });
-    }
+    };
 
     handlePromptSubmitClick = (windowType, docId) => {
-        const {dispatch, handleDeletedStatus} = this.props;
+        const { dispatch, handleDeletedStatus } = this.props;
 
-        this.setState({
-            prompt: Object.assign({}, this.state.prompt, {
-                open: false
-            })
-        }, () => {
-            deleteRequest('window', windowType, null, null, [docId])
-                .then(() => {
+        this.setState(
+            {
+                prompt: Object.assign({}, this.state.prompt, {
+                    open: false
+                })
+            },
+            () => {
+                deleteRequest('window', windowType, null, null, [
+                    docId
+                ]).then(() => {
                     handleDeletedStatus(true);
                     dispatch(push('/window/' + windowType));
                 });
             }
         );
-    }
+    };
 
-    handleDocStatusToggle = (close) => {
+    handleDocStatusToggle = close => {
         const elem = document.getElementsByClassName('js-dropdown-toggler')[0];
 
-        if(close) {
+        if (close) {
             elem.blur();
         } else {
-            if(document.activeElement === elem) {
+            if (document.activeElement === elem) {
                 elem.blur();
             } else {
                 elem.focus();
             }
         }
-    }
+    };
 
     handleSidelistToggle = (id = null, sideListTab) => {
-
         this.toggleScrollScope(id !== null);
 
         this.setState({
             isSideListShow: id !== null && id !== sideListTab,
             sideListTab: id !== sideListTab ? id : null
         });
-    }
+    };
 
     closeOverlays = (clickedItem, callback) => {
-        const {isSubheaderShow} = this.state;
+        const { isSubheaderShow } = this.state;
 
-        this.setState({
-            menuOverlay: null,
-            isMenuOverlayShow: false,
-            isInboxOpen: false,
-            isUDOpen: false,
-            isSideListShow: false,
-            sideListTab: null,
-            isSubheaderShow:
-                (clickedItem == 'isSubheaderShow' ? !isSubheaderShow : false),
-            tooltipOpen: ''
-        }, callback);
+        this.setState(
+            {
+                menuOverlay: null,
+                isMenuOverlayShow: false,
+                isInboxOpen: false,
+                isUDOpen: false,
+                isSideListShow: false,
+                sideListTab: null,
+                isSubheaderShow:
+                    clickedItem == 'isSubheaderShow' ? !isSubheaderShow : false,
+                tooltipOpen: ''
+            },
+            callback
+        );
 
-        if(
+        if (
             document.getElementsByClassName('js-dropdown-toggler')[0] &&
-            (clickedItem != 'dropdown')
-        ){
+            clickedItem != 'dropdown'
+        ) {
             this.handleDocStatusToggle(true);
         }
-    }
+    };
 
-    redirect = (where) => {
-        const {dispatch} = this.props;
+    redirect = where => {
+        const { dispatch } = this.props;
         dispatch(push(where));
-    }
+    };
 
     render() {
         const {
-            docSummaryData, siteName, docNoData, docStatus,
-            docStatusData, windowType, dataId, breadcrumb, showSidelist,
-            inbox, selected, entity, query, showIndicator, isDocumentNotSaved,
-            selectedWindowType, notfound, docId, me, editmode,
-            handleEditModeToggle, activeTab
+            docSummaryData,
+            siteName,
+            docNoData,
+            docStatus,
+            docStatusData,
+            windowType,
+            dataId,
+            breadcrumb,
+            showSidelist,
+            inbox,
+            selected,
+            entity,
+            query,
+            showIndicator,
+            isDocumentNotSaved,
+            selectedWindowType,
+            notfound,
+            docId,
+            me,
+            editmode,
+            handleEditModeToggle,
+            activeTab
         } = this.props;
 
         const {
-            isSubheaderShow, isSideListShow, menuOverlay, isInboxOpen, scrolled,
-            isMenuOverlayShow, tooltipOpen, prompt, sideListTab, isUDOpen,
-            isEmailOpen, isLetterOpen
+            isSubheaderShow,
+            isSideListShow,
+            menuOverlay,
+            isInboxOpen,
+            scrolled,
+            isMenuOverlayShow,
+            tooltipOpen,
+            prompt,
+            sideListTab,
+            isUDOpen,
+            isEmailOpen,
+            isLetterOpen
         } = this.state;
 
         return (
             <div>
-            {
-                prompt.open &&
-                <Prompt
-                    title="Delete"
-                    text="Are you sure?"
-                    buttons={{submit: 'Delete', cancel: 'Cancel'}}
-                    onCancelClick={this.handlePromptCancelClick}
-                    onSubmitClick={() =>
-                        this.handlePromptSubmitClick(windowType, dataId)
-                    }
-                />
-            }
+                {prompt.open && (
+                    <Prompt
+                        title="Delete"
+                        text="Are you sure?"
+                        buttons={{ submit: 'Delete', cancel: 'Cancel' }}
+                        onCancelClick={this.handlePromptCancelClick}
+                        onSubmitClick={() =>
+                            this.handlePromptSubmitClick(windowType, dataId)}
+                    />
+                )}
 
                 <nav
                     className={
                         'header header-super-faded js-not-unselect ' +
-                        (scrolled ? 'header-shadow': '')
+                        (scrolled ? 'header-shadow' : '')
                     }
                 >
                     <div className="container-fluid">
@@ -363,52 +397,54 @@ class Header extends Component {
                             <div className="header-left-side">
                                 <div
                                     onClick={() =>
-                                        this.closeOverlays('isSubheaderShow')
-                                    }
+                                        this.closeOverlays('isSubheaderShow')}
                                     onMouseEnter={() =>
                                         this.toggleTooltip(
-                                            keymap
-                                                .GLOBAL_CONTEXT
+                                            keymap.GLOBAL_CONTEXT
                                                 .OPEN_ACTIONS_MENU
-                                        )
-                                    }
+                                        )}
                                     onMouseLeave={() => this.toggleTooltip('')}
                                     className={
                                         'btn-square btn-header ' +
                                         'tooltip-parent ' +
-                                        (isSubheaderShow ?
-                                            'btn-meta-default-dark ' +
-                                            'btn-subheader-open btn-header-open'
+                                        (isSubheaderShow
+                                            ? 'btn-meta-default-dark ' +
+                                              'btn-subheader-open btn-header-open'
                                             : 'btn-meta-primary')
-                                        }
+                                    }
                                 >
                                     <i className="meta-icon-more" />
 
                                     {tooltipOpen ===
-                                        keymap.GLOBAL_CONTEXT.OPEN_ACTIONS_MENU
-                                        && <Tooltips
+                                        keymap.GLOBAL_CONTEXT
+                                            .OPEN_ACTIONS_MENU && (
+                                        <Tooltips
                                             name={
-                                                keymap
-                                                    .GLOBAL_CONTEXT
+                                                keymap.GLOBAL_CONTEXT
                                                     .OPEN_ACTIONS_MENU
                                             }
-                                            action={
-                                                counterpart.translate(
+                                            action={counterpart.translate(
                                                 'mainScreen.actionMenu.tooltip'
-                                                )
-                                            }
+                                            )}
                                             type={''}
-                                        /> }
+                                        />
+                                    )}
                                 </div>
 
                                 <Breadcrumb
-                                    {...{breadcrumb, windowType, docSummaryData,
-                                        dataId, siteName, menuOverlay, docId,
-                                        isDocumentNotSaved}}
+                                    {...{
+                                        breadcrumb,
+                                        windowType,
+                                        docSummaryData,
+                                        dataId,
+                                        siteName,
+                                        menuOverlay,
+                                        docId,
+                                        isDocumentNotSaved
+                                    }}
                                     handleMenuOverlay={this.handleMenuOverlay}
                                     openModal={this.openModal}
                                 />
-
                             </div>
                             <div className="header-center">
                                 <img
@@ -418,20 +454,16 @@ class Header extends Component {
                                 />
                             </div>
                             <div className="header-right-side">
-                                {docStatus &&
+                                {docStatus && (
                                     <div
                                         className="hidden-sm-down tooltip-parent"
                                         onClick={() => this.toggleTooltip('')}
                                         onMouseEnter={() =>
                                             this.toggleTooltip(
-                                                keymap
-                                                    .GLOBAL_CONTEXT
-                                                    .DOC_STATUS
-                                            )
-                                        }
+                                                keymap.GLOBAL_CONTEXT.DOC_STATUS
+                                            )}
                                         onMouseLeave={() =>
-                                            this.toggleTooltip('')
-                                        }
+                                            this.toggleTooltip('')}
                                     >
                                         <MasterWidget
                                             entity="window"
@@ -440,31 +472,27 @@ class Header extends Component {
                                             widgetData={[docStatusData]}
                                             noLabel={true}
                                             type="primary"
-                                            dropdownOpenCallback={()=>{
-                                                this.closeOverlays('dropdown')
+                                            dropdownOpenCallback={() => {
+                                                this.closeOverlays('dropdown');
                                             }}
                                             {...docStatus}
                                         />
-                                        { tooltipOpen ===
-                                            keymap
-                                                .GLOBAL_CONTEXT
-                                                .DOC_STATUS
-                                            && <Tooltips
+                                        {tooltipOpen ===
+                                            keymap.GLOBAL_CONTEXT
+                                                .DOC_STATUS && (
+                                            <Tooltips
                                                 name={
-                                                    keymap
-                                                        .GLOBAL_CONTEXT
+                                                    keymap.GLOBAL_CONTEXT
                                                         .DOC_STATUS
                                                 }
-                                                action= {
-                                                counterpart.translate(
-                                                'mainScreen.docStatus.tooltip'
-                                                )
-                                                }
+                                                action={counterpart.translate(
+                                                    'mainScreen.docStatus.tooltip'
+                                                )}
                                                 type={''}
                                             />
-                                        }
+                                        )}
                                     </div>
-                                }
+                                )}
 
                                 <div
                                     className={
@@ -476,48 +504,36 @@ class Header extends Component {
                                     onClick={() =>
                                         this.closeOverlays('', () =>
                                             this.handleInboxOpen(true)
-                                    )}
+                                        )}
                                     onMouseEnter={() =>
                                         this.toggleTooltip(
-                                            keymap
-                                                .GLOBAL_CONTEXT
+                                            keymap.GLOBAL_CONTEXT
                                                 .OPEN_INBOX_MENU
-                                        )
-                                    }
+                                        )}
                                     onMouseLeave={() => this.toggleTooltip('')}
                                 >
-                                    <span
-                                        className="header-item header-item-badge icon-lg"
-                                    >
-                                        <i
-                                            className="meta-icon-notifications"
-                                        />
-                                        {inbox.unreadCount > 0 &&
-                                            <span
-                                                className="notification-number"
-                                            >
+                                    <span className="header-item header-item-badge icon-lg">
+                                        <i className="meta-icon-notifications" />
+                                        {inbox.unreadCount > 0 && (
+                                            <span className="notification-number">
                                                 {inbox.unreadCount}
                                             </span>
-                                        }
+                                        )}
                                     </span>
-                                    { tooltipOpen ===
-                                        keymap
-                                            .GLOBAL_CONTEXT
-                                            .OPEN_INBOX_MENU &&
+                                    {tooltipOpen ===
+                                        keymap.GLOBAL_CONTEXT
+                                            .OPEN_INBOX_MENU && (
                                         <Tooltips
                                             name={
-                                                keymap
-                                                    .GLOBAL_CONTEXT
+                                                keymap.GLOBAL_CONTEXT
                                                     .OPEN_INBOX_MENU
                                             }
-                                            action= {
-                                                counterpart.translate(
-                                                    'mainScreen.inbox.tooltip'
-                                                )
-                                            }
+                                            action={counterpart.translate(
+                                                'mainScreen.inbox.tooltip'
+                                            )}
                                             type={''}
                                         />
-                                    }
+                                    )}
                                 </div>
 
                                 <Inbox
@@ -533,19 +549,20 @@ class Header extends Component {
                                     disableOnClickOutside={!isUDOpen}
                                     redirect={this.redirect}
                                     shortcut={
-                                        keymap.GLOBAL_CONTEXT.OPEN_AVATAR_MENU}
+                                        keymap.GLOBAL_CONTEXT.OPEN_AVATAR_MENU
+                                    }
                                     toggleTooltip={this.toggleTooltip}
-                                    {...{tooltipOpen, me}}
+                                    {...{ tooltipOpen, me }}
                                 />
 
-                                {showSidelist &&
+                                {showSidelist && (
                                     <div
                                         className={
                                             'tooltip-parent btn-header ' +
                                             'side-panel-toggle btn-square ' +
-                                            (isSideListShow ?
-                                                'btn-meta-default-bright ' +
-                                                'btn-header-open'
+                                            (isSideListShow
+                                                ? 'btn-meta-default-bright ' +
+                                                  'btn-header-open'
                                                 : 'btn-meta-primary')
                                         }
                                         onClick={() => {
@@ -554,127 +571,156 @@ class Header extends Component {
                                         }}
                                         onMouseEnter={() =>
                                             this.toggleTooltip(
-                                                keymap
-                                                    .GLOBAL_CONTEXT
+                                                keymap.GLOBAL_CONTEXT
                                                     .OPEN_SIDEBAR_MENU_0
-                                            )
-                                        }
+                                            )}
                                         onMouseLeave={() =>
-                                            this.toggleTooltip('')
-                                        }
+                                            this.toggleTooltip('')}
                                     >
                                         <i className="meta-icon-list" />
-                                        { tooltipOpen ===
-                                            keymap
-                                                .GLOBAL_CONTEXT
-                                                .OPEN_SIDEBAR_MENU_0 &&
+                                        {tooltipOpen ===
+                                            keymap.GLOBAL_CONTEXT
+                                                .OPEN_SIDEBAR_MENU_0 && (
                                             <Tooltips
                                                 name={
-                                                    keymap
-                                                        .GLOBAL_CONTEXT
+                                                    keymap.GLOBAL_CONTEXT
                                                         .OPEN_SIDEBAR_MENU_0
                                                 }
-                                                action={
-                                                    counterpart.translate(
+                                                action={counterpart.translate(
                                                     'mainScreen.sideList.tooltip'
-                                                    )
-                                                }
+                                                )}
                                                 type={''}
                                             />
-                                        }
-
+                                        )}
                                     </div>
-                                }
+                                )}
                             </div>
                         </div>
                     </div>
-                    {showIndicator && <Indicator {...{isDocumentNotSaved}}/>}
+                    {showIndicator && <Indicator {...{ isDocumentNotSaved }} />}
                 </nav>
 
-                {isSubheaderShow && <Subheader
-                    closeSubheader={() => this.closeOverlays('isSubheaderShow')}
-                    docNo={docNoData && docNoData.value}
-                    openModal={this.openModal}
-                    openModalRow={this.openModalRow}
-                    handlePrint={this.handlePrint}
-                    handleClone={this.handleClone}
-                    handleDelete={this.handleDelete}
-                    handleEmail={this.handleEmail}
-                    handleLetter={this.handleLetter}
-                    redirect={this.redirect}
-                    disableOnClickOutside={!isSubheaderShow}
-                    {...{breadcrumb, notfound, query, entity,
-                        selectedWindowType, selected, dataId, windowType,
-                        siteName, editmode, handleEditModeToggle, activeTab
-                    }}
-                />}
+                {isSubheaderShow && (
+                    <Subheader
+                        closeSubheader={() =>
+                            this.closeOverlays('isSubheaderShow')}
+                        docNo={docNoData && docNoData.value}
+                        openModal={this.openModal}
+                        openModalRow={this.openModalRow}
+                        handlePrint={this.handlePrint}
+                        handleClone={this.handleClone}
+                        handleDelete={this.handleDelete}
+                        handleEmail={this.handleEmail}
+                        handleLetter={this.handleLetter}
+                        redirect={this.redirect}
+                        disableOnClickOutside={!isSubheaderShow}
+                        {...{
+                            breadcrumb,
+                            notfound,
+                            query,
+                            entity,
+                            selectedWindowType,
+                            selected,
+                            dataId,
+                            windowType,
+                            siteName,
+                            editmode,
+                            handleEditModeToggle,
+                            activeTab
+                        }}
+                    />
+                )}
 
-                {showSidelist && isSideListShow && <SideList
-                    windowType={windowType ? windowType : ''}
-                    closeOverlays={this.closeOverlays}
-                    closeSideList={this.handleSidelistToggle}
-                    isSideListShow={isSideListShow}
-                    disableOnClickOutside={!showSidelist}
-                    docId={dataId}
-                    defaultTab={sideListTab}
-                    open={true}
-                />}
+                {showSidelist &&
+                    isSideListShow && (
+                        <SideList
+                            windowType={windowType ? windowType : ''}
+                            closeOverlays={this.closeOverlays}
+                            closeSideList={this.handleSidelistToggle}
+                            isSideListShow={isSideListShow}
+                            disableOnClickOutside={!showSidelist}
+                            docId={dataId}
+                            defaultTab={sideListTab}
+                            open={true}
+                        />
+                    )}
 
-                {   isEmailOpen &&
+                {isEmailOpen && (
                     <NewEmail
                         windowId={windowType ? windowType : ''}
                         docId={dataId}
                         handleCloseEmail={this.handleCloseEmail}
                     />
-                }
-                {isLetterOpen &&
+                )}
+                {isLetterOpen && (
                     <NewLetter
                         windowId={windowType ? windowType : ''}
                         docId={dataId}
                         handleCloseLetter={this.handleCloseLetter}
                     />
-                }
+                )}
                 <GlobalContextShortcuts
-                    handleSidelistToggle={(id) =>
+                    handleSidelistToggle={id =>
                         showSidelist &&
                         this.handleSidelistToggle(id, sideListTab)}
-                    handleMenuOverlay={isMenuOverlayShow ?
-                        () => this.handleMenuOverlay('', '') :
-                        () => this.closeOverlays('',
-                            ()=> this.handleMenuOverlay('', '0')
-                        )
+                    handleMenuOverlay={
+                        isMenuOverlayShow
+                            ? () => this.handleMenuOverlay('', '')
+                            : () =>
+                                  this.closeOverlays('', () =>
+                                      this.handleMenuOverlay('', '0')
+                                  )
                     }
-                    handleInboxOpen = {isInboxOpen ?
-                        () => this.handleInboxOpen(false) :
-                        () => this.handleInboxOpen(true)
+                    handleInboxOpen={
+                        isInboxOpen
+                            ? () => this.handleInboxOpen(false)
+                            : () => this.handleInboxOpen(true)
                     }
-                    handleUDOpen = {() => this.handleUDOpen(!isUDOpen)}
-                    openModal = {dataId ?
-                        () => this.openModal(
-                            windowType, 'window', 'Advanced edit', true
-                        ) : ''
+                    handleUDOpen={() => this.handleUDOpen(!isUDOpen)}
+                    openModal={
+                        dataId
+                            ? () =>
+                                  this.openModal(
+                                      windowType,
+                                      'window',
+                                      'Advanced edit',
+                                      true
+                                  )
+                            : ''
                     }
-                    handlePrint={dataId ?
-                        () => this.handlePrint(
-                            windowType, dataId, docNoData.value
-                        ) : ''
+                    handlePrint={
+                        dataId
+                            ? () =>
+                                  this.handlePrint(
+                                      windowType,
+                                      dataId,
+                                      docNoData.value
+                                  )
+                            : ''
                     }
                     handleEmail={this.handleEmail}
                     handleLetter={this.handleLetter}
-                    handleDelete={dataId ? this.handleDelete: ''}
-                    redirect={windowType ?
-                        () => this.redirect('/window/'+ windowType +'/new') : ''
+                    handleDelete={dataId ? this.handleDelete : ''}
+                    redirect={
+                        windowType
+                            ? () =>
+                                  this.redirect(
+                                      '/window/' + windowType + '/new'
+                                  )
+                            : ''
                     }
                     handleDocStatusToggle={
-                        document
-                            .getElementsByClassName('js-dropdown-toggler')[0] ?
-                            this.handleDocStatusToggle : ''
+                        document.getElementsByClassName(
+                            'js-dropdown-toggler'
+                        )[0]
+                            ? this.handleDocStatusToggle
+                            : ''
                     }
                     handleEditModeToggle={handleEditModeToggle}
                     closeOverlays={this.closeOverlays}
                 />
             </div>
-        )
+        );
     }
 }
 
@@ -686,29 +732,21 @@ Header.propTypes = {
 };
 
 function mapStateToProps(state) {
-    const {windowHandler, appHandler, routing} = state;
+    const { windowHandler, appHandler, routing } = state;
 
-    const {
-        inbox,
-        me
-    } = appHandler || {
+    const { inbox, me } = appHandler || {
         inbox: {},
         me: {}
-    }
+    };
 
-    const {
-        selected,
-        selectedWindowType
-    } = windowHandler || {
+    const { selected, selectedWindowType } = windowHandler || {
         selected: [],
         selectedWindowType: null
-    }
+    };
 
-    const {
-        pathname
-    } = routing.locationBeforeTransitions || {
+    const { pathname } = routing.locationBeforeTransitions || {
         pathname: ''
-    }
+    };
 
     return {
         selected,
@@ -716,13 +754,13 @@ function mapStateToProps(state) {
         selectedWindowType,
         me,
         pathname
-    }
+    };
 }
 
 Header.childContextTypes = {
     shortcuts: PropTypes.object.isRequired
-}
+};
 
-Header = connect(mapStateToProps)(Header)
+Header = connect(mapStateToProps)(Header);
 
-export default Header
+export default Header;

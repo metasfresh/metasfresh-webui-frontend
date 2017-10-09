@@ -7,9 +7,9 @@ class OverlayField extends Component {
         super(props);
     }
 
-    handleKeyDown = (e) => {
-        const {handleSubmit, closeOverlay} = this.props;
-        switch(e.key) {
+    handleKeyDown = e => {
+        const { handleSubmit, closeOverlay } = this.props;
+        switch (e.key) {
             case 'Enter':
                 document.activeElement.blur();
                 handleSubmit();
@@ -18,14 +18,13 @@ class OverlayField extends Component {
                 closeOverlay();
                 break;
         }
-    }
+    };
 
     renderElements = (layout, data, type) => {
-        const {disabled} = this.props;
+        const { disabled } = this.props;
         const elements = layout.elements;
         return elements.map((elem, id) => {
-            const widgetData = elem.fields.map(item =>
-                data[item.field] || -1);
+            const widgetData = elem.fields.map(item => data[item.field] || -1);
             return (
                 <MasterWidget
                     entity="process"
@@ -38,13 +37,18 @@ class OverlayField extends Component {
                     autoFocus={id === 0}
                     {...elem}
                 />
-            )
-        })
-    }
+            );
+        });
+    };
 
-    renderParameters = (layout) => {
+    renderParameters = layout => {
         const {
-            windowType, viewId, onShow, onHide, handlePatch, handleChange
+            windowType,
+            viewId,
+            onShow,
+            onHide,
+            handlePatch,
+            handleChange
         } = this.props;
         const parameters = layout.parameters;
         return parameters.map((item, index) => {
@@ -65,15 +69,21 @@ class OverlayField extends Component {
                     filterWidget={true}
                     autoFocus={index === 0}
                     textSelected={true}
-                    {...{handlePatch, handleChange, windowType, onShow, onHide,
-                        viewId}}
+                    {...{
+                        handlePatch,
+                        handleChange,
+                        windowType,
+                        onShow,
+                        onHide,
+                        viewId
+                    }}
                 />
-            )
-        })
-    }
+            );
+        });
+    };
 
     render() {
-        const {data, layout, type, filter} = this.props;
+        const { data, layout, type, filter } = this.props;
 
         return (
             <div
@@ -81,14 +91,14 @@ class OverlayField extends Component {
                 onKeyDown={e => this.handleKeyDown(e)}
                 tabIndex={-1}
             >
-                {filter ?
-                    this.renderParameters(layout) :
-                    layout && layout.elements &&
-                        this.renderElements(layout, data, type)
-                }
+                {filter
+                    ? this.renderParameters(layout)
+                    : layout &&
+                      layout.elements &&
+                      this.renderElements(layout, data, type)}
             </div>
-        )
+        );
     }
 }
 
-export default OverlayField
+export default OverlayField;

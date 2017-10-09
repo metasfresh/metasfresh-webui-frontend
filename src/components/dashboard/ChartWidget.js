@@ -14,8 +14,8 @@ export class ChartWidget extends Component {
         };
     }
 
-    componentDidMount(){
-        const {text} = this.props;
+    componentDidMount() {
+        const { text } = this.props;
 
         this.setState({
             captionHandler: text
@@ -25,94 +25,130 @@ export class ChartWidget extends Component {
     handleClickOutside = () => {
         this.setState({
             toggleWidgetMenu: false
-        })
-    }
+        });
+    };
 
-    toggleMenu = (opt) => {
+    toggleMenu = opt => {
         const { toggleWidgetMenu } = this.state;
         this.setState({
             toggleWidgetMenu: typeof opt === 'boolean' ? opt : !toggleWidgetMenu
-        })
-    }
-
+        });
+    };
 
     render() {
         const {
-            text, framework, noData, maximizeWidget,
-            hideWidgets, showWidgets, index, idMaximized, id, chartType,
-            caption, fields, groupBy, pollInterval, editmode, handleChartOptions
+            text,
+            framework,
+            noData,
+            maximizeWidget,
+            hideWidgets,
+            showWidgets,
+            index,
+            idMaximized,
+            id,
+            chartType,
+            caption,
+            fields,
+            groupBy,
+            pollInterval,
+            editmode,
+            handleChartOptions
         } = this.props;
 
         const {
-            toggleWidgetMenu, height, captionHandler, chartOptions,
+            toggleWidgetMenu,
+            height,
+            captionHandler,
+            chartOptions,
             when
         } = this.state;
-        
+
         const isMaximized = idMaximized === id;
-        if(!isMaximized && typeof idMaximized === 'number') return false;
-        
+        if (!isMaximized && typeof idMaximized === 'number') return false;
+
         return (
             <div>
                 <div
                     className={
-                        "draggable-widget-header " +
+                        'draggable-widget-header ' +
                         (editmode ? 'draggable-widget-edited ' : '')
                     }
-                    onDoubleClick={!editmode && (() => {
-                        isMaximized ?
-                            maximizeWidget() : maximizeWidget(id);
-                        this.toggleMenu(false);
-                    })}
+                    onDoubleClick={
+                        !editmode &&
+                        (() => {
+                            isMaximized ? maximizeWidget() : maximizeWidget(id);
+                            this.toggleMenu(false);
+                        })
+                    }
                 >
-                    <p
-                        className="draggable-widget-title"
-                    >
+                    <p className="draggable-widget-title">
                         {text}
-                        {editmode ? 
+                        {editmode ? (
                             <span
                                 className="chart-edit-mode"
-                                onClick={() => handleChartOptions(true, text, id, false)}
+                                onClick={() =>
+                                    handleChartOptions(true, text, id, false)}
                             >
-                                <i className="meta-icon-settings"></i>
+                                <i className="meta-icon-settings" />
                             </span>
-                        : ''}
+                        ) : (
+                            ''
+                        )}
                     </p>
-                    {!editmode && !framework && <i
-                        className="draggable-widget-icon meta-icon-down-1 input-icon-sm"
-                        onClick={() => this.toggleMenu()}
-                    />}
-                    {toggleWidgetMenu && !editmode &&
-                        <div className="draggable-widget-menu">
-                            { isMaximized ?
-                                <span onClick={() => {
-                                        maximizeWidget();
-                                        this.toggleMenu(false)}
-                                    }>
-                                    Minimize
-                                </span> :
-                                <span onClick={() => {
-                                        maximizeWidget(id);
-                                        this.toggleMenu(false)}
-                                    }>
-                                    Maximize
-                                </span>
-                            }
-
-                        </div>
-                    }
+                    {!editmode &&
+                        !framework && (
+                            <i
+                                className="draggable-widget-icon meta-icon-down-1 input-icon-sm"
+                                onClick={() => this.toggleMenu()}
+                            />
+                        )}
+                    {toggleWidgetMenu &&
+                        !editmode && (
+                            <div className="draggable-widget-menu">
+                                {isMaximized ? (
+                                    <span
+                                        onClick={() => {
+                                            maximizeWidget();
+                                            this.toggleMenu(false);
+                                        }}
+                                    >
+                                        Minimize
+                                    </span>
+                                ) : (
+                                    <span
+                                        onClick={() => {
+                                            maximizeWidget(id);
+                                            this.toggleMenu(false);
+                                        }}
+                                    >
+                                        Maximize
+                                    </span>
+                                )}
+                            </div>
+                        )}
                 </div>
 
                 <div className="draggable-widget-body">
-                    {!framework ? <RawChart
-                        {...{
-                            index, chartType, caption, fields, groupBy,
-                            pollInterval, height, isMaximized, id, noData
-                        }}
-                        responsive={true}
-                        chartTitle={text}
-                    /> : 
+                    {!framework ? (
+                        <RawChart
+                            {...{
+                                index,
+                                chartType,
+                                caption,
+                                fields,
+                                groupBy,
+                                pollInterval,
+                                height,
+                                isMaximized,
+                                id,
+                                noData
+                            }}
+                            responsive={true}
+                            chartTitle={text}
+                        />
+                    ) : (
                         <div>{chartType}</div>
-                    }
+                    )}
                 </div>
             </div>
         );

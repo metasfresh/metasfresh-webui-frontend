@@ -12,12 +12,12 @@ class UserDropdown extends Component {
 
     handleClickOutside = () => this.props.handleUDOpen(false);
 
-    handleKeyDown = (e) => {
-        switch(e.key){
+    handleKeyDown = e => {
+        switch (e.key) {
             case 'ArrowDown': {
                 e.preventDefault();
                 const activeElem = document.activeElement;
-                if(activeElem.nextSibling) {
+                if (activeElem.nextSibling) {
                     activeElem.nextSibling.focus();
                 }
                 break;
@@ -26,13 +26,14 @@ class UserDropdown extends Component {
                 e.preventDefault();
                 const activeElem = document.activeElement;
                 // When focus pulled out once, do not allow to get there
-                if(
-                    activeElem.previousSibling.classList
-                        .contains('js-selection-placeholder')
-                ){
+                if (
+                    activeElem.previousSibling.classList.contains(
+                        'js-selection-placeholder'
+                    )
+                ) {
                     return;
                 }
-                if(activeElem.previousSibling) {
+                if (activeElem.previousSibling) {
                     activeElem.previousSibling.focus();
                 }
                 break;
@@ -46,11 +47,16 @@ class UserDropdown extends Component {
                 this.handleClickOutside();
                 break;
         }
-    }
+    };
 
     render() {
         const {
-            open, handleUDOpen, redirect, shortcut, toggleTooltip, tooltipOpen,
+            open,
+            handleUDOpen,
+            redirect,
+            shortcut,
+            toggleTooltip,
+            tooltipOpen,
             me
         } = this.props;
         return (
@@ -65,25 +71,24 @@ class UserDropdown extends Component {
             >
                 <div
                     className="header-item avatar-container"
-                    onClick={() => handleUDOpen(true)}>
+                    onClick={() => handleUDOpen(true)}
+                >
                     <Avatar id={me.avatarId} />
                 </div>
 
-                {open &&
+                {open && (
                     <div
                         className="user-dropdown-list"
                         onKeyDown={this.handleKeyDown}
                     >
-                        <div
-                            className="user-dropdown-item user-dropdown-header-item meta-text-primary"
-                        >
+                        <div className="user-dropdown-item user-dropdown-header-item meta-text-primary">
                             {me.fullname}
                         </div>
                         <hr className="context-menu-separator" />
                         {
-                        // Placeholder, empty place, to keep focus when it is
-                        // not needed (e.g when mouse is in use)
-                        // It is always returning back there due to ref action
+                            // Placeholder, empty place, to keep focus when it is
+                            // not needed (e.g when mouse is in use)
+                            // It is always returning back there due to ref action
                         }
                         <div
                             ref={c => c && c.focus()}
@@ -93,12 +98,15 @@ class UserDropdown extends Component {
                         <div
                             className="user-dropdown-item"
                             onClick={() => {
-                                redirect('/window/' +
-                                    me.userProfileWindowId +
-                                    '/' + me.userProfileId
+                                redirect(
+                                    '/window/' +
+                                        me.userProfileWindowId +
+                                        '/' +
+                                        me.userProfileId
                                 );
                                 handleUDOpen(false);
-                                toggleTooltip('')}}
+                                toggleTooltip('');
+                            }}
                             tabIndex={0}
                         >
                             <i className="meta-icon-settings" />
@@ -106,22 +114,27 @@ class UserDropdown extends Component {
                         </div>
                         <div
                             className="user-dropdown-item"
-                            onClick={() => {redirect('/logout');
-                                handleUDOpen(false)}}
+                            onClick={() => {
+                                redirect('/logout');
+                                handleUDOpen(false);
+                            }}
                             tabIndex={0}
                         >
                             <i className="meta-icon-logout" />
                             {counterpart.translate('window.logOut.caption')}
                         </div>
                     </div>
-                }
-                {tooltipOpen === shortcut && !open && <Tooltips
-                    name={shortcut}
-                    action= {
-                        counterpart.translate('mainScreen.userMenu.tooltip')
-                    }
-                    type={''}
-                />}
+                )}
+                {tooltipOpen === shortcut &&
+                    !open && (
+                        <Tooltips
+                            name={shortcut}
+                            action={counterpart.translate(
+                                'mainScreen.userMenu.tooltip'
+                            )}
+                            type={''}
+                        />
+                    )}
             </div>
         );
     }

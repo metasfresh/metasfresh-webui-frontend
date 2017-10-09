@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import MenuOverlayContainer from '../components/header/MenuOverlayContainer';
-import {push} from 'react-router-redux';
+import { push } from 'react-router-redux';
 import DebounceInput from 'react-debounce-input';
 import Container from '../components/Container';
 import counterpart from 'counterpart';
@@ -11,14 +11,12 @@ import {
     rootRequest,
     nodePathsRequest,
     queryPathsRequest
- } from '../actions/MenuActions';
+} from '../actions/MenuActions';
 
-import {
-    openModal
-} from '../actions/WindowActions';
+import { openModal } from '../actions/WindowActions';
 
 class NavigationTree extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
             rootResults: {
@@ -34,114 +32,123 @@ class NavigationTree extends Component {
     componentDidMount = () => {
         this.getData();
         document.getElementById('search-input').focus();
-    }
+    };
 
     getData = (callback, doNotResetState) => {
-        const {query} = this.state;
+        const { query } = this.state;
 
-        if(doNotResetState && query){
+        if (doNotResetState && query) {
             this.queryRequest(query);
         } else {
-            rootRequest().then(response => {
-                this.setState(Object.assign({}, this.state, {
-                    rootResults: response.data,
-                    queriedResults: response.data.children,
-                    query: ''
-                }), () => {
-                    callback();
+            rootRequest()
+                .then(response => {
+                    this.setState(
+                        Object.assign({}, this.state, {
+                            rootResults: response.data,
+                            queriedResults: response.data.children,
+                            query: ''
+                        }),
+                        () => {
+                            callback();
+                        }
+                    );
                 })
-            }).catch((err) => {
-                if(err.response && err.response.status === 404) {
-                    this.setState(Object.assign({}, this.state, {
-                        queriedResults: [],
-                        rootResults: {},
-                        query: ''
-                    }), () => {
-                        callback();
-                    })
-                }
-            });
+                .catch(err => {
+                    if (err.response && err.response.status === 404) {
+                        this.setState(
+                            Object.assign({}, this.state, {
+                                queriedResults: [],
+                                rootResults: {},
+                                query: ''
+                            }),
+                            () => {
+                                callback();
+                            }
+                        );
+                    }
+                });
         }
-    }
-
+    };
 
     updateData = () => {
         this.getData(false, true);
-    }
+    };
 
     openModal = (windowType, type, caption, isAdvanced) => {
-        const {dispatch} = this.props;
+        const { dispatch } = this.props;
         dispatch(openModal(caption, windowType, type, null, null, isAdvanced));
-    }
+    };
 
-    handleQuery = (e) => {
+    handleQuery = e => {
         e.preventDefault();
-        if(e.target.value){
+        if (e.target.value) {
             this.setState({
                 query: e.target.value
             });
 
             this.queryRequest(e.target.value);
-
-        }else{
+        } else {
             this.getData(this.clearValue);
         }
-    }
+    };
 
-    queryRequest = (value) => {
+    queryRequest = value => {
         queryPathsRequest(value, '', true)
             .then(response => {
                 this.setState({
                     queriedResults: response.data.children
-                })
-            }).catch((err) => {
-                if(err.response && err.response.status === 404) {
+                });
+            })
+            .catch(err => {
+                if (err.response && err.response.status === 404) {
                     this.setState({
                         queriedResults: [],
                         rootResults: {}
-                    })
+                    });
                 }
             });
-    }
+    };
 
     clearValue = () => {
-        document.getElementById('search-input').value=''
-    }
+        document.getElementById('search-input').value = '';
+    };
 
-    handleClear = (e) => {
+    handleClear = e => {
         e.preventDefault();
         this.getData(this.clearValue);
-    }
+    };
 
-    handleKeyDown = (e) => {
+    handleKeyDown = e => {
         const input = document.getElementById('search-input');
-        const firstMenuItem =
-            document.getElementsByClassName('js-menu-item')[0];
+        const firstMenuItem = document.getElementsByClassName(
+            'js-menu-item'
+        )[0];
         let prevSiblings = document.activeElement.previousSibling;
 
-        switch(e.key) {
+        switch (e.key) {
             case 'ArrowDown':
-                if(document.activeElement === input) {
+                if (document.activeElement === input) {
                     firstMenuItem.focus();
                 }
                 break;
             case 'ArrowUp':
-                if(
+                if (
                     document.activeElement.classList.contains('js-menu-header')
-                ){
+                ) {
                     prevParentSibling.children[0] &&
-                    prevParentSibling.children[0]
-                        .classList.contains('js-menu-header') &&
-                    prevParentSibling.children[0].focus();
+                        prevParentSibling.children[0].classList.contains(
+                            'js-menu-header'
+                        ) &&
+                        prevParentSibling.children[0].focus();
                 }
 
-                if(document.activeElement.classList.contains('js-menu-item')) {
+                if (document.activeElement.classList.contains('js-menu-item')) {
                     this.handleArrowUp();
                 }
                 break;
             case 'Tab':
                 e.preventDefault();
-                if(document.activeElement === input) {
+                if (document.activeElement === input) {
                     firstMenuItem.focus();
                 } else {
                     input.focus();
@@ -152,14 +159,15 @@ class NavigationTree extends Component {
                 document.activeElement.childNodes[0].childNodes[0].click();
                 break;
         }
-    }
+    };
 
     handleArrowUp() {
         let prevSiblings = document.activeElement.previousSibling;
-        if(prevSiblings && prevSiblings.classList.contains('input-primary')) {
+        if (prevSiblings && prevSiblings.classList.contains('input-primary')) {
             document.getElementById('search-input-query').focus();
         } else if (
-            prevSiblings && prevSiblings.classList.contains('js-menu-item')
+            prevSiblings &&
+            prevSiblings.classList.contains('js-menu-item')
         ) {
             document.activeElement.previousSibling.focus();
         } else {
@@ -171,12 +179,16 @@ class NavigationTree extends Component {
         let elem = document.activeElement.parentElement;
         let i = 0;
         while (
-            !(elem && elem.classList.contains('js-menu-container') &&
-                elem.previousSibling && elem.previousSibling.children.length
-                !== 0 || elem &&
-                elem.classList.contains('js-menu-main-container') &&
-                i < 100)
-            ) {
+            !(
+                (elem &&
+                    elem.classList.contains('js-menu-container') &&
+                    elem.previousSibling &&
+                    elem.previousSibling.children.length !== 0) ||
+                (elem &&
+                    elem.classList.contains('js-menu-main-container') &&
+                    i < 100)
+            )
+        ) {
             elem = elem && elem.parentElement;
             i++;
         }
@@ -189,12 +201,12 @@ class NavigationTree extends Component {
         const previousGroup =
             document.activeElement.parentElement.previousSibling;
 
-        if(previousGroup && previousGroup.classList.contains('js-menu-item')){
+        if (previousGroup && previousGroup.classList.contains('js-menu-item')) {
             previousGroup.focus();
         } else {
             if (previousGroup && previousGroup.children.length > 0) {
                 this.selectLastItem(previousGroup);
-            } else if(previousMainGroup) {
+            } else if (previousMainGroup) {
                 this.selectLastItem(previousMainGroup);
             } else {
                 document.activeElement.previousSibling.focus();
@@ -205,69 +217,77 @@ class NavigationTree extends Component {
     selectLastItem(previousGroup) {
         const listChildren = previousGroup.childNodes;
         const lastChildren = listChildren[listChildren.length - 1];
-        if(listChildren.length == 1){
+        if (listChildren.length == 1) {
             listChildren[0].focus && listChildren[0].focus();
-        }else{
-            if(lastChildren.classList.contains('js-menu-item')) {
+        } else {
+            if (lastChildren.classList.contains('js-menu-item')) {
                 lastChildren.focus();
             } else {
-                if(lastChildren.children[lastChildren.children.length - 1]
-                    .classList.contains('js-menu-item')){
-                    lastChildren.children[lastChildren.children.length - 1]
-                    .focus();
+                if (
+                    lastChildren.children[
+                        lastChildren.children.length - 1
+                    ].classList.contains('js-menu-item')
+                ) {
+                    lastChildren.children[
+                        lastChildren.children.length - 1
+                    ].focus();
                 } else {
                     lastChildren.children[lastChildren.children.length - 1]
-                    .getElementsByClassName('js-menu-item')[lastChildren
-                    .children[lastChildren.children.length - 1]
-                    .getElementsByClassName('js-menu-item').length-1].focus();
+                        .getElementsByClassName('js-menu-item')
+                        [
+                            lastChildren.children[
+                                lastChildren.children.length - 1
+                            ].getElementsByClassName('js-menu-item').length - 1
+                        ].focus();
                 }
-
             }
-
         }
     }
 
     handleRedirect = (elementId, isNew, type) => {
-        const {dispatch} = this.props;
-        dispatch(push(
-            '/' + (type ? type : 'window') + '/' + elementId
-        ));
-    }
+        const { dispatch } = this.props;
+        dispatch(push('/' + (type ? type : 'window') + '/' + elementId));
+    };
 
-    handleNewRedirect = (elementId) => {
-        const {dispatch} = this.props;
+    handleNewRedirect = elementId => {
+        const { dispatch } = this.props;
         dispatch(push('/window/' + elementId + '/new'));
-    }
+    };
 
     handleDeeper = (e, nodeId) => {
         e.preventDefault();
 
         nodePathsRequest(nodeId, 4).then(response => {
-            this.setState(Object.assign({}, this.state, {
-                deepNode: response.data
-            }))
-        })
-    }
-    handleClickBack = (e) => {
+            this.setState(
+                Object.assign({}, this.state, {
+                    deepNode: response.data
+                })
+            );
+        });
+    };
+    handleClickBack = e => {
         e.preventDefault();
 
-        this.setState(Object.assign({}, this.state, {
-            deepNode: null
-        }))
-    }
+        this.setState(
+            Object.assign({}, this.state, {
+                deepNode: null
+            })
+        );
+    };
 
     renderTree = () => {
-        const {rootResults, queriedResults, query} = this.state;
+        const { rootResults, queriedResults, query } = this.state;
 
-        return(
+        return (
             <div className="sitemap">
                 <div className="search-wrapper">
                     <div className="input-flex input-primary">
-                        <i className="input-icon meta-icon-preview"/>
+                        <i className="input-icon meta-icon-preview" />
 
                         <DebounceInput
                             debounceTimeout={250}
-                            type="text" id="search-input"
+                            type="text"
+                            id="search-input"
                             className="input-field"
                             placeholder={counterpart.translate(
                                 'window.type.placeholder'
@@ -290,38 +310,35 @@ class NavigationTree extends Component {
                 </p>
 
                 <div className="column-wrapper">
-                    {queriedResults && queriedResults.map((subitem, subindex) =>
-                        <MenuOverlayContainer
-                            key={subindex}
-                            printChildren={true}
-                            showBookmarks={true}
-                            openModal={this.openModal}
-                            updateData={this.updateData}
-                            onKeyDown={this.handleKeyDown}
-                            handleClickOnFolder={this.handleDeeper}
-                            handleRedirect={this.handleRedirect}
-                            handleNewRedirect={this.handleNewRedirect}
-                            {...subitem}
-                        />
-                    )}
+                    {queriedResults &&
+                        queriedResults.map((subitem, subindex) => (
+                            <MenuOverlayContainer
+                                key={subindex}
+                                printChildren={true}
+                                showBookmarks={true}
+                                openModal={this.openModal}
+                                updateData={this.updateData}
+                                onKeyDown={this.handleKeyDown}
+                                handleClickOnFolder={this.handleDeeper}
+                                handleRedirect={this.handleRedirect}
+                                handleNewRedirect={this.handleNewRedirect}
+                                {...subitem}
+                            />
+                        ))}
 
-                    {(queriedResults.length === 0) && (query !== '') && (
-                        <span>There are no results</span>
-                    )}
+                    {queriedResults.length === 0 &&
+                        query !== '' && <span>There are no results</span>}
                 </div>
             </div>
-        )
-    }
+        );
+    };
 
     render() {
-        const {rawModal, modal} = this.props;
-        const {rootResults} = this.state;
+        const { rawModal, modal } = this.props;
+        const { rootResults } = this.state;
 
         return (
-            <Container
-                siteName = "Sitemap"
-                {...{modal, rawModal}}
-            >
+            <Container siteName="Sitemap" {...{ modal, rawModal }}>
                 {this.renderTree(rootResults)}
             </Container>
         );
@@ -331,25 +348,23 @@ class NavigationTree extends Component {
 function mapStateToProps(state) {
     const { windowHandler } = state;
 
-    const {
-        modal,
-        rawModal
-    } = windowHandler || {
+    const { modal, rawModal } = windowHandler || {
         modal: {},
         rawModal: {}
-    }
+    };
 
     return {
-        modal, rawModal
-    }
+        modal,
+        rawModal
+    };
 }
 
 NavigationTree.propTypes = {
     dispatch: PropTypes.func.isRequired,
     modal: PropTypes.object.isRequired,
-    rawModal: PropTypes.object.isRequired,
+    rawModal: PropTypes.object.isRequired
 };
 
 NavigationTree = connect(mapStateToProps)(NavigationTree);
 
-export default NavigationTree
+export default NavigationTree;

@@ -36,7 +36,6 @@ export default {
         SELECT_ALL_LEAFS: mod + '+' + 's',
         EXPAND_INDENT: '+',
         COLLAPSE_INDENT: '-'
-
     },
     TABLE_CONTEXT: {
         TOGGLE_QUICK_INPUT: mod + '+' + 'q',
@@ -59,4 +58,4 @@ export default {
         APPLY: mod + '+' + 'enter',
         CANCEL: 'esc'
     }
-}
+};

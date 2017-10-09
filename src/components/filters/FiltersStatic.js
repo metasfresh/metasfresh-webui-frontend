@@ -6,7 +6,7 @@ class FiltersStatic extends Component {
     }
 
     render() {
-        const {data, clearFilters} = this.props;
+        const { data, clearFilters } = this.props;
         return (
             <div className="filter-wrapper">
                 {data.map((item, index) => {
@@ -19,14 +19,12 @@ class FiltersStatic extends Component {
                                 }
                                 onClick={() => clearFilters(item.id)}
                             >
-                                <i
-                                    className="meta-icon-trash"
-                                />
+                                <i className="meta-icon-trash" />
                                 {item.caption}
                             </button>
-                        </div>);
-                    })
-                }
+                        </div>
+                    );
+                })}
             </div>
         );
     }

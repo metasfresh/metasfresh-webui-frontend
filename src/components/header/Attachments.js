@@ -16,12 +16,12 @@ class Attachments extends Component {
     state = {
         data: null,
         attachmentHovered: null,
-        isAttachUrlOpen: false,
-    }
+        isAttachUrlOpen: false
+    };
 
     componentDidMount = () => {
         this.fetchAttachments();
-    }
+    };
 
     fetchAttachments = () => {
         const { windowType, docId } = this.props;
@@ -29,66 +29,72 @@ class Attachments extends Component {
         attachmentsRequest('window', windowType, docId).then(response => {
             this.setState({ data: response.data }, () => {
                 if (this.attachments) {
-                  this.attachments.focus();
+                    this.attachments.focus();
                 }
             });
         });
-    }
+    };
 
-    toggleAttachmentDelete = (value) => {
+    toggleAttachmentDelete = value => {
         this.setState({
             attachmentHovered: value
-        })
-    }
+        });
+    };
 
     handleClickAttachUrl = () => {
         this.setState({ isAttachUrlOpen: true });
-    }
+    };
 
-    handleCloseAttachUrl = (event) => {
+    handleCloseAttachUrl = event => {
         event.stopPropagation();
         this.setState({ isAttachUrlOpen: false });
-    }
+    };
 
-    handleClickAttachment = (id) => {
-        const {windowType, docId} = this.props;
+    handleClickAttachment = id => {
+        const { windowType, docId } = this.props;
         openFile('window', windowType, docId, 'attachments', id);
-    }
+    };
 
     handleDeleteAttachment = (e, id) => {
-        const {windowType, docId} = this.props;
+        const { windowType, docId } = this.props;
         e.stopPropagation();
 
         deleteRequest(
-            'window', windowType, docId, null, null, 'attachments', id
-        ).then(() => {
-            return attachmentsRequest(
-                'window', windowType, docId
-            )
-        }).then((response) => {
-            this.setState({
-                data: response.data
+            'window',
+            windowType,
+            docId,
+            null,
+            null,
+            'attachments',
+            id
+        )
+            .then(() => {
+                return attachmentsRequest('window', windowType, docId);
             })
-        });
-    }
+            .then(response => {
+                this.setState({
+                    data: response.data
+                });
+            });
+    };
 
-    handleKeyDown = (e) => {
+    handleKeyDown = e => {
         const active = document.activeElement;
 
         const keyHandler = (e, dir) => {
             const sib = dir ? 'nextSibling' : 'previousSibling';
             e.preventDefault();
-            if(active.classList.contains('js-subheader-item')){
+            if (active.classList.contains('js-subheader-item')) {
                 active[sib] && active[sib].focus();
-            }else{
+            } else {
                 active.childNodes[0].focus();
             }
-        }
+        };
 
-        switch(e.key){
+        switch (e.key) {
             case 'ArrowDown':
                 keyHandler(e, true);
-                break
+                break;
             case 'ArrowUp':
                 keyHandler(e, false);
                 break;
@@ -97,7 +103,7 @@ class Attachments extends Component {
                 document.activeElement.click();
                 break;
         }
-    }
+    };
 
     renderActions = () => {
         const { windowType, docId } = this.props;
@@ -105,22 +111,22 @@ class Attachments extends Component {
 
         return (
             <div
-              className="subheader-attachurl"
-              onClick={this.handleClickAttachUrl}
+                className="subheader-attachurl"
+                onClick={this.handleClickAttachUrl}
             >
                 {counterpart.translate('window.attachment.url.add')}
 
                 {isAttachUrlOpen && (
                     <AttachUrl
-                      windowId={windowType}
-                      documentId={docId}
-                      handleClose={this.handleCloseAttachUrl}
-                      fetchAttachments={this.fetchAttachments}
+                        windowId={windowType}
+                        documentId={docId}
+                        handleClose={this.handleCloseAttachUrl}
+                        fetchAttachments={this.fetchAttachments}
                     />
                 )}
             </div>
         );
-    }
+    };
 
     renderData = () => {
         const { data, attachmentHovered } = this.state;
@@ -130,30 +136,36 @@ class Attachments extends Component {
                 className="subheader-item subheader-item-ellipsis js-subheader-item"
                 key={key}
                 tabIndex={0}
-                onMouseEnter={() => { this.toggleAttachmentDelete(item.id); }}
-                onMouseLeave={() => { this.toggleAttachmentDelete(null); }}
-                onClick={() => { this.handleClickAttachment(item.id); }}
+                onMouseEnter={() => {
+                    this.toggleAttachmentDelete(item.id);
+                }}
+                onMouseLeave={() => {
+                    this.toggleAttachmentDelete(null);
+                }}
+                onClick={() => {
+                    this.handleClickAttachment(item.id);
+                }}
             >
                 {item.name}
-                {attachmentHovered === item.id &&
+                {attachmentHovered === item.id && (
                     <div
                         className="subheader-additional-box"
-                        onClick={(e) => {
+                        onClick={e => {
                             this.handleDeleteAttachment(e, item.id);
                         }}
                     >
-                        <i className="meta-icon-delete"/>
+                        <i className="meta-icon-delete" />
                     </div>
-                }
+                )}
             </div>
         ));
-    }
+    };
 
     renderEmpty = () => (
         <div className="subheader-item subheader-item-disabled">
             {counterpart.translate('window.sideList.attachments.empty')}
         </div>
-    )
+    );
 
     render() {
         const { data } = this.state;
@@ -169,7 +181,9 @@ class Attachments extends Component {
         return (
             <div
                 onKeyDown={this.handleKeyDown}
-                ref={(c) => { this.attachments = c; }}
+                ref={c => {
+                    this.attachments = c;
+                }}
                 tabIndex={0}
             >
                 {content}
@@ -181,7 +195,7 @@ class Attachments extends Component {
 
 Attachments.propTypes = {
     windowType: PropTypes.string.isRequired,
-    docId: PropTypes.string.isRequired,
+    docId: PropTypes.string.isRequired
 };
 
 export default Attachments;

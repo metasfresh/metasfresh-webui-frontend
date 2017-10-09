@@ -11,32 +11,32 @@ class FiltersFrequent extends Component {
 
         this.state = {
             openFilterId: null
-        }
+        };
     }
 
-    toggleFilter = (index) => {
+    toggleFilter = index => {
         this.setState({
             openFilterId: index
-        })
-    }
+        });
+    };
 
     handleClickOutside = () => {
         this.outsideClick();
-    }
+    };
 
     outsideClick = () => {
-        const {widgetShown, dropdownToggled} = this.props;
+        const { widgetShown, dropdownToggled } = this.props;
         !widgetShown && this.toggleFilter(null, null);
         dropdownToggled();
-    }
+    };
 
     isActive(filterId) {
         const { active } = this.props;
         let result = false;
 
         if (active) {
-            let activeFilter = active.find( (item) => item.filterId === filterId );
-            result = (typeof activeFilter !== 'undefined') && activeFilter;
+            let activeFilter = active.find(item => item.filterId === filterId);
+            result = typeof activeFilter !== 'undefined' && activeFilter;
         }
 
         return result;
@@ -44,8 +44,14 @@ class FiltersFrequent extends Component {
 
     render() {
         const {
-            data, windowType, notValidFields, viewId, handleShow,
-            applyFilters, clearFilters, active
+            data,
+            windowType,
+            notValidFields,
+            viewId,
+            handleShow,
+            applyFilters,
+            clearFilters,
+            active
         } = this.props;
 
         const { openFilterId } = this.state;
@@ -63,25 +69,27 @@ class FiltersFrequent extends Component {
                                     'btn btn-filter ' +
                                     'btn-meta-outline-secondary btn-distance ' +
                                     'btn-sm ' +
-                                    (openFilterId === index ?
-                                        'btn-select ': ''
-                                    ) +
-                                    (isActive ? 'btn-active ': '')
+                                    (openFilterId === index
+                                        ? 'btn-select '
+                                        : '') +
+                                    (isActive ? 'btn-active ' : '')
                                 }
                             >
                                 <i className="meta-icon-preview" />
-                                { isActive ?
-                                    
-                                    counterpart.translate(
-                                        'window.filters.caption'
-                                    ) + ': ' + item.caption :
-                                    counterpart.translate(
-                                        'window.filters.caption2'
-                                    ) + ': ' + item.caption
-                                }
+                                {isActive
+                                    ? counterpart.translate(
+                                          'window.filters.caption'
+                                      ) +
+                                      ': ' +
+                                      item.caption
+                                    : counterpart.translate(
+                                          'window.filters.caption2'
+                                      ) +
+                                      ': ' +
+                                      item.caption}
                             </button>
 
-                            {openFilterId === index &&
+                            {openFilterId === index && (
                                 <FiltersItem
                                     key={index}
                                     windowType={windowType}
@@ -97,9 +105,9 @@ class FiltersFrequent extends Component {
                                     viewId={viewId}
                                     outsideClick={this.outsideClick}
                                 />
-                            }
+                            )}
                         </div>
-                    )
+                    );
                 })}
             </div>
         );
