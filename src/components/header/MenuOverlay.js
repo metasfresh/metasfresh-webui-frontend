@@ -421,13 +421,16 @@ class MenuOverlay extends Component {
                         lastChildren.children.length - 1
                     ].focus();
                 } else {
-                    lastChildren.children[lastChildren.children.length - 1]
-                        .getElementsByClassName('js-menu-item')
-                        [
-                            lastChildren.children[
-                                lastChildren.children.length - 1
-                            ].getElementsByClassName('js-menu-item').length - 1
-                        ].focus();
+                    const index =
+                        lastChildren.children[
+                            lastChildren.children.length - 1
+                        ].getElementsByClassName('js-menu-item').length - 1;
+
+                    const element = lastChildren.children[
+                        lastChildren.children.length - 1
+                    ].getElementsByClassName('js-menu-item')[index];
+
+                    element.focus();
                 }
             }
         }
