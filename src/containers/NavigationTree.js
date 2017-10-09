@@ -123,7 +123,6 @@ class NavigationTree extends Component {
         const firstMenuItem = document.getElementsByClassName(
             'js-menu-item'
         )[0];
-        let prevSiblings = document.activeElement.previousSibling;
 
         switch (e.key) {
             case 'ArrowDown':
@@ -132,16 +131,6 @@ class NavigationTree extends Component {
                 }
                 break;
             case 'ArrowUp':
-                if (
-                    document.activeElement.classList.contains('js-menu-header')
-                ) {
-                    prevParentSibling.children[0] &&
-                        prevParentSibling.children[0].classList.contains(
-                            'js-menu-header'
-                        ) &&
-                        prevParentSibling.children[0].focus();
-                }
-
                 if (document.activeElement.classList.contains('js-menu-item')) {
                     this.handleArrowUp();
                 }
@@ -365,6 +354,4 @@ NavigationTree.propTypes = {
     rawModal: PropTypes.object.isRequired
 };
 
-NavigationTree = connect(mapStateToProps)(NavigationTree);
-
-export default NavigationTree;
+export default connect(mapStateToProps)(NavigationTree);
