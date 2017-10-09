@@ -55,7 +55,7 @@ export default function appHandler(state = initialState, action) {
                 })
             });
 
-        case types.SET_NOTIFICATION_PROGRESS:
+        case types.SET_NOTIFICATION_PROGRESS: {
             let notifications = Object.assign({}, state.notifications, {
                 [action.key]: Object.assign(
                     {},
@@ -69,6 +69,7 @@ export default function appHandler(state = initialState, action) {
             return Object.assign({}, state, {
                 notifications: notifications
             });
+        }
 
         case types.DELETE_NOTIFICATION:
             return Object.assign({}, state, {
