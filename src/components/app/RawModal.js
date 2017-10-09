@@ -167,6 +167,4 @@ RawModal.propTypes = {
     modalVisible: PropTypes.bool
 };
 
-RawModal = connect(mapStateToProps)(RawModal);
-
-export default RawModal;
+export default connect(mapStateToProps)(RawModal);

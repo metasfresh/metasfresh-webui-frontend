@@ -65,6 +65,4 @@ Prompt.propTypes = {
     dispatch: PropTypes.func.isRequired
 };
 
-Prompt = connect()(Prompt);
-
-export default Prompt;
+export default connect()(Prompt);

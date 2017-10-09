@@ -132,8 +132,6 @@ AttributesDropdown.propTypes = {
     dispatch: PropTypes.func.isRequired
 };
 
-AttributesDropdown = connect(state => ({
+export default connect(state => ({
     pendingIndicator: state.windowHandler.indicator
 }))(onClickOutside(AttributesDropdown));
-
-export default AttributesDropdown;

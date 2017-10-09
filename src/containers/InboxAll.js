@@ -71,6 +71,4 @@ InboxAll.propTypes = {
     inbox: PropTypes.object.isRequired
 };
 
-InboxAll = connect(mapStateToProps)(InboxAll);
-
-export default InboxAll;
+export default connect(mapStateToProps)(InboxAll);

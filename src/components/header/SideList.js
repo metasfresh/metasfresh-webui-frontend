@@ -171,6 +171,4 @@ function mapStateToProps(state) {
     };
 }
 
-SideList = connect(mapStateToProps)(onClickOutside(SideList));
-
-export default SideList;
+export default connect(mapStateToProps)(onClickOutside(SideList));

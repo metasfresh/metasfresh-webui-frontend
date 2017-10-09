@@ -533,6 +533,4 @@ Modal.propTypes = {
     dispatch: PropTypes.func.isRequired
 };
 
-Modal = connect()(Modal);
-
-export default Modal;
+export default connect()(Modal);

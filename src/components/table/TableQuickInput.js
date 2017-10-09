@@ -282,6 +282,4 @@ TableQuickInput.propTypes = {
     dispatch: PropTypes.func.isRequired
 };
 
-TableQuickInput = connect()(TableQuickInput);
-
-export default TableQuickInput;
+export default connect()(TableQuickInput);

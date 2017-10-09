@@ -235,6 +235,4 @@ TableContextMenu.propTypes = {
     dispatch: PropTypes.func.isRequired
 };
 
-TableContextMenu = connect()(TableContextMenu);
-
-export default TableContextMenu;
+export default connect()(TableContextMenu);

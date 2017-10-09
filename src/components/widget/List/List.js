@@ -246,6 +246,4 @@ List.propTypes = {
     dispatch: PropTypes.func.isRequired
 };
 
-List = connect(false, false, false, { withRef: true })(List);
-
-export default List;
+export default connect(false, false, false, { withRef: true })(List);

@@ -72,6 +72,4 @@ class BookmarkButton extends Component {
     }
 }
 
-BookmarkButton = connect()(BookmarkButton);
-
-export default BookmarkButton;
+export default connect()(BookmarkButton);

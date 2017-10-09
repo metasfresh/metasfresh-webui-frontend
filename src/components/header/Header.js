@@ -760,6 +760,4 @@ Header.childContextTypes = {
     shortcuts: PropTypes.object.isRequired
 };
 
-Header = connect(mapStateToProps)(Header);
-
-export default Header;
+export default connect(mapStateToProps)(Header);

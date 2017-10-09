@@ -132,6 +132,4 @@ class FiltersNotFrequent extends Component {
     }
 }
 
-FiltersNotFrequent = connect()(onClickOutside(FiltersNotFrequent));
-
-export default FiltersNotFrequent;
+export default connect()(onClickOutside(FiltersNotFrequent));

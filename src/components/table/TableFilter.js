@@ -152,6 +152,4 @@ TableFilter.propTypes = {
     dispatch: PropTypes.func.isRequired
 };
 
-TableFilter = connect()(TableFilter);
-
-export default TableFilter;
+export default connect()(TableFilter);

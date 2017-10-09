@@ -536,6 +536,4 @@ MenuOverlay.propTypes = {
     dispatch: PropTypes.func.isRequired
 };
 
-MenuOverlay = connect()(onClickOutside(MenuOverlay));
-
-export default MenuOverlay;
+export default connect()(onClickOutside(MenuOverlay));

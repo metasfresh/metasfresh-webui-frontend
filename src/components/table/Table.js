@@ -1259,6 +1259,6 @@ Table.propTypes = {
     dispatch: PropTypes.func.isRequired
 };
 
-Table = connect(false, false, false, { withRef: true })(onClickOutside(Table));
-
-export default Table;
+export default connect(false, false, false, { withRef: true })(
+    onClickOutside(Table)
+);

@@ -179,6 +179,4 @@ Inbox.propTypes = {
     dispatch: PropTypes.func.isRequired
 };
 
-Inbox = connect()(onClickOutside(Inbox));
-
-export default Inbox;
+export default connect()(onClickOutside(Inbox));

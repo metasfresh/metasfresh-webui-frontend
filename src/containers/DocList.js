@@ -228,6 +228,4 @@ function mapStateToProps(state) {
     };
 }
 
-DocList = connect(mapStateToProps)(DocList);
-
-export default DocList;
+export default connect(mapStateToProps)(DocList);

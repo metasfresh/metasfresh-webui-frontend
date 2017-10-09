@@ -225,6 +225,4 @@ Breadcrumb.propTypes = {
     dispatch: PropTypes.func.isRequired
 };
 
-Breadcrumb = connect()(Breadcrumb);
-
-export default Breadcrumb;
+export default connect()(Breadcrumb);

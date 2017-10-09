@@ -219,6 +219,4 @@ Attributes.propTypes = {
     dispatch: PropTypes.func.isRequired
 };
 
-Attributes = connect()(Attributes);
-
-export default Attributes;
+export default connect()(Attributes);

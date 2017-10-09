@@ -486,6 +486,4 @@ MasterWindow.contextTypes = {
     router: PropTypes.object.isRequired
 };
 
-MasterWindow = connect(mapStateToProps)(MasterWindow);
-
-export default MasterWindow;
+export default connect(mapStateToProps)(MasterWindow);

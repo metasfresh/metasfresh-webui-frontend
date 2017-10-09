@@ -803,6 +803,4 @@ DocumentList.propTypes = {
     dispatch: PropTypes.func.isRequired
 };
 
-DocumentList = connect()(DocumentList);
-
-export default DocumentList;
+export default connect()(DocumentList);

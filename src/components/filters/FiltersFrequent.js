@@ -114,6 +114,4 @@ class FiltersFrequent extends Component {
     }
 }
 
-FiltersFrequent = connect()(onClickOutside(FiltersFrequent));
-
-export default FiltersFrequent;
+export default connect()(onClickOutside(FiltersFrequent));

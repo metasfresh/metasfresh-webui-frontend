@@ -142,8 +142,6 @@ class Card extends Component {
     }
 }
 
-Card = DragSource(ItemTypes.CARD, cardSource, collect)(
+export default DragSource(ItemTypes.CARD, cardSource, collect)(
     DropTarget(ItemTypes.CARD, cardTarget, connect)(Card)
 );
-
-export default Card;

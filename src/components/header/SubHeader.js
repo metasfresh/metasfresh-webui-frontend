@@ -400,8 +400,6 @@ Subheader.propTypes = {
     dispatch: PropTypes.func.isRequired
 };
 
-Subheader = connect(state => ({
+export default connect(state => ({
     standardActions: state.windowHandler.master.standardActions
 }))(onClickOutside(Subheader));
-
-export default Subheader;
