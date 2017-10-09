@@ -20,6 +20,7 @@ export class Dashboard extends Component {
 
     componentDidUpdate() {
         // TODO: Resolve this hotfix
+        /* eslint-disable no-unreachable */
         return;
 
         const { me } = this.props;
@@ -36,6 +37,7 @@ export class Dashboard extends Component {
                 introHints: docIntroHints
             });
         }
+        /* eslint-enable no-unreachable */
     }
 
     toggleEditMode = () =>
