@@ -71,7 +71,7 @@ class TableCell extends Component {
             : '';
     };
 
-    createAmount = (field, type) => {
+    createAmount = field => {
         let value = numeral(parseFloat(field)).format();
         return field ? value : '';
     };

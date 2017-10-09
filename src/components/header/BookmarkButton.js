@@ -27,7 +27,7 @@ class BookmarkButton extends Component {
     };
 
     handleClick = () => {
-        const { dispatch, nodeId, updateData } = this.props;
+        const { nodeId, updateData } = this.props;
         const { isBookmark } = this.state;
 
         patchRequest({

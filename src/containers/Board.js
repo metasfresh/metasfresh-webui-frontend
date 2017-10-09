@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import update from 'immutability-helper';
-import { push } from 'react-router-redux';
 
 import {
     getData,
@@ -10,7 +9,6 @@ import {
     deleteRequest,
     getRequest
 } from '../actions/GenericActions';
-import { getElementBreadcrumb } from '../actions/MenuActions';
 import { connectWS, disconnectWS } from '../actions/WindowActions';
 import { addCard } from '../actions/BoardActions';
 
@@ -49,7 +47,6 @@ class Board extends Component {
         const { board } = this.state;
         const { laneId, cardIds } = event;
         const laneIndex = board.lanes.findIndex(lane => lane.laneId === laneId);
-        const lane = board.lanes[laneIndex];
 
         const prom = Promise.all(
             cardIds.map(id => getRequest('board', board.boardId, 'card', id))
@@ -87,7 +84,7 @@ class Board extends Component {
                     }
                 );
             })
-            .catch(err => {
+            .catch(() => {
                 this.setState({
                     board: 404
                 });
@@ -214,7 +211,7 @@ class Board extends Component {
     };
 
     render() {
-        const { modal, rawModal, breadcrumb, indicator, dispatch } = this.props;
+        const { modal, rawModal, breadcrumb, indicator } = this.props;
 
         const { board, targetIndicator, sidenav, sidenavViewId } = this.state;
 

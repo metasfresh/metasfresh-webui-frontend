@@ -4,8 +4,8 @@ import { connect } from 'react-redux';
 import Container from '../components/Container';
 import DraggableWrapper from '../components/dashboard/DraggableWrapper';
 
-import { Steps, Hints } from 'intro.js-react';
-import { introSteps, introHints } from '../components/intro/intro';
+import { Hints } from 'intro.js-react';
+import { introHints } from '../components/intro/intro';
 
 export class Dashboard extends Component {
     constructor(props) {

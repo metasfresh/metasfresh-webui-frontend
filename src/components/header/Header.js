@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { push, replace } from 'react-router-redux';
+import { push } from 'react-router-redux';
 import counterpart from 'counterpart';
 
 import logo from '../../assets/images/metasfresh_logo_green_thumb.png';
@@ -18,7 +18,7 @@ import Prompt from '../app/Prompt';
 import NewEmail from '../email/NewEmail';
 import NewLetter from '../letter/NewLetter';
 
-import { openModal, closeModal } from '../../actions/WindowActions';
+import { openModal } from '../../actions/WindowActions';
 
 import {
     deleteRequest,
@@ -72,7 +72,6 @@ class Header extends Component {
     };
 
     componentDidUpdate = prevProps => {
-        const { dispatch, pathname } = this.props;
         if (
             prevProps.me.language !== undefined &&
             JSON.stringify(prevProps.me.language) !==

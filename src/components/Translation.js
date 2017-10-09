@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import counterpart from 'counterpart';
 
 import { getMessages, deepForceUpdate } from '../actions/AppActions';

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { push } from 'react-router-redux';
 import counterpart from 'counterpart';
 import FiltersFrequent from './FiltersFrequent';
 import FiltersNotFrequent from './FiltersNotFrequent';
@@ -155,11 +154,9 @@ class Filters extends Component {
 
     render() {
         const { filterData, windowType, viewId } = this.props;
-        const {
-            frequentFilters,
-            notFrequentFilters,
-            staticFilters
-        } = this.sortFilters(filterData);
+        const { frequentFilters, notFrequentFilters } = this.sortFilters(
+            filterData
+        );
         const { notValidFields, widgetShown, filter } = this.state;
 
         return (

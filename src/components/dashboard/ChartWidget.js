@@ -1,8 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import ItemTypes from '../../constants/ItemTypes';
-import { DragSource, DropTarget } from 'react-dnd';
-import onClickOutside from 'react-onclickoutside';
 import RawChart from '../charts/RawChart';
 
 export class ChartWidget extends Component {
@@ -41,8 +37,6 @@ export class ChartWidget extends Component {
             framework,
             noData,
             maximizeWidget,
-            hideWidgets,
-            showWidgets,
             index,
             idMaximized,
             id,
@@ -55,13 +49,7 @@ export class ChartWidget extends Component {
             handleChartOptions
         } = this.props;
 
-        const {
-            toggleWidgetMenu,
-            height,
-            captionHandler,
-            chartOptions,
-            when
-        } = this.state;
+        const { toggleWidgetMenu, height } = this.state;
 
         const isMaximized = idMaximized === id;
         if (!isMaximized && typeof idMaximized === 'number') return false;

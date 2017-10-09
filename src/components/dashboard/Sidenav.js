@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import Loader from '../app/Loader';
 import ChartWidget from './ChartWidget';
 import Indicator from '../charts/Indicator';
 import DndWidget from './DndWidget';
@@ -17,8 +16,6 @@ class Sidenav extends Component {
     }
 
     componentDidMount = () => {
-        const { entity } = this.props;
-
         getRequest('dashboard', 'kpis', 'available').then(res => {
             this.setState({
                 indicators: res.data.filter(
@@ -66,7 +63,7 @@ class Sidenav extends Component {
 
     render() {
         const { indicators, cards } = this.state;
-        const { entity } = this.props;
+
         return (
             <div className="board-sidenav overlay-shadow">
                 <div className="board-sidenav-header">

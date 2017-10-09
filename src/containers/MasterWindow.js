@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { push, replace } from 'react-router-redux';
+import { push } from 'react-router-redux';
 
 import { Steps, Hints } from 'intro.js-react';
 import { introSteps, introHints } from '../components/intro/intro';

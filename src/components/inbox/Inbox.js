@@ -11,8 +11,6 @@ import InboxItem from './InboxItem';
 import {
     markAllAsRead,
     markAsRead,
-    getNotifications,
-    getNotificationsSuccess,
     deleteUserNotification
 } from '../../actions/AppActions';
 
@@ -64,8 +62,6 @@ class Inbox extends Component {
     };
 
     handleDelete = (e, item) => {
-        const { dispatch } = this.props;
-
         e.preventDefault();
         e.stopPropagation();
 

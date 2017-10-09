@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import ItemTypes from '../../constants/ItemTypes';
 import { DragSource, DropTarget } from 'react-dnd';
 
 const cardSource = {

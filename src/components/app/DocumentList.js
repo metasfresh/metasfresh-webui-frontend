@@ -409,7 +409,7 @@ class DocumentList extends Component {
         });
     };
 
-    getData = (id, page, sortingQuery, refresh) => {
+    getData = (id, page, sortingQuery) => {
         const {
             dispatch,
             windowType,

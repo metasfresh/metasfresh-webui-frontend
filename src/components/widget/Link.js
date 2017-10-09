@@ -15,10 +15,9 @@ class Link extends Component {
             isEdited,
             widgetProperties,
             icon,
-            fullScreen,
-            tabIndex,
             widgetData
         } = this.props;
+
         return (
             <div className="input-inner-container">
                 <div

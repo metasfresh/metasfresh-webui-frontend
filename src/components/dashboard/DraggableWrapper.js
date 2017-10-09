@@ -10,7 +10,6 @@ import RawChart from '../charts/RawChart';
 import DndWidget from './DndWidget';
 import Sidenav from './Sidenav';
 import Placeholder from './Placeholder';
-import Indicator from '../charts/Indicator';
 import RawList from '../widget/List/RawList';
 
 import {
@@ -180,7 +179,7 @@ export class DraggableWrapper extends Component {
     };
 
     renderIndicators = () => {
-        const { indicators, idMaximized } = this.state;
+        const { indicators } = this.state;
         const { editmode } = this.props;
 
         if (!indicators.length && editmode)
@@ -437,7 +436,7 @@ export class DraggableWrapper extends Component {
     };
 
     render() {
-        const { editmode, toggleEditMode } = this.props;
+        const { editmode } = this.props;
 
         return (
             <div className="dashboard-cards-wrapper">
