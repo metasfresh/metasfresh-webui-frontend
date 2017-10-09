@@ -8,12 +8,20 @@ class Lane extends Component {
 
     render() {
         const {
-            caption, cards, laneId, onHover, onDrop, targetIndicator, onReject,
-            onDelete, placeholder, onCaptionClick
+            caption,
+            cards,
+            laneId,
+            onHover,
+            onDrop,
+            targetIndicator,
+            onReject,
+            onDelete,
+            placeholder,
+            onCaptionClick
         } = this.props;
 
-        if(placeholder){
-            return (<div className="board-lane-placeholder" />)
+        if (placeholder) {
+            return <div className="board-lane-placeholder" />;
         }
 
         return (
@@ -25,25 +33,36 @@ class Lane extends Component {
                         (!cards.length ? 'board-draggable-placeholder ' : '')
                     }
                 >
-                    {!cards.length && <Card
-                        index={0}
-                        {...{laneId, onHover, onDrop, targetIndicator}}
-                        placeholder={true} />
-                    }
-                    {cards.map((card, i) => <Card
-                        key={i}
-                        index={i}
-                        {...{
-                            laneId, onHover, onDrop, onReject, targetIndicator,
-                            onDelete, onCaptionClick
-                        }}
-                        {...card} />
+                    {!cards.length && (
+                        <Card
+                            index={0}
+                            {...{ laneId, onHover, onDrop, targetIndicator }}
+                            placeholder={true}
+                        />
                     )}
-                    {cards.length && <Card
-                        index={cards.length}
-                        {...{laneId, onHover, onDrop, targetIndicator}}
-                        placeholder={true} />
-                    }
+                    {cards.map((card, i) => (
+                        <Card
+                            key={i}
+                            index={i}
+                            {...{
+                                laneId,
+                                onHover,
+                                onDrop,
+                                onReject,
+                                targetIndicator,
+                                onDelete,
+                                onCaptionClick
+                            }}
+                            {...card}
+                        />
+                    ))}
+                    {cards.length && (
+                        <Card
+                            index={cards.length}
+                            {...{ laneId, onHover, onDrop, targetIndicator }}
+                            placeholder={true}
+                        />
+                    )}
                 </div>
             </div>
         );

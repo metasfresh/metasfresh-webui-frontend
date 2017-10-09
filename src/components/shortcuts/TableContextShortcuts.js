@@ -2,14 +2,12 @@ import React, { Component } from 'react';
 import { Shortcuts } from 'react-shortcuts';
 
 class TableContextShortcuts extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
     }
 
-    handleShortcuts = (action) => {
-        const {
-            handleToggleExpand, handleToggleQuickInput
-        } = this.props;
+    handleShortcuts = action => {
+        const { handleToggleExpand, handleToggleQuickInput } = this.props;
 
         switch (action) {
             case 'TOGGLE_EXPAND':
@@ -19,20 +17,20 @@ class TableContextShortcuts extends Component {
                 handleToggleQuickInput();
                 break;
         }
-    }
+    };
 
     render() {
         return (
             <Shortcuts
                 name="TABLE_CONTEXT"
-                handler = { this.handleShortcuts }
-                targetNodeSelector = "body"
-                isolate = { true }
-                preventDefault = { true }
-                stopPropagation = { true }
-                alwaysFireHandler = { true }
+                handler={this.handleShortcuts}
+                targetNodeSelector="body"
+                isolate={true}
+                preventDefault={true}
+                stopPropagation={true}
+                alwaysFireHandler={true}
             />
-        )
+        );
     }
 }
 

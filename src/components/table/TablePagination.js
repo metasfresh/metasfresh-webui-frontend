@@ -1,31 +1,30 @@
 import React, { Component } from 'react';
 import counterpart from 'counterpart';
-import PaginationContextShortcuts from
-    '../shortcuts/PaginationContextShortcuts';
+import PaginationContextShortcuts from '../shortcuts/PaginationContextShortcuts';
 
 class TablePagination extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
             firstDotsState: false,
             secondDotsState: false,
             value: ''
-        }
+        };
     }
 
-    handleValue = (e) => {
+    handleValue = e => {
         e.preventDefault();
         this.setState({
             value: e.target.value ? e.target.value : ''
-        })
-    }
+        });
+    };
 
     handleSubmit = (e, value, pages) => {
-        const {handleChangePage, deselect} = this.props;
-        if(e.key === 'Enter'){
+        const { handleChangePage, deselect } = this.props;
+        if (e.key === 'Enter') {
             e.preventDefault();
 
-            if(value <= pages && value > 0){
+            if (value <= pages && value > 0) {
                 handleChangePage(Number(value));
                 deselect();
                 this.setState({
@@ -34,44 +33,49 @@ class TablePagination extends Component {
                     firstDotsState: false
                 });
             }
-
         }
-    }
+    };
 
     handleFirstDotsState = () => {
-        const {firstDotsState} = this.state;
-        this.setState({
-            firstDotsState: !firstDotsState
-        }, () => {
-            if(!firstDotsState){
-                this.goToPage.focus();
+        const { firstDotsState } = this.state;
+        this.setState(
+            {
+                firstDotsState: !firstDotsState
+            },
+            () => {
+                if (!firstDotsState) {
+                    this.goToPage.focus();
+                }
             }
-        });
-    }
+        );
+    };
 
     handleSecondDotsState = () => {
-        const {secondDotsState} = this.state;
-        this.setState({
-            secondDotsState: !secondDotsState
-        }, () => {
-            if(!secondDotsState) {
-                this.goToPage.focus();
+        const { secondDotsState } = this.state;
+        this.setState(
+            {
+                secondDotsState: !secondDotsState
+            },
+            () => {
+                if (!secondDotsState) {
+                    this.goToPage.focus();
+                }
             }
-        });
-    }
+        );
+    };
 
-    handleSelectWholePage = (value) => {
+    handleSelectWholePage = value => {
         this.setState({
             selectedWholePage: value
-        })
-    }
+        });
+    };
 
     resetGoToPage = () => {
         this.setState({
             secondDotsState: false,
             firstDotsState: false
-        })
-    }
+        });
+    };
 
     renderGoToPage = (pages, value) => {
         return (
@@ -80,19 +84,19 @@ class TablePagination extends Component {
                 <input
                     type="number"
                     min="1"
-                    ref={c => this.goToPage = c}
+                    ref={c => (this.goToPage = c)}
                     max={pages}
                     value={value}
                     onChange={e => this.handleValue(e)}
-                    onKeyDown={(e) => this.handleSubmit(e, value, pages)}
+                    onKeyDown={e => this.handleSubmit(e, value, pages)}
                 />
             </div>
-        )
-    }
+        );
+    };
 
     renderFirstPartPagination = (pagination, pages) => {
-        const {handleChangePage, deselect, compressed} = this.props;
-        const {firstDotsState, value} = this.state;
+        const { handleChangePage, deselect, compressed } = this.props;
+        const { firstDotsState, value } = this.state;
         pagination.push(
             <li
                 className="page-item"
@@ -100,44 +104,51 @@ class TablePagination extends Component {
                 onClick={() => {
                     this.resetGoToPage();
                     handleChangePage(1);
-                    deselect()} }
+                    deselect();
+                }}
             >
                 <a
                     className={
                         'page-link ' +
                         (compressed ? 'page-link-compressed ' : '')
                     }
-                >{1}</a>
+                >
+                    {1}
+                </a>
             </li>
         );
         pagination.push(
             <li className="page-item page-dots" key={0}>
-                { firstDotsState && this.renderGoToPage(pages, value) }
+                {firstDotsState && this.renderGoToPage(pages, value)}
                 <a
                     className={
                         'page-link ' +
                         (compressed ? 'page-link-compressed ' : '')
                     }
                     onClick={() => this.handleFirstDotsState()}
-                >{'...'}</a>
+                >
+                    {'...'}
+                </a>
             </li>
         );
-    }
+    };
 
     renderLastPartPagination = (pagination, pages) => {
-        const {handleChangePage, deselect, compressed} = this.props;
-        const {secondDotsState, value} = this.state;
+        const { handleChangePage, deselect, compressed } = this.props;
+        const { secondDotsState, value } = this.state;
 
         pagination.push(
             <li className="page-item page-dots" key={99990}>
-                { secondDotsState && this.renderGoToPage(pages, value) }
+                {secondDotsState && this.renderGoToPage(pages, value)}
                 <a
                     className={
                         'page-link ' +
                         (compressed ? 'page-link-compressed ' : '')
                     }
                     onClick={() => this.handleSecondDotsState()}
-                >{'...'}</a>
+                >
+                    {'...'}
+                </a>
             </li>
         );
         pagination.push(
@@ -147,98 +158,100 @@ class TablePagination extends Component {
                 onClick={() => {
                     this.resetGoToPage();
                     handleChangePage(pages);
-                    deselect()
-                } }
+                    deselect();
+                }}
             >
                 <a
                     className={
                         'page-link ' +
                         (compressed ? 'page-link-compressed ' : '')
                     }
-                >{pages}</a>
+                >
+                    {pages}
+                </a>
             </li>
         );
-    }
+    };
 
     renderPaginationContent = (pagination, page, start, end) => {
-        const {handleChangePage, deselect, compressed} = this.props;
-        for(let i = start; i <= end; i++){
+        const { handleChangePage, deselect, compressed } = this.props;
+        for (let i = start; i <= end; i++) {
             pagination.push(
                 <li
-                    className={
-                        'page-item ' +
-                        (page === i ? 'active': '')
-                    }
+                    className={'page-item ' + (page === i ? 'active' : '')}
                     key={i}
                     onClick={() => {
                         this.resetGoToPage();
                         handleChangePage(i);
                         deselect();
-                    } }
+                    }}
                 >
                     <a
                         className={
                             'page-link ' +
                             (compressed ? 'page-link-compressed ' : '')
-                        }>{i}</a>
+                        }
+                    >
+                        {i}
+                    </a>
                 </li>
             );
         }
-    }
+    };
 
     renderTotalItems = () => {
-        const {size, queryLimitHit} = this.props;
+        const { size, queryLimitHit } = this.props;
         return (
             <div className="hidden-sm-down">
                 <div>
                     {counterpart.translate('view.totalItems.caption')} {size}
-                    {queryLimitHit &&
-                        <span className="text-danger"> (limited)
-                        </span>
-                    }
+                    {queryLimitHit && (
+                        <span className="text-danger"> (limited)</span>
+                    )}
                 </div>
             </div>
-        )
-    }
+        );
+    };
 
     renderSelectAll = () => {
         const {
-            selected, handleSelectAll, handleSelectRange, size, pageLength
+            selected,
+            handleSelectAll,
+            handleSelectRange,
+            size,
+            pageLength
         } = this.props;
-        const selectedWholePage = selected && (selected.length === pageLength);
+        const selectedWholePage = selected && selected.length === pageLength;
         return (
             <div className="hidden-sm-down">
-                <div>{selected.length > 0 ?
-                        counterpart.translate(
-                            'view.itemsSelected.caption',
-                            {
-                                size: (selected[0] === 'all' ? size :
-                                selected.length)
-                            }
-                        )
-                        : counterpart.translate('view.noItemSelected.caption')
-                     }
-                 </div>
+                <div>
+                    {selected.length > 0
+                        ? counterpart.translate('view.itemsSelected.caption', {
+                              size:
+                                  selected[0] === 'all' ? size : selected.length
+                          })
+                        : counterpart.translate('view.noItemSelected.caption')}
+                </div>
                 <div
                     className="pagination-link pointer"
                     onClick={() => {
-                        selectedWholePage ?
-                             handleSelectRange(['all']) : handleSelectAll()
+                        selectedWholePage
+                            ? handleSelectRange(['all'])
+                            : handleSelectAll();
                     }}
                 >
-                    {selectedWholePage ?
-                        counterpart.translate(
-                            'view.selectAllItems.caption',
-                            {size: size}) :
-                        counterpart.translate('view.selectAllOnPage.caption')
-                    }
+                    {selectedWholePage
+                        ? counterpart.translate('view.selectAllItems.caption', {
+                              size: size
+                          })
+                        : counterpart.translate('view.selectAllOnPage.caption')}
                 </div>
             </div>
-        )
-    }
+        );
+    };
 
-    renderArrow = (left) => {
-        const {compressed, handleChangePage, deselect} = this.props;
+    renderArrow = left => {
+        const { compressed, handleChangePage, deselect } = this.props;
         return (
             <li className="page-item">
                 <a
@@ -255,12 +268,16 @@ class TablePagination extends Component {
                     <span>{left ? '«' : '»'}</span>
                 </a>
             </li>
-        )
-    }
+        );
+    };
 
     render() {
         const {
-            size, pageLength, handleChangePage, page, compressed,
+            size,
+            pageLength,
+            handleChangePage,
+            page,
+            compressed,
             disablePaginationShortcuts
         } = this.props;
 
@@ -268,22 +285,32 @@ class TablePagination extends Component {
 
         let pagination = [];
 
-        if(pages < 8 ) {
-            if(pages <= 0){
+        if (pages < 8) {
+            if (pages <= 0) {
                 this.renderPaginationContent(pagination, page, 1, 1);
             } else {
                 this.renderPaginationContent(pagination, page, 1, pages);
             }
         } else {
-            if(page <= 4) {
+            if (page <= 4) {
                 this.renderPaginationContent(pagination, page, 1, 5);
                 this.renderLastPartPagination(pagination, pages);
-            } else if(page > pages - 4) {
+            } else if (page > pages - 4) {
                 this.renderFirstPartPagination(pagination, pages);
-                this.renderPaginationContent(pagination, page, pages-4, pages);
+                this.renderPaginationContent(
+                    pagination,
+                    page,
+                    pages - 4,
+                    pages
+                );
             } else {
                 this.renderFirstPartPagination(pagination, pages);
-                this.renderPaginationContent(pagination, page, page-1, page+1);
+                this.renderPaginationContent(
+                    pagination,
+                    page,
+                    page - 1,
+                    page + 1
+                );
                 this.renderLastPartPagination(pagination, pages);
             }
         }
@@ -308,21 +335,20 @@ class TablePagination extends Component {
                     </div>
                 </div>
 
-                {
-                    !disablePaginationShortcuts &&
+                {!disablePaginationShortcuts && (
                     <PaginationContextShortcuts
                         handleFirstPage={() => handleChangePage(1)}
-                        handleLastPage={() => handleChangePage(
-                            size ? Math.ceil(size / pageLength) : 0)
-                        }
+                        handleLastPage={() =>
+                            handleChangePage(
+                                size ? Math.ceil(size / pageLength) : 0
+                            )}
                         handleNextPage={() => handleChangePage('up')}
                         handlePrevPage={() => handleChangePage('down')}
                         pages={pages}
                     />
-                }
+                )}
             </div>
         );
-
     }
 }
 

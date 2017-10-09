@@ -14,9 +14,9 @@ class Auth {
             this.notificationClient.connected &&
                 this.notificationClient.subscribe(topic.data, msg => {
                     cb && cb(msg);
-                })
-        })
-    }
+                });
+        });
+    };
 
     initSessionClient = (topic, cb) => {
         this.sessionClient = Stomp.Stomp.over(new SockJs(config.WS_URL));
@@ -25,18 +25,19 @@ class Auth {
             this.sessionClient.connected &&
                 this.sessionClient.subscribe(topic, msg => {
                     cb && cb(msg);
-                })
+                });
         });
-    }
+    };
 
     close = () => {
-        if(!this.notificationClient || !this.sessionClient){
+        if (!this.notificationClient || !this.sessionClient) {
             return;
         }
 
-        this.notificationClient.connected && this.notificationClient.disconnect();
+        this.notificationClient.connected &&
+            this.notificationClient.disconnect();
         this.sessionClient.connected && this.sessionClient.disconnect();
-    }
+    };
 }
 
 export default Auth;

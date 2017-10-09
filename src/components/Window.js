@@ -9,7 +9,7 @@ import Tabs from '../components/tabs/Tabs';
 import Table from '../components/table/Table';
 
 class Window extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.state = {
@@ -17,39 +17,39 @@ class Window extends Component {
             dragActive: false
         };
 
-        if(props.isModal){
+        if (props.isModal) {
             this.tabIndex = {
                 firstColumn: 0,
                 tabs: 0,
                 secondColumn: 0
-            }
-        }else{
+            };
+        } else {
             this.tabIndex = {
                 firstColumn: 1,
                 tabs: 2,
                 secondColumn: 3
-            }
+            };
         }
     }
 
-    toggleTableFullScreen = (tabId) => {
+    toggleTableFullScreen = tabId => {
         this.setState({
             fullScreen: tabId
         });
-    }
+    };
 
-    renderTabs = (tabs) => {
-        const {type} = this.props.layout;
-        const {data, rowData, newRow, tabsInfo, sort} = this.props;
-        const {fullScreen} = this.state;
+    renderTabs = tabs => {
+        const { type } = this.props.layout;
+        const { data, rowData, newRow, tabsInfo, sort } = this.props;
+        const { fullScreen } = this.state;
 
-        if(!Object.keys(data).length){
+        if (!Object.keys(data).length) {
             return;
         }
 
         const dataId = data.ID && data.ID.value;
 
-        return(
+        return (
             <Tabs
                 tabIndex={this.tabIndex.tabs}
                 toggleTableFullScreen={this.toggleTableFullScreen}
@@ -58,8 +58,13 @@ class Window extends Component {
             >
                 {tabs.map(elem => {
                     const {
-                        tabid, caption, elements, emptyResultText,
-                        emptyResultHint, queryOnActivate, supportQuickInput,
+                        tabid,
+                        caption,
+                        elements,
+                        emptyResultText,
+                        emptyResultHint,
+                        queryOnActivate,
+                        supportQuickInput,
                         defaultOrderBys
                     } = elem;
                     return (
@@ -84,97 +89,100 @@ class Window extends Component {
                             tabInfo={tabsInfo && tabsInfo[tabid]}
                             disconnectFromState={true}
                         />
-                    )
+                    );
                 })}
             </Tabs>
-        )
-    }
+        );
+    };
 
-    renderSections = (sections) => {
-        return sections.map((elem, id)=> {
-            const {title, columns} = elem;
-            const isFirst = (id === 0);
+    renderSections = sections => {
+        return sections.map((elem, id) => {
+            const { title, columns } = elem;
+            const isFirst = id === 0;
             return (
                 <div className="row" key={'section' + id}>
-                    {title && <Separator {...{title}} />}
+                    {title && <Separator {...{ title }} />}
                     {columns && this.renderColumns(columns, isFirst)}
                 </div>
-            )
-       })
-    }
+            );
+        });
+    };
 
     renderColumns = (columns, isSectionFirst) => {
         const maxRows = 12;
         const colWidth = Math.floor(maxRows / columns.length);
-        return columns.map((elem, id)=> {
+        return columns.map((elem, id) => {
             const isFirst = id === 0 && isSectionFirst;
             const elementGroups = elem.elementGroups;
             return (
                 <div className={'col-sm-' + colWidth} key={'col' + id}>
                     {elementGroups &&
-                        this.renderElementGroups(elementGroups, isFirst)
-                    }
+                        this.renderElementGroups(elementGroups, isFirst)}
                 </div>
-            )
-        })
-    }
+            );
+        });
+    };
 
     renderElementGroups = (group, isFirst) => {
-        const {isModal} = this.props;
-        return group.map((elem, id)=> {
-            const {type, elementsLine} = elem;
-            const shouldBeFocused = isFirst && (id === 0);
+        const { isModal } = this.props;
+        return group.map((elem, id) => {
+            const { type, elementsLine } = elem;
+            const shouldBeFocused = isFirst && id === 0;
 
-            const tabIndex = (type === 'primary') ?
-                this.tabIndex.firstColumn:
-                this.tabIndex.secondColumn;
+            const tabIndex =
+                type === 'primary'
+                    ? this.tabIndex.firstColumn
+                    : this.tabIndex.secondColumn;
 
             return (
-                elementsLine && elementsLine.length > 0 &&
+                elementsLine &&
+                elementsLine.length > 0 && (
                     <div
                         key={'elemGroups' + id}
                         ref={c => {
-                            if(this.focused)
-                                return;
-                            if(isModal && shouldBeFocused && c)
-                                c.focus();
+                            if (this.focused) return;
+                            if (isModal && shouldBeFocused && c) c.focus();
                             this.focused = true;
                         }}
                         tabIndex={shouldBeFocused ? 0 : undefined}
                         className={
                             'panel panel-spaced panel-distance ' +
-                            ((type === 'primary') ?
-                                'panel-bordered panel-primary' :
-                                'panel-secondary'
-                            )
+                            (type === 'primary'
+                                ? 'panel-bordered panel-primary'
+                                : 'panel-secondary')
                         }
                     >
                         {this.renderElementsLine(
-                            elementsLine, tabIndex, shouldBeFocused
+                            elementsLine,
+                            tabIndex,
+                            shouldBeFocused
                         )}
                     </div>
-            )
-        })
-    }
+                )
+            );
+        });
+    };
 
     renderElementsLine = (elementsLine, tabIndex, shouldBeFocused) => {
-        return elementsLine.map((elem, id)=> {
-            const {elements} = elem;
-            const isFocused = shouldBeFocused && (id === 0);
+        return elementsLine.map((elem, id) => {
+            const { elements } = elem;
+            const isFocused = shouldBeFocused && id === 0;
             return (
-                elements && elements.length > 0 &&
+                elements &&
+                elements.length > 0 && (
                     <div className="elements-line" key={'line' + id}>
                         {this.renderElements(elements, tabIndex, isFocused)}
                     </div>
-            )
-        })
-    }
+                )
+            );
+        });
+    };
 
     handleBlurWidget(fieldName) {
         let currentWidgetIndex = -1;
 
         if (this.widgets) {
-            this.widgets.forEach( (widget, index) => {
+            this.widgets.forEach((widget, index) => {
                 if (widget && widget.props && widget.props.widgetData) {
                     let widgetData = widget.props.widgetData[0];
                     if (widgetData && widgetData.field === fieldName) {
@@ -184,9 +192,17 @@ class Window extends Component {
             });
 
             if (currentWidgetIndex >= 0) {
-                let nextWidgetIndex = Math.min(this.widgets.length - 1, currentWidgetIndex + 1);
+                let nextWidgetIndex = Math.min(
+                    this.widgets.length - 1,
+                    currentWidgetIndex + 1
+                );
 
-                let element = ReactDOM.findDOMNode(this.widgets[nextWidgetIndex]);
+                // TODO: Remove dependency on ReactDOM.findDOMNode
+                // eslint-disable-next-line react/no-find-dom-node
+                let element = ReactDOM.findDOMNode(
+                    this.widgets[nextWidgetIndex]
+                );
+
                 if (element) {
                     let tabElement = element.querySelector('[tabindex]');
 
@@ -199,18 +215,18 @@ class Window extends Component {
     }
 
     renderElements = (elements, tabIndex, isFocused) => {
-        const {type} = this.props.layout;
-        const {data, modal, tabId, rowId, dataId, isAdvanced} = this.props;
-        const {fullScreen} = this.state;
+        const { type } = this.props.layout;
+        const { data, modal, tabId, rowId, dataId, isAdvanced } = this.props;
+        const { fullScreen } = this.state;
 
-        return elements.map((elem, id)=> {
-            const autoFocus = isFocused && (id === 0);
+        return elements.map((elem, id) => {
+            const autoFocus = isFocused && id === 0;
             const widgetData = elem.fields.map(item => data[item.field] || -1);
-            const fieldName = (elem.fields) ? elem.fields[0].field : '';
+            const fieldName = elem.fields ? elem.fields[0].field : '';
             const relativeDocId = data.ID && data.ID.value;
             return (
                 <MasterWidget
-                    ref={ (c) => {
+                    ref={c => {
                         if (c) {
                             this.widgets.push(c);
                         }
@@ -231,14 +247,17 @@ class Window extends Component {
                     onBlurWidget={this.handleBlurWidget.bind(this, fieldName)}
                     {...elem}
                 />
-            )
-        })
-    }
+            );
+        });
+    };
 
     render() {
-        const {sections, tabs} = this.props.layout;
+        const { sections, tabs } = this.props.layout;
         const {
-            handleDropFile, handleRejectDropped, handleDragStart, isModal
+            handleDropFile,
+            handleRejectDropped,
+            handleDragStart,
+            isModal
         } = this.props;
 
         this.widgets = [];
@@ -254,12 +273,11 @@ class Window extends Component {
                         {sections && this.renderSections(sections)}
                     </div>
                 </Dropzone>
-                {
-                    !isModal &&
+                {!isModal && (
                     <div className="mt-1 tabs-wrapper">
                         {tabs && this.renderTabs(tabs)}
                     </div>
-                }
+                )}
             </div>
         );
     }

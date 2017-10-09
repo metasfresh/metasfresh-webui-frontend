@@ -8,16 +8,14 @@ const cardTarget = {
         props.onDrop && props.onDrop(monitor.getItem(), props.laneId);
     },
     hover(props, monitor) {
-        if(
-            !props.onHover
-        ){
+        if (!props.onHover) {
             return;
         }
 
-        if(
-             monitor.getItem().index === props.index &&
-             props.laneId === monitor.getItem().laneId
-        ){
+        if (
+            monitor.getItem().index === props.index &&
+            props.laneId === monitor.getItem().laneId
+        ) {
             return;
         }
 
@@ -55,11 +53,11 @@ function collect(connect, monitor) {
     };
 }
 
-const TargetIndicator = (props) => {
-    const {index, laneId, parentIndex, parentLaneId} = props;
-    if(laneId !== parentLaneId || index !== parentIndex) return false;
-    return (<div className="lane-card-placeholder" />);
-}
+const TargetIndicator = props => {
+    const { index, laneId, parentIndex, parentLaneId } = props;
+    if (laneId !== parentLaneId || index !== parentIndex) return false;
+    return <div className="lane-card-placeholder" />;
+};
 
 class Card extends Component {
     constructor(props) {
@@ -67,71 +65,83 @@ class Card extends Component {
 
         this.state = {
             mouseOn: false
-        }
+        };
     }
 
     renderCard = () => {
         const {
-            caption, description, users, placeholder, connectDragSource,
-            connectDropTarget, onDelete, cardId, laneId, onCaptionClick,
+            caption,
+            description,
+            users,
+            placeholder,
+            connectDragSource,
+            connectDropTarget,
+            onDelete,
+            cardId,
+            laneId,
+            onCaptionClick,
             documentPath
         } = this.props;
 
-        const {mouseOn} = this.state;
+        const { mouseOn } = this.state;
 
-        if(placeholder){
+        if (placeholder) {
             return connectDropTarget(<div className="card-placeholder" />);
-        }else{
-            return connectDragSource(connectDropTarget(
-                <div className="card">
-                    {mouseOn && onDelete && <i
-                        className="pointer meta-icon-close-1 float-xs-right"
-                        onClick={() => onDelete(laneId, cardId)}
-                    />}
-                    <b
-                        className="pointer"
-                        onClick={() => onCaptionClick(documentPath)}
-                    >{caption}</b>
-                    <p className="card-description">{description}</p>
-                    {users.map((user, i) =>
-                        <Avatar
-                            key={i}
-                            id={user.avatarId}
-                            className="float-xs-right"
-                            size="sm"
-                            title={user.fullname}
-                        />
-                    )}
-                    <span className="clearfix"/>
-                </div>
-            ));
+        } else {
+            return connectDragSource(
+                connectDropTarget(
+                    <div className="card">
+                        {mouseOn &&
+                            onDelete && (
+                                <i
+                                    className="pointer meta-icon-close-1 float-xs-right"
+                                    onClick={() => onDelete(laneId, cardId)}
+                                />
+                            )}
+                        <b
+                            className="pointer"
+                            onClick={() => onCaptionClick(documentPath)}
+                        >
+                            {caption}
+                        </b>
+                        <p className="card-description">{description}</p>
+                        {users.map((user, i) => (
+                            <Avatar
+                                key={i}
+                                id={user.avatarId}
+                                className="float-xs-right"
+                                size="sm"
+                                title={user.fullname}
+                            />
+                        ))}
+                        <span className="clearfix" />
+                    </div>
+                )
+            );
         }
-    }
+    };
 
     render() {
-        const {
-            targetIndicator, index, laneId
-        } = this.props;
+        const { targetIndicator, index, laneId } = this.props;
 
         return (
             <div
-                onMouseEnter={() => this.setState({mouseOn: true})}
-                onMouseLeave={() => this.setState({mouseOn: false})}
+                onMouseEnter={() => this.setState({ mouseOn: true })}
+                onMouseLeave={() => this.setState({ mouseOn: false })}
             >
-                {targetIndicator && <TargetIndicator
-                    {...targetIndicator}
-                    parentIndex={index}
-                    parentLaneId={laneId}
-                />}
+                {targetIndicator && (
+                    <TargetIndicator
+                        {...targetIndicator}
+                        parentIndex={index}
+                        parentLaneId={laneId}
+                    />
+                )}
                 {this.renderCard()}
             </div>
         );
     }
 }
 
-Card = DragSource(ItemTypes.CARD, cardSource, collect)(
-    DropTarget(ItemTypes.CARD, cardTarget, connect)(
-        Card
-    ));
-
-export default Card;
+export default DragSource(ItemTypes.CARD, cardSource, collect)(
+    DropTarget(ItemTypes.CARD, cardTarget, connect)(Card)
+);

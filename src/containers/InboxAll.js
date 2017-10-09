@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 
 import Container from '../components/Container';
 
@@ -9,57 +9,61 @@ import Inbox from '../components/inbox/Inbox';
 class InboxAll extends Component {
     render() {
         const {
-            inbox, modal, rawModal, processStatus, indicator, selected,
+            inbox,
+            modal,
+            rawModal,
+            processStatus,
+            indicator,
+            selected,
             includedView
         } = this.props;
 
         return (
             <Container
-                siteName = "Inbox"
-                {...{modal, rawModal, processStatus, indicator, selected,
-                    includedView}}
+                siteName="Inbox"
+                {...{
+                    modal,
+                    rawModal,
+                    processStatus,
+                    indicator,
+                    selected,
+                    includedView
+                }}
             >
-                <Inbox
-                    all={true}
-                    inbox={inbox}
-                />
+                <Inbox all={true} inbox={inbox} />
             </Container>
         );
     }
 }
 
 function mapStateToProps(state) {
-    const { appHandler, windowHandler, listHandler  } = state;
+    const { appHandler, windowHandler, listHandler } = state;
 
-    const {
-        inbox,
-        processStatus
-    } = appHandler || {
+    const { inbox, processStatus } = appHandler || {
         inbox: {},
         processStatus: ''
-    }
+    };
 
-    const {
-        modal,
-        rawModal,
-        selected,
-        indicator,
-    } = windowHandler || {
+    const { modal, rawModal, selected, indicator } = windowHandler || {
         modal: false,
         rawModal: false,
         selected: [],
         indicator: ''
-    }
+    };
 
-    const {
-        includedView
-    } = listHandler || {
+    const { includedView } = listHandler || {
         includedView: {}
-    }
+    };
 
     return {
-        inbox, modal, rawModal, selected, indicator, includedView, processStatus
-    }
+        inbox,
+        modal,
+        rawModal,
+        selected,
+        indicator,
+        includedView,
+        processStatus
+    };
 }
 
 InboxAll.propTypes = {
@@ -67,6 +71,4 @@ InboxAll.propTypes = {
     inbox: PropTypes.object.isRequired
 };
 
-InboxAll = connect(mapStateToProps)(InboxAll);
-
-export default InboxAll
+export default connect(mapStateToProps)(InboxAll);

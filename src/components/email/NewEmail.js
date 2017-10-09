@@ -1,17 +1,13 @@
 import React, { Component } from 'react';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import counterpart from 'counterpart';
 
 import Attachments from './Attachments';
 import AutocompleteTo from './AutocompleteTo';
 
-import {
-    addNotification
-} from '../../actions/AppActions';
+import { addNotification } from '../../actions/AppActions';
 
-import {
-    patchRequest
-} from '../../actions/GenericActions';
+import { patchRequest } from '../../actions/GenericActions';
 
 import {
     createEmail,
@@ -20,10 +16,10 @@ import {
     getTemplates
 } from '../../actions/EmailActions';
 
-import RawList from '../widget/List/RawList'
+import RawList from '../widget/List/RawList';
 
 class NewEmail extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.state = {
@@ -31,51 +27,53 @@ class NewEmail extends Component {
             cached: {},
             templates: [],
             template: {}
-        }
+        };
     }
 
     componentWillMount = () => {
-        const {windowId, docId, handleCloseEmail} = this.props;
-        createEmail(windowId, docId).then(res => {
-            this.setState({
-                init: true,
-                ...res.data,
-                cached: res.data
+        const { windowId, docId, handleCloseEmail } = this.props;
+        createEmail(windowId, docId)
+            .then(res => {
+                this.setState({
+                    init: true,
+                    ...res.data,
+                    cached: res.data
+                });
+                this.getTemplates();
             })
-            this.getTemplates();
-        }).catch(() => {
-            handleCloseEmail();
-        })
-    }
+            .catch(() => {
+                handleCloseEmail();
+            });
+    };
 
-    getEmail = (emailId) => {
+    getEmail = emailId => {
         getEmail(emailId).then(res => {
             this.setState({
                 init: true,
                 ...res.data,
                 cached: res.data
-            })
+            });
         });
-    }
+    };
 
     getTemplates = () => {
         getTemplates().then(res => {
             this.setState({
                 templates: res.data.values
-            })
+            });
         });
-    }
+    };
 
     change = (prop, value) => {
         this.setState({
             [prop]: value
-        })
-    }
+        });
+    };
 
     patch = (prop, value) => {
-        const {emailId} = this.state;
+        const { emailId } = this.state;
 
-        if(this.state.cached[prop] === value) return;
+        if (this.state.cached[prop] === value) return;
 
         patchRequest({
             entity: 'mail',
@@ -86,24 +84,29 @@ class NewEmail extends Component {
             this.setState({
                 ...response.data,
                 cached: response.data
-            })
+            });
         });
-    }
+    };
 
     send = () => {
-        const {emailId} = this.state;
-        const {handleCloseEmail, dispatch} = this.props;
+        const { emailId } = this.state;
+        const { handleCloseEmail, dispatch } = this.props;
         sendEmail(emailId).then(() => {
             handleCloseEmail();
-            dispatch(addNotification(
-                'Email', 'Email has been sent.', 5000, 'success'
-            ));
+            dispatch(
+                addNotification(
+                    'Email',
+                    'Email has been sent.',
+                    5000,
+                    'success'
+                )
+            );
         });
-    }
+    };
 
-    handleTemplate=(option)=> {
-        const {emailId, template} = this.state;
-        if(template === option) return;
+    handleTemplate = option => {
+        const { emailId, template } = this.state;
+        if (template === option) return;
 
         patchRequest({
             entity: 'mail',
@@ -111,21 +114,27 @@ class NewEmail extends Component {
             property: 'templateId',
             value: option
         }).then(response => {
-           this.setState({
-               ...response.data,
+            this.setState({
+                ...response.data,
                 template: option
             });
         });
-    }
+    };
 
     render() {
-        const {handleCloseEmail, windowId, docId} = this.props;
+        const { handleCloseEmail, windowId, docId } = this.props;
         const {
-            init, attachments, emailId, subject, message, to,
-            templates, template
+            init,
+            attachments,
+            emailId,
+            subject,
+            message,
+            to,
+            templates,
+            template
         } = this.state;
 
-        if(!init) return false;
+        if (!init) return false;
 
         return (
             <div className="screen-freeze">
@@ -140,7 +149,8 @@ class NewEmail extends Component {
                                     <RawList
                                         rank="primary"
                                         list={templates}
-                                        onSelect={option => this.handleTemplate(option)}
+                                        onSelect={option =>
+                                            this.handleTemplate(option)}
                                         selected={template}
                                     />
                                 </div>
@@ -149,7 +159,7 @@ class NewEmail extends Component {
                                 className="input-icon input-icon-lg icon-email"
                                 onClick={handleCloseEmail}
                             >
-                                <i className="meta-icon-close-1"/>
+                                <i className="meta-icon-close-1" />
                             </div>
                         </div>
                         <div className="panel-email-header panel-email-bright">
@@ -158,14 +168,16 @@ class NewEmail extends Component {
                                     {counterpart.translate('window.email.to')}:
                                 </span>
                                 <AutocompleteTo
-                                    {...{windowId, docId, emailId, to}}
+                                    {...{ windowId, docId, emailId, to }}
                                 />
                             </div>
                         </div>
                         <div className="panel-email-header panel-email-bright">
                             <div className="panel-email-data-wrapper">
                                 <span className="email-label">
-                                    {counterpart.translate('window.email.topic')}:
+                                    {counterpart.translate(
+                                        'window.email.topic'
+                                    )}:
                                 </span>
                                 <input
                                     className="email-input email-input-msg"
@@ -173,9 +185,8 @@ class NewEmail extends Component {
                                     onChange={e =>
                                         this.change('subject', e.target.value)}
                                     value={subject ? subject : ''}
-                                    onBlur={
-                                        () => this.patch('subject', subject)
-                                    }
+                                    onBlur={() =>
+                                        this.patch('subject', subject)}
                                 />
                             </div>
                         </div>
@@ -191,7 +202,8 @@ class NewEmail extends Component {
                     <div className="panel-email-footer">
                         <Attachments
                             getEmail={this.getEmail}
-                            {...{attachments, emailId}} />
+                            {...{ attachments, emailId }}
+                        />
                         <button
                             onClick={this.send}
                             className="btn btn-meta-success btn-sm btn-submit"
@@ -201,10 +213,8 @@ class NewEmail extends Component {
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 }
 
-NewEmail = connect()(NewEmail);
-
-export default NewEmail;
+export default connect()(NewEmail);

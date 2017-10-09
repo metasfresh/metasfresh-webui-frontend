@@ -4,13 +4,9 @@ import { connect } from 'react-redux';
 
 import AttributesDropdown from './AttributesDropdown';
 
-import {
-    getAttributesInstance
-} from '../../../actions/AppActions';
+import { getAttributesInstance } from '../../../actions/AppActions';
 
-import {
-    parseToDisplay
-} from '../../../actions/WindowActions';
+import { parseToDisplay } from '../../../actions/WindowActions';
 
 import {
     patchRequest,
@@ -26,19 +22,19 @@ class Attributes extends Component {
             dropdown: false,
             layout: null,
             data: null
-        }
+        };
     }
 
     handleChange = (field, value) => {
         this.setState(prevState => ({
             data: Object.assign({}, prevState.data, {
-                [field]: Object.assign({}, prevState.data[field], {value})
+                [field]: Object.assign({}, prevState.data[field], { value })
             })
-        }))
-    }
+        }));
+    };
 
     handlePatch = (prop, value, id, cb) => {
-        const {attributeType} = this.props;
+        const { attributeType } = this.props;
 
         patchRequest({
             entity: attributeType,
@@ -49,78 +45,102 @@ class Attributes extends Component {
         }).then(response => {
             const fields = response.data[0].fieldsByName;
             Object.keys(fields).map(fieldName => {
-                this.setState(prevState => ({
-                    data: Object.assign({}, prevState.data, {
-                        [fieldName]: Object.assign(
-                            {}, prevState.data[fieldName], {value}
-                        )
-                    })
-                }), () => cb && cb());
-            })
+                this.setState(
+                    prevState => ({
+                        data: Object.assign({}, prevState.data, {
+                            [fieldName]: Object.assign(
+                                {},
+                                prevState.data[fieldName],
+                                { value }
+                            )
+                        })
+                    }),
+                    () => cb && cb()
+                );
+            });
         });
-    }
+    };
 
     handleInit = () => {
         const {
-            docType, dataId, tabId, rowId, fieldName, attributeType,
-            widgetData, entity
+            docType,
+            dataId,
+            tabId,
+            rowId,
+            fieldName,
+            attributeType,
+            widgetData,
+            entity
         } = this.props;
         const tmpId = Object.keys(widgetData.value)[0];
 
         getAttributesInstance(
-            attributeType, tmpId, docType, dataId, tabId, rowId, fieldName,
+            attributeType,
+            tmpId,
+            docType,
+            dataId,
+            tabId,
+            rowId,
+            fieldName,
             entity
-        ).then(response => {
-            const {id, fieldsByName} = response.data;
+        )
+            .then(response => {
+                const { id, fieldsByName } = response.data;
 
-            this.setState({
-                data: parseToDisplay(fieldsByName)
+                this.setState({
+                    data: parseToDisplay(fieldsByName)
+                });
+
+                return initLayout(attributeType, id);
+            })
+            .then(response => {
+                const { elements } = response.data;
+
+                this.setState({
+                    layout: elements
+                });
+            })
+            .then(() => {
+                this.setState({
+                    dropdown: true
+                });
             });
+    };
 
-            return initLayout(attributeType, id);
-        }).then(response => {
-            const {elements} = response.data;
+    handleToggle = option => {
+        const { handleBackdropLock } = this.props;
 
-            this.setState({
-                layout: elements
-            });
-        }).then(() => {
-            this.setState({
-                dropdown: true
-            });
-        });
-    }
+        this.setState(
+            {
+                data: null,
+                layout: null,
+                dropdown: null
+            },
+            () => {
+                //Method is disabling outside click in parents
+                //elements if there is some
+                handleBackdropLock && handleBackdropLock(!!option);
 
-    handleToggle = (option) => {
-        const {handleBackdropLock} = this.props;
-
-        this.setState({
-            data: null,
-            layout: null,
-            dropdown: null
-        }, () => {
-            //Method is disabling outside click in parents
-            //elements if there is some
-            handleBackdropLock && handleBackdropLock(!!option);
-
-            if(option){
-                this.handleInit();
+                if (option) {
+                    this.handleInit();
+                }
             }
-        })
-    }
+        );
+    };
 
     handleCompletion = () => {
-        const {attributeType, patch} = this.props;
-        const {data} = this.state;
+        const { attributeType, patch } = this.props;
+        const { data } = this.state;
         const attrId = data && data.ID ? data.ID.value : -1;
 
-        const mandatory = Object.keys(data).filter(fieldName =>
-            data[fieldName].mandatory);
+        const mandatory = Object.keys(data).filter(
+            fieldName => data[fieldName].mandatory
+        );
         const valid = !mandatory.filter(field => !data[field].value).length;
 
         //there are required values that are not set. just close
-        if (mandatory.length && !valid){
-            if(window.confirm('Do you really want to leave?')){
+        if (mandatory.length && !valid) {
+            if (window.confirm('Do you really want to leave?')) {
                 this.handleToggle(false);
             }
             return;
@@ -130,27 +150,30 @@ class Attributes extends Component {
             patch(response.data);
             this.handleToggle(false);
         });
-    }
+    };
 
-    handleKeyDown = (e) => {
-        switch(e.key){
+    handleKeyDown = e => {
+        switch (e.key) {
             case 'Escape':
                 e.preventDefault();
                 this.handleCompletion();
                 break;
         }
-    }
+    };
 
     render() {
         const {
-            widgetData, dataId, rowId, attributeType, tabIndex, readonly
+            widgetData,
+            dataId,
+            rowId,
+            attributeType,
+            tabIndex,
+            readonly
         } = this.props;
 
-        const {
-            dropdown, data, layout
-        } = this.state;
+        const { dropdown, data, layout } = this.state;
 
-        const {value} = widgetData;
+        const { value } = widgetData;
         const tmpId = Object.keys(value)[0];
         const label = value[tmpId];
         const attrId = data && data.ID ? data.ID.value : -1;
@@ -159,8 +182,7 @@ class Attributes extends Component {
             <div
                 onKeyDown={this.handleKeyDown}
                 className={
-                    'attributes ' +
-                    (rowId ? 'attributes-in-table ' : '')
+                    'attributes ' + (rowId ? 'attributes-in-table ' : '')
                 }
             >
                 <button
@@ -175,7 +197,7 @@ class Attributes extends Component {
                 >
                     {label ? label : 'Edit'}
                 </button>
-                {dropdown &&
+                {dropdown && (
                     <AttributesDropdown
                         attributeType={attributeType}
                         dataId={dataId}
@@ -187,9 +209,9 @@ class Attributes extends Component {
                         handleChange={this.handleChange}
                         attrId={attrId}
                     />
-                }
+                )}
             </div>
-        )
+        );
     }
 }
 
@@ -197,6 +219,4 @@ Attributes.propTypes = {
     dispatch: PropTypes.func.isRequired
 };
 
-Attributes = connect()(Attributes)
-
-export default Attributes
+export default connect()(Attributes);

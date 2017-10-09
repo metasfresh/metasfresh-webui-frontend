@@ -10,7 +10,7 @@ class RawList extends Component {
             selected: props.selected || 0,
             dropdownList: this.props.list || [],
             isOpen: false
-        }
+        };
     }
 
     componentDidMount = () => {
@@ -18,7 +18,7 @@ class RawList extends Component {
         if (this.dropdown && autofocus && onRequestListData) {
             onRequestListData();
         }
-    }
+    };
 
     componentWillUnmount() {
         this.clearComponentState();
@@ -26,8 +26,17 @@ class RawList extends Component {
 
     componentDidUpdate = (prevProps, prevState) => {
         const {
-            list, mandatory, defaultValue, autofocus, blur, property,
-            initialFocus, selected, doNotOpenOnFocus, lastProperty, loading,
+            list,
+            mandatory,
+            defaultValue,
+            autofocus,
+            blur,
+            property,
+            initialFocus,
+            selected,
+            doNotOpenOnFocus,
+            lastProperty,
+            loading,
             disableAutofocus
         } = this.props;
 
@@ -37,8 +46,12 @@ class RawList extends Component {
             }
         }
 
-        if (list.length === 0 && (prevProps.loading !== loading) &&
-            loading === false && lastProperty){
+        if (
+            list.length === 0 &&
+            prevProps.loading !== loading &&
+            loading === false &&
+            lastProperty
+        ) {
             disableAutofocus();
         }
 
@@ -58,15 +71,13 @@ class RawList extends Component {
 
         if (this.dropdown) {
             if (autofocus) {
-                if (list && (list.length > 0)) {
+                if (list && list.length > 0) {
                     this.dropdown.focus();
                 }
-            }
-            else {
-                if (property && (prevProps.defaultValue !== defaultValue)) {
+            } else {
+                if (property && prevProps.defaultValue !== defaultValue) {
                     this.dropdown.focus();
-                }
-                else {
+                } else {
                     if (initialFocus && !defaultValue) {
                         this.dropdown.focus();
                     }
@@ -84,7 +95,7 @@ class RawList extends Component {
             if (list.length > 0) {
                 let openDropdownState = {};
 
-                if (this.openDropdown && (list.length > 1)) {
+                if (this.openDropdown && list.length > 1) {
                     this.openDropdown = false;
                     openDropdownState.isOpen = true;
                 }
@@ -95,7 +106,7 @@ class RawList extends Component {
                     Object.assign(
                         {
                             dropdownList: dropdownList,
-                            selected: defaultValue ? defaultValue : list[0],
+                            selected: defaultValue ? defaultValue : list[0]
                         },
                         openDropdownState
                     )
@@ -120,7 +131,7 @@ class RawList extends Component {
 
         const listElHeight = this.optionElement.offsetHeight;
         const listVisible = Math.floor(listScroll.offsetHeight / listElHeight);
-        const shouldListScrollUpdate = (listVisible <= items.childNodes.length);
+        const shouldListScrollUpdate = listVisible <= items.childNodes.length;
 
         if (!shouldListScrollUpdate) {
             return;
@@ -145,34 +156,37 @@ class RawList extends Component {
         const scrollFromDown = selectedIndex * listElHeight;
 
         if (
-            (selectedIndex * listElHeight < visibleMin) &&
-            (listScroll.scrollTop !== scrollFromDown)
+            selectedIndex * listElHeight < visibleMin &&
+            listScroll.scrollTop !== scrollFromDown
         ) {
             listScroll.scrollTop = scrollFromDown;
         }
-    }
+    };
 
     clearComponentState = () => {
         this.state = {
             selected: 0,
             dropdownList: [],
             isOpen: false
-        }
-    }
+        };
+    };
 
     focus = () => {
         if (this.dropdown) {
             this.dropdown.focus();
         }
-    }
+    };
 
     openDropdownList = () => {
-        this.setState({
-            isOpen: true
-        }, () => {
-            this.focus();
-        });
-    }
+        this.setState(
+            {
+                isOpen: true
+            },
+            () => {
+                this.focus();
+            }
+        );
+    };
 
     closeDropdownList = () => {
         if (this.state && this.state.isOpen) {
@@ -180,7 +194,7 @@ class RawList extends Component {
                 isOpen: false
             });
         }
-    }
+    };
 
     getSelectedIndex() {
         const { list, mandatory } = this.props;
@@ -191,11 +205,11 @@ class RawList extends Component {
         }
 
         let baseIndex = list.indexOf(selected);
-        if (selected && (baseIndex < 0)) {
+        if (selected && baseIndex < 0) {
             let selectedKey = Object.keys(selected)[0];
 
             baseIndex = list.findIndex(
-                (item) => Object.keys(item)[0] === selectedKey
+                item => Object.keys(item)[0] === selectedKey
             );
         }
 
@@ -214,9 +228,9 @@ class RawList extends Component {
 
         // option and selected are not objects
         if (
-            (typeof option !== 'object') &&
-            (typeof selected !== 'object') &&
-            (selected === option)
+            typeof option !== 'object' &&
+            typeof selected !== 'object' &&
+            selected === option
         ) {
             return true;
         }
@@ -229,20 +243,22 @@ class RawList extends Component {
 
         // objects, and first elements are not
         if (
-            (typeof option === 'object') &&
-            (typeof selected === 'object') &&
-            (typeof firstOption !== 'object') &&
-            (typeof firstSelected !== 'object')
+            typeof option === 'object' &&
+            typeof selected === 'object' &&
+            typeof firstOption !== 'object' &&
+            typeof firstSelected !== 'object'
         ) {
-            return (optionKeys[0] === firstSelectedKey) &&
-                   (firstOption === firstSelected);
+            return (
+                optionKeys[0] === firstSelectedKey &&
+                firstOption === firstSelected
+            );
         }
 
         // first elements are nested objects, repeat checking
         return this.areOptionsEqual(firstOption, firstSelected);
     }
 
-    navigateToAlphanumeric = (char) => {
+    navigateToAlphanumeric = char => {
         const { list } = this.props;
         const { isOpen, selected } = this.state;
 
@@ -252,13 +268,13 @@ class RawList extends Component {
             });
         }
 
-        const caption = (item) => item[Object.keys(item)[0]];
-        const items = list.filter( (item) =>
-            caption(item)[0].toUpperCase() === char.toUpperCase()
+        const caption = item => item[Object.keys(item)[0]];
+        const items = list.filter(
+            item => caption(item)[0].toUpperCase() === char.toUpperCase()
         );
 
         const selectedIndex = items.indexOf(selected);
-        const item = (selectedIndex > -1) ? items[selectedIndex + 1] : items[0];
+        const item = selectedIndex > -1 ? items[selectedIndex + 1] : items[0];
 
         if (!item) {
             return;
@@ -267,9 +283,9 @@ class RawList extends Component {
         this.setState({
             selected: item
         });
-    }
+    };
 
-    navigate = (up) => {
+    navigate = up => {
         const { selected, dropdownList, isOpen } = this.state;
 
         if (!isOpen) {
@@ -289,11 +305,12 @@ class RawList extends Component {
         const next = up ? selectedIndex + 1 : selectedIndex - 1;
 
         this.setState({
-            selected: (
-                (next >= 0) && (next <= dropdownList.length - 1)
-            ) ? dropdownList[next] : selected
+            selected:
+                next >= 0 && next <= dropdownList.length - 1
+                    ? dropdownList[next]
+                    : selected
         });
-    }
+    };
 
     handleBlur = () => {
         const { selected, doNotOpenOnFocus } = this.props;
@@ -306,13 +323,13 @@ class RawList extends Component {
             isOpen: false,
             selected: selected || 0
         });
-    }
+    };
 
     /*
      * Alternative method to open dropdown, in case of disabled opening
      * on focus.
      */
-    handleClick = (e) => {
+    handleClick = e => {
         e.preventDefault();
 
         const { onFocus } = this.props;
@@ -322,9 +339,9 @@ class RawList extends Component {
         this.setState({
             isOpen: true
         });
-    }
+    };
 
-    handleFocus = (e) => {
+    handleFocus = e => {
         if (e) {
             e.preventDefault();
         }
@@ -336,15 +353,15 @@ class RawList extends Component {
         if (!doNotOpenOnFocus && !autofocus) {
             this.openDropdown = true;
         }
-    }
+    };
 
-    handleChange = (e) => {
+    handleChange = e => {
         e.preventDefault();
 
         this.handleBlur();
-    }
+    };
 
-    handleSelect = (option) => {
+    handleSelect = option => {
         const { onSelect } = this.props;
 
         if (option) {
@@ -353,22 +370,25 @@ class RawList extends Component {
             onSelect(null);
         }
 
-        this.setState({
-            selected: (option || 0)
-        }, () => this.handleBlur());
-    }
+        this.setState(
+            {
+                selected: option || 0
+            },
+            () => this.handleBlur()
+        );
+    };
 
-    handleSwitch = (option) => {
+    handleSwitch = option => {
         this.setState({
-            selected: (option || 0)
+            selected: option || 0
         });
-    }
+    };
 
-    handleKeyDown = (e) => {
+    handleKeyDown = e => {
         const { onSelect, list, readonly } = this.props;
         const { selected, isOpen } = this.state;
 
-        if ((e.keyCode > 47) && (e.keyCode < 123)) {
+        if (e.keyCode > 47 && e.keyCode < 123) {
             this.navigateToAlphanumeric(e.key);
         } else {
             switch (e.key) {
@@ -402,78 +422,93 @@ class RawList extends Component {
                     break;
 
                 case 'Tab':
-                    ((list.length === 0) && !readonly) && onSelect(null);
+                    list.length === 0 && !readonly && onSelect(null);
                     break;
             }
         }
-    }
+    };
 
     getRow = (index, option, label) => {
-        const {defaultValue} = this.props;
-        const {selected} = this.state;
+        const { defaultValue } = this.props;
+        const { selected } = this.state;
 
-        const value = defaultValue && defaultValue[Object.keys(defaultValue)[0]]
+        const value =
+            defaultValue && defaultValue[Object.keys(defaultValue)[0]];
 
         return (
             <div
                 key={index}
-                className={'input-dropdown-list-option'  +
-                    (
-                        selected === 0 ? '' :
-                        this.areOptionsEqual(selected, option) ?
-                        ' input-dropdown-list-option-key-on ' :
-                        value === option[Object.keys(option)[0]] && !selected ?
-                        ' input-dropdown-list-option-key-on ' :
-                        !value && !selected && index == 1 ?
-                        ' input-dropdown-list-option-key-on ':
-                        ''
-                    )
+                className={
+                    'input-dropdown-list-option' +
+                    (selected === 0
+                        ? ''
+                        : this.areOptionsEqual(selected, option)
+                          ? ' input-dropdown-list-option-key-on '
+                          : value === option[Object.keys(option)[0]] &&
+                            !selected
+                            ? ' input-dropdown-list-option-key-on '
+                            : !value && !selected && index == 1
+                              ? ' input-dropdown-list-option-key-on '
+                              : '')
                 }
                 onMouseEnter={() => this.handleSwitch(option)}
                 onClick={() => this.handleSelect(option)}
-                ref={option => this.optionElement = option}
+                ref={option => (this.optionElement = option)}
             >
                 <p className="input-dropdown-item-title">
                     {label ? label : option[Object.keys(option)[0]]}
                 </p>
             </div>
         );
-    }
+    };
 
     renderOptions = () => {
         const { list, mandatory, emptyText } = this.props;
 
         return (
             <div ref="items">
-            {[
-                // if field is not mandatory add extra empty row
-                ...(!mandatory && emptyText ?
-                    [this.getRow(0, 0, emptyText)] : []
-                ),
-                // fill with options
-                ...list.map((option, index) => this.getRow(index + 1, option))
-            ]}
+                {[
+                    // if field is not mandatory add extra empty row
+                    ...(!mandatory && emptyText
+                        ? [this.getRow(0, 0, emptyText)]
+                        : []),
+                    // fill with options
+                    ...list.map((option, index) =>
+                        this.getRow(index + 1, option)
+                    )
+                ]}
             </div>
         );
-    }
+    };
 
     render() {
         const {
-            list, rank, readonly, defaultValue, selected, align, updated,
-            loading, rowId, isModal, tabIndex, disabled, mandatory, validStatus,
+            list,
+            rank,
+            readonly,
+            defaultValue,
+            selected,
+            align,
+            updated,
+            loading,
+            rowId,
+            isModal,
+            tabIndex,
+            disabled,
+            mandatory,
+            validStatus,
             lookupList
         } = this.props;
 
         let placeholder = '';
-        const isListEmpty = (list.length === 0);
+        const isListEmpty = list.length === 0;
         const { isOpen } = this.state;
 
         if (typeof defaultValue === 'string') {
             placeholder = defaultValue;
         } else {
-            placeholder = defaultValue && (
-                defaultValue[Object.keys(defaultValue)[0]]
-            );
+            placeholder =
+                defaultValue && defaultValue[Object.keys(defaultValue)[0]];
         }
 
         let value;
@@ -490,12 +525,12 @@ class RawList extends Component {
 
         return (
             <div
-                ref={ (c) => this.dropdown = c }
+                ref={c => (this.dropdown = c)}
                 className={
                     'input-dropdown-container ' +
                     (readonly ? 'input-disabled ' : '') +
                     (rowId ? 'input-dropdown-container-static ' : '') +
-                    ((rowId && !isModal) ? 'input-table ' : '')
+                    (rowId && !isModal ? 'input-table ' : '')
                 }
                 tabIndex={tabIndex ? tabIndex : 0}
                 onFocus={!readonly && this.handleFocus}
@@ -503,21 +538,27 @@ class RawList extends Component {
                 onClick={!readonly && this.handleClick}
                 onKeyDown={this.handleKeyDown}
             >
-                <div className={
-                    'input-dropdown input-block input-readonly input-' +
-                    (rank ? rank : 'secondary') +
-                    (updated ? ' pulse ' : ' ') +
-                    ((mandatory && !selected) ? 'input-mandatory ' : '') +
-                    (validStatus &&
+                <div
+                    className={
+                        'input-dropdown input-block input-readonly input-' +
+                        (rank ? rank : 'secondary') +
+                        (updated ? ' pulse ' : ' ') +
+                        (mandatory && !selected ? 'input-mandatory ' : '') +
+                        (validStatus &&
                         (!validStatus.valid && !validStatus.initialValue) &&
-                        !isOpen ? 'input-error ' : '')
-                }>
-                    <div className={
-                        'input-editable input-dropdown-focused ' +
-                        (align ? 'text-xs-' + align + ' ' : '')
-                    }>
+                        !isOpen
+                            ? 'input-error '
+                            : '')
+                    }
+                >
+                    <div
+                        className={
+                            'input-editable input-dropdown-focused ' +
+                            (align ? 'text-xs-' + align + ' ' : '')
+                        }
+                    >
                         <input
-                            ref={ (c) => this.inputSearch = c }
+                            ref={c => (this.inputSearch = c)}
                             type="text"
                             className={
                                 'input-field js-input-field ' +
@@ -534,39 +575,38 @@ class RawList extends Component {
                     </div>
 
                     <div className="input-icon">
-                        <i className="meta-icon-down-1 input-icon-sm"/>
+                        <i className="meta-icon-down-1 input-icon-sm" />
                     </div>
                 </div>
 
                 {isOpen && (
-                    <div
-                        className="input-dropdown-list"
-                        ref="listScroll"
-                    >
-                        {(isListEmpty && loading === false) && (
-                            <div className="input-dropdown-list-header">
-                                There is no choice available
-                            </div>
-                        )}
+                    <div className="input-dropdown-list" ref="listScroll">
+                        {isListEmpty &&
+                            loading === false && (
+                                <div className="input-dropdown-list-header">
+                                    There is no choice available
+                                </div>
+                            )}
 
-                        {(loading && isListEmpty) && (
-                            <div className="input-dropdown-list-header">
-                                <ReactCSSTransitionGroup
-                                    transitionName="rotate"
-                                    transitionEnterTimeout={1000}
-                                    transitionLeaveTimeout={1000}
-                                >
-                                    <div className="rotate icon-rotate">
-                                        <i className="meta-icon-settings"/>
-                                    </div>
-                                </ReactCSSTransitionGroup>
-                            </div>
-                        )}
+                        {loading &&
+                            isListEmpty && (
+                                <div className="input-dropdown-list-header">
+                                    <ReactCSSTransitionGroup
+                                        transitionName="rotate"
+                                        transitionEnterTimeout={1000}
+                                        transitionLeaveTimeout={1000}
+                                    >
+                                        <div className="rotate icon-rotate">
+                                            <i className="meta-icon-settings" />
+                                        </div>
+                                    </ReactCSSTransitionGroup>
+                                </div>
+                            )}
                         {this.renderOptions()}
                     </div>
                 )}
             </div>
-        )
+        );
     }
 }
 

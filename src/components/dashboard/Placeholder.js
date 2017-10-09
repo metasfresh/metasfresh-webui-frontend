@@ -6,14 +6,11 @@ class Placeholder extends Component {
     }
 
     render() {
-        const {description, entity} = this.props;
+        const { description, entity } = this.props;
         const height = entity === 'cards' ? '300px' : '100px';
 
         return (
-            <div
-                style={{height}}
-                className="dnd-placeholder-filling"
-            >
+            <div style={{ height }} className="dnd-placeholder-filling">
                 {description}
             </div>
         );

@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import counterpart from 'counterpart';
 
 const OFFLINE_MESSAGE_LINE1 = 'Connection lost.';
-const OFFLINE_MESSAGE_LINE2 = 'There are some connection issues. ' +
-                              'Check connection and try to refresh the page.';
+const OFFLINE_MESSAGE_LINE2 =
+    'There are some connection issues. ' +
+    'Check connection and try to refresh the page.';
 
 class ErrorScreen extends Component {
     constructor(props) {
@@ -24,12 +25,10 @@ class ErrorScreen extends Component {
         return (
             <div className="screen-freeze">
                 <h3>{line1}</h3>
-                <p>
-                    {line2}
-                </p>
+                <p>{line2}</p>
             </div>
-        )
+        );
     }
 }
 
-export default ErrorScreen
+export default ErrorScreen;

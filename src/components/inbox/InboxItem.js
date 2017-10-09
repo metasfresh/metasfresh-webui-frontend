@@ -3,35 +3,35 @@ import Moment from 'moment';
 import counterpart from 'counterpart';
 
 class InboxItem extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
     }
 
-    renderIconFromTarget = (target) => {
-        switch(target){
+    renderIconFromTarget = target => {
+        switch (target) {
             case '143':
                 return 'sales';
             default:
                 return 'system';
         }
-    }
+    };
 
     componentDidMount() {
         document.getElementsByClassName('js-inbox-wrapper')[0].focus();
     }
 
-    handleKeyDown = (e) => {
-        const {close} = this.props;
-        switch(e.key){
+    handleKeyDown = e => {
+        const { close } = this.props;
+        switch (e.key) {
             case 'ArrowDown':
                 e.preventDefault();
-                if(document.activeElement.nextSibling) {
+                if (document.activeElement.nextSibling) {
                     document.activeElement.nextSibling.focus();
                 }
                 break;
             case 'ArrowUp':
                 e.preventDefault();
-                if(document.activeElement.previousSibling) {
+                if (document.activeElement.previousSibling) {
                     document.activeElement.previousSibling.focus();
                 }
                 break;
@@ -44,24 +44,25 @@ class InboxItem extends Component {
                 close && close();
                 break;
         }
-    }
+    };
 
     render() {
-        const {item, onClick, onDelete} = this.props;
+        const { item, onClick, onDelete } = this.props;
         return (
             <div
                 onClick={onClick}
                 onKeyDown={this.handleKeyDown}
                 tabIndex={0}
                 className={
-                'inbox-item js-inbox-item pointer ' +
-                (!item.read ? 'inbox-item-unread ':'')
-            }>
-                {item.important && <div
-                    className="inbox-item-icon inbox-item-icon-sm"
-                >
-                    <i className="meta-icon-important" />
-                </div>}
+                    'inbox-item js-inbox-item pointer ' +
+                    (!item.read ? 'inbox-item-unread ' : '')
+                }
+            >
+                {item.important && (
+                    <div className="inbox-item-icon inbox-item-icon-sm">
+                        <i className="meta-icon-important" />
+                    </div>
+                )}
                 <div className="inbox-item-icon">
                     <i
                         className={
@@ -69,18 +70,16 @@ class InboxItem extends Component {
                             this.renderIconFromTarget(
                                 item.target && item.target.documentType
                             )
-                    }/>
+                        }
+                    />
                 </div>
                 <div className="inbox-item-content">
-                    <div className="inbox-item-title">
-                        {item.message}
-                    </div>
+                    <div className="inbox-item-title">{item.message}</div>
                     <div className="inbox-item-footer">
                         <div
-                            title={
-                                Moment(item.timestamp)
-                                    .format('DD.MM.YYYY HH:mm:ss')
-                            }
+                            title={Moment(item.timestamp).format(
+                                'DD.MM.YYYY HH:mm:ss'
+                            )}
                         >
                             {Moment(item.timestamp).fromNow()}
                         </div>
@@ -98,7 +97,7 @@ class InboxItem extends Component {
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 }
 

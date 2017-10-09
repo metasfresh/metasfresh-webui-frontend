@@ -1,63 +1,61 @@
 import React, { Component } from 'react';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import Tab from './Tab';
-import {activateTab} from '../../actions/WindowActions';
+import { activateTab } from '../../actions/WindowActions';
 
 class Tabs extends Component {
     constructor(props) {
         super(props);
         this.state = {
             selected: this.props.children[0].key
-        }
+        };
     }
 
     componentDidMount = () => {
         this.props.dispatch(activateTab('master', this.state.selected));
-    }
+    };
 
     componentDidUpdate = (prevProps, prevState) => {
-        const {dispatch} = this.props;
-        if(prevState.selected !== this.state.selected){
+        const { dispatch } = this.props;
+        if (prevState.selected !== this.state.selected) {
             dispatch(activateTab('master', this.state.selected));
         }
-    }
+    };
 
     handleClick = (e, id) => {
         e.preventDefault();
         this.setState({
-            'selected': id
+            selected: id
         });
-    }
+    };
 
     handlePillKeyDown = (e, key) => {
-        if(e.key === 'Enter'){
+        if (e.key === 'Enter') {
             this.handleClick(e, key);
         }
-    }
+    };
 
-    renderPills = (pills) => {
-        const {tabIndex} = this.props;
-        const maxWidth = (95 / pills.length) + '%';
-        const {selected} = this.state;
-        return pills.map((item) => {
-
+    renderPills = pills => {
+        const { tabIndex } = this.props;
+        const maxWidth = 95 / pills.length + '%';
+        const { selected } = this.state;
+        return pills.map(item => {
             return (
                 <li
                     className="nav-item"
                     key={'tab' + item.key}
-                    onClick={(e) => this.handleClick(e, item.key)}
+                    onClick={e => this.handleClick(e, item.key)}
                     tabIndex={tabIndex}
-                    onKeyDown={(e) => this.handlePillKeyDown(e, item.key)}
+                    onKeyDown={e => this.handlePillKeyDown(e, item.key)}
                     style={{ maxWidth }}
                     title={item.props.caption}
-
                 >
                     <a
                         className={
                             'nav-link ' +
-                            ((selected === item.key) ? 'active' : '')
+                            (selected === item.key ? 'active' : '')
                         }
                     >
                         {item.props.caption}
@@ -65,15 +63,13 @@ class Tabs extends Component {
                 </li>
             );
         });
-    }
+    };
 
-    renderTabs = (tabs) => {
-        const {
-            toggleTableFullScreen, fullScreen, windowType
-        } = this.props;
-        const {selected} = this.state;
+    renderTabs = tabs => {
+        const { toggleTableFullScreen, fullScreen, windowType } = this.props;
+        const { selected } = this.state;
 
-        return tabs.map((item) => {
+        return tabs.map(item => {
             const itemWithProps = Object.assign({}, item, {
                 props: Object.assign({}, item.props, {
                     toggleFullScreen: toggleTableFullScreen,
@@ -81,16 +77,17 @@ class Tabs extends Component {
                 })
             });
 
-            if(selected == item.key){
-                const {tabid, queryOnActivate, docId, orderBy} = item.props;
+            if (selected == item.key) {
+                const { tabid, queryOnActivate, docId, orderBy } = item.props;
 
                 return (
-                    <div
-                        key={'pane' + item.key}
-                        className="tab-pane active"
-                    >
+                    <div key={'pane' + item.key} className="tab-pane active">
                         <Tab
-                            {...{queryOnActivate, tabid, docId, windowType,
+                            {...{
+                                queryOnActivate,
+                                tabid,
+                                docId,
+                                windowType,
                                 orderBy
                             }}
                         >
@@ -98,33 +95,34 @@ class Tabs extends Component {
                         </Tab>
                     </div>
                 );
-            }else{
-                return false
+            } else {
+                return false;
             }
-
         });
-    }
+    };
 
     render() {
-        const {children, tabIndex, fullScreen} = this.props;
+        const { children, tabIndex, fullScreen } = this.props;
 
         return (
-            <div className={
-                'mb-1 ' +
-                (fullScreen ? 'tabs-fullscreen container-fluid ' : '')
-            }>
+            <div
+                className={
+                    'mb-1 ' +
+                    (fullScreen ? 'tabs-fullscreen container-fluid ' : '')
+                }
+            >
                 <ul className="nav nav-tabs mt-1">
                     {this.renderPills(children)}
                 </ul>
                 <div
                     className="tab-content"
                     tabIndex={tabIndex}
-                    ref={c => this.tabContent = c}
+                    ref={c => (this.tabContent = c)}
                 >
                     {this.renderTabs(children)}
                 </div>
             </div>
-        )
+        );
     }
 }
 
@@ -132,6 +130,4 @@ Tabs.propTypes = {
     dispatch: PropTypes.func.isRequired
 };
 
-Tabs = connect()(Tabs);
-
-export default Tabs;
+export default connect()(Tabs);

@@ -19,7 +19,8 @@ export const drawLegend = (svg, fields, horizontal, rangeZ) => {
 };
 
 const drawContainer = (svg, fields, width) => {
-    const existingLegend = svg.select('.legend')
+    const existingLegend = svg
+        .select('.legend')
         .attr('font-family', 'sans-serif')
         .attr('font-size', 10)
         .attr('text-anchor', 'start')
@@ -27,7 +28,8 @@ const drawContainer = (svg, fields, width) => {
         .data(fields);
 
     const legend = existingLegend
-        .enter().append('g')
+        .enter()
+        .append('g')
         .merge(existingLegend);
 
     return legend.attr(
@@ -35,17 +37,18 @@ const drawContainer = (svg, fields, width) => {
         (d, i) =>
             'translate(' +
             i * (width / legend.size()) +
-            ', ' + size.offset + ')'
+            ', ' +
+            size.offset +
+            ')'
     );
 };
 
 const drawRects = (legend, rangeZ) => {
-    const existingColors = legend
-        .selectAll('rect')
-        .data(d => [d]);
+    const existingColors = legend.selectAll('rect').data(d => [d]);
 
     return existingColors
-        .enter().append('rect')
+        .enter()
+        .append('rect')
         .merge(existingColors)
         .attr('x', size.offset)
         .attr('width', size.width)
@@ -54,21 +57,21 @@ const drawRects = (legend, rangeZ) => {
 };
 
 const drawTexts = (legend, width) => {
-    const existingTexts = legend
-        .selectAll('text')
-        .data(d => [d]);
+    const existingTexts = legend.selectAll('text').data(d => [d]);
 
     return existingTexts
-        .enter().append('text')
+        .enter()
+        .append('text')
         .merge(existingTexts)
         .attr('x', 2 * size.offset + size.width)
         .attr('y', 10)
         .attr('dy', '0.32em')
-        .text(d => d.caption + (d.unit ? (' [' + d.unit + ']') : ''))
-        .each(function(){
-            addEllipsis(this,
-                (width / legend.size()) - (size.offset + size.width)
-            )
+        .text(d => d.caption + (d.unit ? ' [' + d.unit + ']' : ''))
+        .each(function() {
+            addEllipsis(
+                this,
+                width / legend.size() - (size.offset + size.width)
+            );
         });
 };
 

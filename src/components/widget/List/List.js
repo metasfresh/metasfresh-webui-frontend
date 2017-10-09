@@ -4,9 +4,7 @@ import { connect } from 'react-redux';
 
 import RawList from './RawList';
 
-import {
-    dropdownRequest
-} from '../../../actions/GenericActions';
+import { dropdownRequest } from '../../../actions/GenericActions';
 
 class List extends Component {
     constructor(props) {
@@ -25,10 +23,10 @@ class List extends Component {
         }
     }
 
-    componentDidUpdate(prevProps){
+    componentDidUpdate(prevProps) {
         const { isInputEmpty } = this.props;
 
-        if (isInputEmpty && (prevProps.isInputEmpty !== isInputEmpty)) {
+        if (isInputEmpty && prevProps.isInputEmpty !== isInputEmpty) {
             this.previousValue = '';
         }
     }
@@ -42,13 +40,22 @@ class List extends Component {
             list: null,
             loading: false,
             selectedItem: ''
-        }
-    }
+        };
+    };
 
     requestListData = (forceSelection = false, forceFocus = false) => {
         const {
-            properties, dataId, rowId, tabId, windowType,
-            filterWidget, entity, subentity, subentityId, viewId, attribute
+            properties,
+            dataId,
+            rowId,
+            tabId,
+            windowType,
+            filterWidget,
+            entity,
+            subentity,
+            subentityId,
+            viewId,
+            attribute
         } = this.props;
 
         this.setState({
@@ -61,9 +68,9 @@ class List extends Component {
             docId: dataId,
             docType: windowType,
             entity,
-            propertyName: (filterWidget ?
-                properties[0].parameterName : properties[0].field
-            ),
+            propertyName: filterWidget
+                ? properties[0].parameterName
+                : properties[0].field,
             rowId,
             subentity,
             subentityId,
@@ -71,7 +78,7 @@ class List extends Component {
             viewId
         }).then(res => {
             let values = res.data.values || [];
-            let singleOption = values && (values.length === 1);
+            let singleOption = values && values.length === 1;
 
             if (forceSelection && singleOption) {
                 this.previousValue = '';
@@ -92,47 +99,48 @@ class List extends Component {
                 });
             }
 
-            if (
-                forceFocus && values &&
-                (values.length > 0)
-            ) {
+            if (forceFocus && values && values.length > 0) {
                 this.focus();
             }
         });
-    }
+    };
 
     handleFocus = () => {
         if (this.state && !this.state.list && !this.state.loading) {
             this.requestListData();
         }
-    }
+    };
 
     focus = () => {
         if (this.rawList) {
             this.rawList.focus();
         }
-    }
+    };
 
     closeDropdownList = () => {
         if (this.rawList) {
             this.rawList.closeDropdownList();
         }
-    }
+    };
 
     activate = () => {
         const { list } = this.state;
 
-        if (list && (list.length > 1)) {
+        if (list && list.length > 1) {
             if (this.rawList) {
                 this.rawList.openDropdownList();
                 this.rawList.focus();
             }
         }
-    }
+    };
 
-    handleSelect = (option) => {
+    handleSelect = option => {
         const {
-            onChange, lookupList, properties, setNextProperty, mainProperty,
+            onChange,
+            lookupList,
+            properties,
+            setNextProperty,
+            mainProperty,
             enableAutofocus
         } = this.props;
 
@@ -141,8 +149,8 @@ class List extends Component {
         }
 
         let optionKey = option && Object.keys(option)[0];
-        if (this.previousValue !== (option && option[optionKey] )) {
-             if (lookupList) {
+        if (this.previousValue !== (option && option[optionKey])) {
+            if (lookupList) {
                 const promise = onChange(properties[0].field, option);
                 const mainPropertyField = mainProperty[0].field;
 
@@ -155,12 +163,14 @@ class List extends Component {
                 }
 
                 if (promise) {
-                    promise.then( (patchResult)=> {
+                    promise.then(patchResult => {
                         setNextProperty(mainPropertyField);
 
                         if (
-                            patchResult && Array.isArray(patchResult) &&
-                            patchResult[0] && patchResult[0].fieldsByName
+                            patchResult &&
+                            Array.isArray(patchResult) &&
+                            patchResult[0] &&
+                            patchResult[0].fieldsByName
                         ) {
                             let patchFields = patchResult[0].fieldsByName;
                             if (patchFields.lookupValuesStale === true) {
@@ -169,28 +179,42 @@ class List extends Component {
                                 });
                             }
                         }
-                    })
+                    });
                 } else {
                     setNextProperty(mainPropertyField);
                 }
             } else {
-                 onChange(option);
+                onChange(option);
             }
-         }
-    }
+        }
+    };
 
     render() {
         const {
-            rank, readonly, defaultValue, selected, align, updated, rowId,
-            emptyText, tabIndex, mandatory, validStatus, lookupList, autofocus,
-            blur, initialFocus, lastProperty, disableAutofocus
+            rank,
+            readonly,
+            defaultValue,
+            selected,
+            align,
+            updated,
+            rowId,
+            emptyText,
+            tabIndex,
+            mandatory,
+            validStatus,
+            lookupList,
+            autofocus,
+            blur,
+            initialFocus,
+            lastProperty,
+            disableAutofocus
         } = this.props;
 
         const { list, loading, selectedItem } = this.state;
 
         return (
             <RawList
-                ref={ (c) => this.rawList = c }
+                ref={c => (this.rawList = c)}
                 loading={loading}
                 list={list || []}
                 lookupList={lookupList}
@@ -214,7 +238,7 @@ class List extends Component {
                 onFocus={this.handleFocus}
                 onSelect={option => this.handleSelect(option)}
             />
-        )
+        );
     }
 }
 
@@ -222,6 +246,4 @@ List.propTypes = {
     dispatch: PropTypes.func.isRequired
 };
 
-List = connect(false, false, false, { withRef: true })(List);
-
-export default List
+export default connect(false, false, false, { withRef: true })(List);

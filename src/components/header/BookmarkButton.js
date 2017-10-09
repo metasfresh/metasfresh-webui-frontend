@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 
-import {patchRequest} from '../../actions/GenericActions';
+import { patchRequest } from '../../actions/GenericActions';
 
 class BookmarkButton extends Component {
     constructor(props) {
@@ -9,26 +9,26 @@ class BookmarkButton extends Component {
         this.state = {
             isBookmarkButtonShowed: false,
             isBookmark: props.isBookmark
-        }
+        };
     }
 
-    componentWillReceiveProps = (next) => {
-        if(next.isBookmark !== this.props.isBookmark){
+    componentWillReceiveProps = next => {
+        if (next.isBookmark !== this.props.isBookmark) {
             this.setState({
                 isBookmark: next.isBookmark
-            })
+            });
         }
-    }
+    };
 
     toggleBookmarkButton = () => {
         this.setState(prev => ({
             isBookmarkButtonShowed: !prev.isBookmarkButtonShowed
         }));
-    }
+    };
 
     handleClick = () => {
-        const {dispatch, nodeId, updateData} = this.props;
-        const {isBookmark} = this.state;
+        const { nodeId, updateData } = this.props;
+        const { isBookmark } = this.state;
 
         patchRequest({
             entity: 'menu',
@@ -37,16 +37,16 @@ class BookmarkButton extends Component {
             subentity: 'node',
             subentityId: nodeId
         }).then(response => {
-            this.setState({isBookmark: !isBookmark})
+            this.setState({ isBookmark: !isBookmark });
             updateData && updateData(response.data);
         });
-    }
+    };
 
     render() {
-        const {children, alwaysShowed, transparentBookmarks} = this.props;
-        const {isBookmarkButtonShowed, isBookmark} = this.state;
+        const { children, alwaysShowed, transparentBookmarks } = this.props;
+        const { isBookmarkButtonShowed, isBookmark } = this.state;
 
-        if(transparentBookmarks){
+        if (transparentBookmarks) {
             return children;
         }
 
@@ -57,20 +57,19 @@ class BookmarkButton extends Component {
                 className="btn-bookmark"
             >
                 {children}
-                {alwaysShowed || (isBookmarkButtonShowed || isBookmark) &&
-                    <i
-                        onClick={this.handleClick}
-                        className={
-                            'btn-bookmark-icon meta-icon-star icon-spaced ' +
-                            (isBookmark ? 'active ' : '')
-                        }
-                    />
-                }
+                {alwaysShowed ||
+                    ((isBookmarkButtonShowed || isBookmark) && (
+                        <i
+                            onClick={this.handleClick}
+                            className={
+                                'btn-bookmark-icon meta-icon-star icon-spaced ' +
+                                (isBookmark ? 'active ' : '')
+                            }
+                        />
+                    ))}
             </span>
         );
     }
 }
 
-BookmarkButton = connect()(BookmarkButton)
-
-export default BookmarkButton;
+export default connect()(BookmarkButton);

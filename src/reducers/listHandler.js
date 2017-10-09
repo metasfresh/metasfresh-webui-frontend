@@ -17,10 +17,10 @@ const initialState = {
         viewId: '',
         windowType: null
     }
-}
+};
 
 export default function listHandler(state = initialState, action) {
-    switch(action.type){
+    switch (action.type) {
         case types.SET_LIST_ID:
             return Object.assign({}, state, {
                 viewId: Object.assign({}, state.viewId, {

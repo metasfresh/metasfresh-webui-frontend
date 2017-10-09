@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 
 import MasterWidget from './widget/MasterWidget';
 
 export class Process extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
     }
 
     renderElements = (layout, data, type) => {
-        const {disabled} = this.props;
+        const { disabled } = this.props;
         const elements = layout.elements;
         return elements.map((elem, id) => {
             const widgetData = elem.fields.map(item => data[item.field] || -1);
@@ -26,18 +26,17 @@ export class Process extends Component {
                     autoFocus={id === 0}
                     {...elem}
                 />
-            )
-        })
-    }
+            );
+        });
+    };
 
     render() {
-        const {data, layout, type} = this.props;
+        const { data, layout, type } = this.props;
         return (
             <div key="window" className="window-wrapper process-wrapper">
-                {
-                    layout && layout.elements &&
-                    this.renderElements(layout, data, type)
-                }
+                {layout &&
+                    layout.elements &&
+                    this.renderElements(layout, data, type)}
             </div>
         );
     }
@@ -47,6 +46,4 @@ Process.propTypes = {
     dispatch: PropTypes.func.isRequired
 };
 
-Process = connect()(Process);
-
-export default Process
+export default connect()(Process);

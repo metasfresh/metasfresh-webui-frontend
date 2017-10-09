@@ -1,38 +1,31 @@
 {
-  "ecmaFeatures": {
-    "jsx": true,
-    "modules": true
-  },
-  "env": {
-    "browser": true,
-    "node": true,
-    "es6": true
-  },
-  "parser": "babel-eslint",
-  "extends": "eslint:recommended",
-  "rules": {
-    "max-len": [2, {
-        "code": 80,
-        "ignorePattern": "^\\s*className=\"([\\s\\w-]*)\""
-    }],
-    "quotes": [2, "single"],
-    "jsx-quotes": [2, "prefer-double"],
-    "no-console": [2, { allow: ["warn", "error"] }],
-    "strict": [2, "never"],
-    "no-class-assign": 0,
-    "no-trailing-spaces": 2,
-    "comma-spacing": 2,
-    "no-multiple-empty-lines": [2, {max: 1, maxEOF: 1, maxBOF: 0}],
-    "react/jsx-uses-react": 2,
-    "react/jsx-uses-vars": 2,
-    "react/react-in-jsx-scope": 2
-  },
-  "plugins": [
-    "react"
-  ],
-  "globals": {
-    "localStorage",
-    "Promise",
-    "config"
-  }
+    "ecmaFeatures": {
+        "jsx": true,
+        "modules": true
+    },
+    "env": {
+        "browser": true,
+        "node": true,
+        "es6": true
+    },
+    "parser": "babel-eslint",
+    "extends": ["eslint:recommended", "plugin:react/recommended", "prettier"],
+    "rules": {
+        "prettier/prettier": [
+            "error",
+            {
+                "tabWidth": 4,
+                "singleQuote": true
+            }
+        ],
+        # Disable prop type checking since code base is in a too bad
+        # condition for this to be viable to refactor
+        "react/prop-types": 0
+    },
+    "plugins": ["prettier", "react"],
+    "globals": {
+        "localStorage": true,
+        "Promise": true,
+        "config": true
+    }
 }

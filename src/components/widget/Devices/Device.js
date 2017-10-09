@@ -9,11 +9,11 @@ class Device extends Component {
         this.state = {
             value: null,
             valueChangeStopper: false
-        }
+        };
     }
 
     componentDidMount() {
-        const {device} = this.props;
+        const { device } = this.props;
         this.mounted = true;
         this.sock = new SockJs(config.WS_URL);
         this.sockClient = Stomp.Stomp.over(this.sock);
@@ -21,12 +21,13 @@ class Device extends Component {
         this.sockClient.debug = null;
         this.sockClient.connect({}, () => {
             this.sockClient.subscribe(device.websocketEndpoint, msg => {
-                if(!this.state.valueChangeStopper){
+                if (!this.state.valueChangeStopper) {
                     const body = JSON.parse(msg.body);
 
-                    this.mounted && this.setState({
-                        value: body.value
-                    });
+                    this.mounted &&
+                        this.setState({
+                            value: body.value
+                        });
                 }
             });
         });
@@ -34,45 +35,46 @@ class Device extends Component {
 
     componentWillUnmount() {
         this.mounted = false;
-        (this.sockClient && this.sockClient.connected) &&
+        this.sockClient &&
+            this.sockClient.connected &&
             this.sockClient.disconnect();
     }
 
     handleClick = () => {
-        const {handleChange} = this.props;
-        const {value} = this.state;
+        const { handleChange } = this.props;
+        const { value } = this.state;
 
         handleChange(value);
-    }
+    };
 
-    handleToggleChangeStopper = (value) => {
+    handleToggleChangeStopper = value => {
         this.setState({
             valueChangeStopper: value
-        })
-    }
+        });
+    };
 
-    handleKey = (e) => {
-        const {handleChange} = this.props;
-        const {value} = this.state;
+    handleKey = e => {
+        const { handleChange } = this.props;
+        const { value } = this.state;
 
-        switch(e.key){
+        switch (e.key) {
             case 'Enter':
                 handleChange(value);
                 break;
         }
-    }
+    };
 
     render() {
-        const {value, index, isMore} = this.state;
-        const {tabIndex} = this.props;
+        const { value, index, isMore } = this.state;
+        const { tabIndex } = this.props;
 
-        if(value){
+        if (value) {
             return (
                 <div
                     className={
                         'btn btn-device btn-meta-outline-secondary btn-sm ' +
                         'btn-inline pointer btn-distance-rev ' +
-                        (isMore ? 'btn-flagged ': '')
+                        (isMore ? 'btn-flagged ' : '')
                     }
                     onClick={this.handleClick}
                     tabIndex={tabIndex ? tabIndex : ''}
@@ -80,13 +82,13 @@ class Device extends Component {
                     onFocus={() => this.handleToggleChangeStopper(true)}
                     onMouseLeave={() => this.handleToggleChangeStopper(false)}
                     onBlur={() => this.handleToggleChangeStopper(false)}
-                    onKeyDown={(e) => this.handleKey(e)}
+                    onKeyDown={e => this.handleKey(e)}
                 >
                     {isMore && <span className="btn-flag">{index + 1}</span>}
                     {value}
                 </div>
-            )
-        }else{
+            );
+        } else {
             return false;
         }
     }

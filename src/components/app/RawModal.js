@@ -1,21 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import counterpart from 'counterpart';
 
 import Indicator from './Indicator';
-import {
-    closeRawModal,
-    closeModal
-} from '../../actions/WindowActions';
+import { closeRawModal, closeModal } from '../../actions/WindowActions';
 
-import {
-    deleteView
-} from '../../actions/AppActions';
+import { deleteView } from '../../actions/AppActions';
 
-import {
-    closeListIncludedView
-} from '../../actions/ListActions';
+import { closeListIncludedView } from '../../actions/ListActions';
 
 import keymap from '../../keymap.js';
 import ModalContextShortcuts from '../shortcuts/ModalContextShortcuts';
@@ -30,7 +23,7 @@ class RawModal extends Component {
         this.state = {
             scrolled: false,
             isTooltipShow: false
-        }
+        };
     }
 
     componentDidMount() {
@@ -48,23 +41,23 @@ class RawModal extends Component {
         this.removeEventListeners();
     }
 
-    toggleTooltip = (visible) => {
+    toggleTooltip = visible => {
         this.setState({
             isTooltipShow: visible
         });
-    }
+    };
 
     getChildContext = () => {
-        return { shortcuts: shortcutManager }
-    }
+        return { shortcuts: shortcutManager };
+    };
 
     initEventListeners = () => {
-        const modalContent = document.querySelector('.js-panel-modal-content')
+        const modalContent = document.querySelector('.js-panel-modal-content');
 
         if (modalContent) {
             modalContent.addEventListener('scroll', this.handleScroll);
         }
-    }
+    };
 
     removeEventListeners = () => {
         const modalContent = document.querySelector('.js-panel-modal-content');
@@ -72,55 +65,49 @@ class RawModal extends Component {
         if (modalContent) {
             modalContent.removeEventListener('scroll', this.handleScroll);
         }
-    }
+    };
 
-    handleScroll = (event) => {
+    handleScroll = event => {
         const scrollTop = event.srcElement.scrollTop;
 
         this.setState({
             scrolled: scrollTop > 0
-        })
-    }
+        });
+    };
 
     handleClose = () => {
-        const {closeCallback, viewId, windowType} = this.props;
-        const {isNew} = this.state;
+        const { closeCallback, viewId, windowType } = this.props;
+        const { isNew } = this.state;
 
         closeCallback && closeCallback(isNew);
         deleteView(windowType, viewId);
         this.removeModal();
-    }
+    };
 
     removeModal = () => {
-        const {dispatch, modalVisible} = this.props;
+        const { dispatch, modalVisible } = this.props;
 
         dispatch(closeRawModal());
         dispatch(closeModal());
         dispatch(closeListIncludedView());
 
-        if (!modalVisible){
+        if (!modalVisible) {
             document.body.style.overflow = 'auto';
         }
-    }
+    };
 
     render() {
-        const {
-            modalTitle, children, modalDescription
-        } = this.props;
+        const { modalTitle, children, modalDescription } = this.props;
 
-        const {
-            scrolled, isTooltipShow
-        } = this.state;
+        const { scrolled, isTooltipShow } = this.state;
 
         return (
-            <div
-                className="screen-freeze raw-modal"
-            >
+            <div className="screen-freeze raw-modal">
                 <div className="panel panel-modal panel-modal-primary">
                     <div
                         className={
                             'panel-modal-header ' +
-                            (scrolled ? 'header-shadow': '')
+                            (scrolled ? 'header-shadow' : '')
                         }
                     >
                         <span className="panel-modal-header-title">
@@ -135,35 +122,35 @@ class RawModal extends Component {
                                 className="btn btn-meta-outline-secondary btn-distance-3 btn-md"
                                 onClick={this.handleClose}
                                 tabIndex={0}
-                                onMouseEnter={() =>
-                                    this.toggleTooltip(true)
-                                }
+                                onMouseEnter={() => this.toggleTooltip(true)}
                                 onMouseLeave={() => this.toggleTooltip(false)}
                             >
                                 {counterpart.translate('modal.actions.done')}
-                            {isTooltipShow &&
-                                <Tooltips
-                                    name={keymap.MODAL_CONTEXT.APPLY}
-                                    action={counterpart.translate('modal.actions.done')}
-                                    type={''}
-                                />
-                            }
+                                {isTooltipShow && (
+                                    <Tooltips
+                                        name={keymap.MODAL_CONTEXT.APPLY}
+                                        action={counterpart.translate(
+                                            'modal.actions.done'
+                                        )}
+                                        type={''}
+                                    />
+                                )}
                             </button>
                         </div>
                     </div>
                     <Indicator />
                     <div
                         className="panel-modal-content js-panel-modal-content"
-                        ref={c => { c && c.focus()}}
+                        ref={c => {
+                            c && c.focus();
+                        }}
                     >
                         {children}
                     </div>
-                    <ModalContextShortcuts
-                        apply={this.handleClose}
-                    />
+                    <ModalContextShortcuts apply={this.handleClose} />
                 </div>
             </div>
-        )
+        );
     }
 }
 
@@ -173,13 +160,11 @@ const mapStateToProps = state => ({
 
 RawModal.childContextTypes = {
     shortcuts: PropTypes.object.isRequired
-}
+};
 
 RawModal.propTypes = {
     dispatch: PropTypes.func.isRequired,
     modalVisible: PropTypes.bool
 };
 
-RawModal = connect(mapStateToProps)(RawModal)
-
-export default RawModal
+export default connect(mapStateToProps)(RawModal);

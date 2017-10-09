@@ -1,16 +1,14 @@
-import * as types from '../constants/ActionTypes'
+import * as types from '../constants/ActionTypes';
 import axios from 'axios';
-import {replace} from 'react-router-redux';
+import { replace } from 'react-router-redux';
 import Moment from 'moment';
 import numeral from 'numeral';
-import {LOCAL_LANG}  from '../constants/Constants';
+import { LOCAL_LANG } from '../constants/Constants';
 
 // REQUESTS
 
 export function getAvatar(id) {
-    return config.API_URL +
-        '/image/' + id +
-        '?maxWidth=200&maxHeight=200';
+    return config.API_URL + '/image/' + id + '?maxWidth=200&maxHeight=200';
 }
 
 export function getUserSession() {
@@ -30,40 +28,48 @@ export function getAvailableLang() {
 }
 
 export function browseViewRequest(
-    viewId, page, pageLength, orderBy, windowType
-){
+    viewId,
+    page,
+    pageLength,
+    orderBy,
+    windowType
+) {
     return axios.get(
         config.API_URL +
-        '/documentView/' +
-        windowType + '/' +
-        viewId +
-        '?firstRow=' + pageLength * (page - 1) +
-        '&pageLength=' + pageLength +
-        (orderBy ? '&orderBy=' + orderBy : '')
+            '/documentView/' +
+            windowType +
+            '/' +
+            viewId +
+            '?firstRow=' +
+            pageLength * (page - 1) +
+            '&pageLength=' +
+            pageLength +
+            (orderBy ? '&orderBy=' + orderBy : '')
     );
 }
 
-export function deleteView(
-    windowId, viewId
-){
+export function deleteView(windowId, viewId) {
     return axios.delete(
-        config.API_URL +
-        '/documentView/' +
-        windowId + '/' +
-        viewId
+        config.API_URL + '/documentView/' + windowId + '/' + viewId
     );
 }
 
 export function createViewRequest(
-    windowType, viewType, pageLength, filters, refDocType = null,
-    refDocId = null, refTabId = null, refRowIds = null
-){
+    windowType,
+    viewType,
+    pageLength,
+    filters,
+    refDocType = null,
+    refDocId = null,
+    refTabId = null,
+    refRowIds = null
+) {
     let referencing = null;
 
     if (refDocType && refDocId) {
         referencing = {
-            'documentType': refDocType,
-            'documentId': refDocId
+            documentType: refDocType,
+            documentId: refDocId
         };
 
         if (refTabId && refRowIds) {
@@ -73,46 +79,55 @@ export function createViewRequest(
     }
 
     return axios.post(config.API_URL + '/documentView/' + windowType, {
-        'documentType': windowType,
-        'viewType': viewType,
-        'referencing': referencing,
-        'filters': filters
+        documentType: windowType,
+        viewType: viewType,
+        referencing: referencing,
+        filters: filters
     });
 }
 
-export function filterViewRequest(windowType, viewId, filters){
-    return axios.post(config.API_URL + '/documentView/' + windowType +
-    '/'+viewId+'/filter', {
-        'filters': filters
-    });
+export function filterViewRequest(windowType, viewId, filters) {
+    return axios.post(
+        config.API_URL +
+            '/documentView/' +
+            windowType +
+            '/' +
+            viewId +
+            '/filter',
+        {
+            filters: filters
+        }
+    );
 }
 
 export function deleteStaticFilter(windowId, viewId, filterId) {
     return axios.delete(
         config.API_URL +
-        '/documentView/' + windowId +
-        '/' + viewId +
-        '/staticFilter/' + filterId
+            '/documentView/' +
+            windowId +
+            '/' +
+            viewId +
+            '/staticFilter/' +
+            filterId
     );
 }
 
-export function loginRequest(username, password){
-    return axios.post(
-        config.API_URL +
-        '/login/authenticate',
-        { username, password }
-    );
+export function loginRequest(username, password) {
+    return axios.post(config.API_URL + '/login/authenticate', {
+        username,
+        password
+    });
 }
 
-export function localLoginRequest(){
+export function localLoginRequest() {
     return axios.get(config.API_URL + '/login/isLoggedIn');
 }
 
-export function loginCompletionRequest(role){
+export function loginCompletionRequest(role) {
     return axios.post(config.API_URL + '/login/loginComplete', role);
 }
 
-export function logoutRequest(){
+export function logoutRequest() {
     return axios.get(config.API_URL + '/login/logout');
 }
 
@@ -137,18 +152,25 @@ export function deleteUserNotification(id) {
 }
 
 export function getAttributesInstance(
-    attrType, tmpId, docType, docId, tabId, rowId, fieldName, entity
+    attrType,
+    tmpId,
+    docType,
+    docId,
+    tabId,
+    rowId,
+    fieldName,
+    entity
 ) {
     const type = entity === 'process' ? 'processId' : 'windowId';
 
     return axios.post(config.API_URL + '/' + attrType, {
-        'templateId': tmpId,
-        'source': {
-            [type] : docType,
-            'documentId': docId,
-            'tabid': tabId,
-            'rowId': rowId,
-            'fieldName': fieldName
+        templateId: tmpId,
+        source: {
+            [type]: docType,
+            documentId: docId,
+            tabid: tabId,
+            rowId: rowId,
+            fieldName: fieldName
         }
     });
 }
@@ -157,32 +179,33 @@ export function getImageAction(id) {
     return axios({
         url: `${config.API_URL}/image/${id}?maxWidth=200&maxHeight=200`,
         responseType: 'blob'
-    })
-        .then(response => response.data);
+    }).then(response => response.data);
 }
 
-export function postImageAction (data) {
-    return axios.post(`${config.API_URL}/image`, data)
+export function postImageAction(data) {
+    return axios
+        .post(`${config.API_URL}/image`, data)
         .then(response => response.data);
 }
 
 export function getKPIsDashboard() {
-    return axios.get(config.API_URL +
-        '/dashboard/kpis?silentError=true');
+    return axios.get(config.API_URL + '/dashboard/kpis?silentError=true');
 }
 
 export function getTargetIndicatorsDashboard() {
-    return axios.get(config.API_URL +
-        '/dashboard/targetIndicators?silentError=true');
+    return axios.get(
+        config.API_URL + '/dashboard/targetIndicators?silentError=true'
+    );
 }
 
 export function getKPIData(id) {
-    return axios.get(config.API_URL + '/dashboard/kpis/'+id+
-        '/data?silentError=true');
+    return axios.get(
+        config.API_URL + '/dashboard/kpis/' + id + '/data?silentError=true'
+    );
 }
 
 export function changeKPIItem(id, path, value) {
-    return axios.patch(config.API_URL + '/dashboard/kpis/'+id, [
+    return axios.patch(config.API_URL + '/dashboard/kpis/' + id, [
         {
             op: 'replace',
             path: path,
@@ -192,7 +215,7 @@ export function changeKPIItem(id, path, value) {
 }
 
 export function changeTargetIndicatorsItem(id, path, value) {
-    return axios.patch(config.API_URL + '/dashboard/targetIndicators/'+id, [
+    return axios.patch(config.API_URL + '/dashboard/targetIndicators/' + id, [
         {
             op: 'replace',
             path: path,
@@ -204,9 +227,9 @@ export function changeTargetIndicatorsItem(id, path, value) {
 export function getTargetIndicatorsData(id) {
     return axios.get(
         config.API_URL +
-        '/dashboard/targetIndicators/' +
-        id +
-        '/data?silentError=true'
+            '/dashboard/targetIndicators/' +
+            id +
+            '/data?silentError=true'
     );
 }
 
@@ -222,9 +245,13 @@ export function getMessages(lang) {
 
 export function createUrlAttachment({ windowId, documentId, name, url }) {
     return axios.post(
-        config.API_URL + '/window/' + windowId + '/' + documentId +
-        '/attachments/addUrl',
-        { name, url },
+        config.API_URL +
+            '/window/' +
+            windowId +
+            '/' +
+            documentId +
+            '/attachments/addUrl',
+        { name, url }
     );
 }
 
@@ -234,84 +261,98 @@ export function loginSuccess(auth) {
     return dispatch => {
         localStorage.setItem('isLogged', true);
 
-/*
+        /*
         getMessages().then(response => {
             counterpart.registerTranslations('lang', response.data);
             counterpart.setLocale('lang');
         });
-*/
+        */
 
         getUserSession().then(session => {
             dispatch(userSessionInit(session.data));
             languageSuccess(Object.keys(session.data.language)[0]);
             initNumeralLocales(
-              Object.keys(session.data.language)[0],
-              session.data.locale,
+                Object.keys(session.data.language)[0],
+                session.data.locale
             );
 
             auth.initSessionClient(session.data.websocketEndpoint, msg => {
                 const me = JSON.parse(msg.body);
                 dispatch(userSessionUpdate(me));
                 me.language && languageSuccess(Object.keys(me.language)[0]);
-                me.locale && initNumeralLocales(
-                  Object.keys(me.language)[0],
-                  me.locale,
-                );
+                me.locale &&
+                    initNumeralLocales(Object.keys(me.language)[0], me.locale);
 
                 getNotifications().then(response => {
-                    dispatch(getNotificationsSuccess(
-                        response.data.notifications,
-                        response.data.unreadCount
-                    ));
+                    dispatch(
+                        getNotificationsSuccess(
+                            response.data.notifications,
+                            response.data.unreadCount
+                        )
+                    );
                 });
 
-/*
+                /*
                 getMessages().then(response => {
                     counterpart.registerTranslations('lang', response.data);
                     counterpart.setLocale('lang');
                 });
-*/
+                */
             });
-        })
+        });
 
         getNotificationsEndpoint().then(topic => {
             auth.initNotificationClient(topic, msg => {
                 const notification = JSON.parse(msg.body);
 
-                if(notification.eventType === 'Read'){
-                    dispatch(updateNotification(
-                        notification.notification, notification.unreadCount
-                    ));
-                }else if(notification.eventType === 'Delete') {
-                    dispatch(removeNotification(
-                        notification.notificationId, notification.unreadCount
-                    ));
-                }else if(notification.eventType === 'New'){
-                    dispatch(newNotification(
-                        notification.notification, notification.unreadCount
-                    ));
+                if (notification.eventType === 'Read') {
+                    dispatch(
+                        updateNotification(
+                            notification.notification,
+                            notification.unreadCount
+                        )
+                    );
+                } else if (notification.eventType === 'Delete') {
+                    dispatch(
+                        removeNotification(
+                            notification.notificationId,
+                            notification.unreadCount
+                        )
+                    );
+                } else if (notification.eventType === 'New') {
+                    dispatch(
+                        newNotification(
+                            notification.notification,
+                            notification.unreadCount
+                        )
+                    );
                     const notif = notification.notification;
-                    if(notif.important){
-                        dispatch(addNotification(
-                            'Important notification', notif.message, 5000,
-                            'primary'
-                        ))
+                    if (notif.important) {
+                        dispatch(
+                            addNotification(
+                                'Important notification',
+                                notif.message,
+                                5000,
+                                'primary'
+                            )
+                        );
                     }
                 }
             });
-        })
+        });
 
         getNotifications().then(response => {
-            dispatch(getNotificationsSuccess(
-                response.data.notifications,
-                response.data.unreadCount
-            ));
+            dispatch(
+                getNotificationsSuccess(
+                    response.data.notifications,
+                    response.data.unreadCount
+                )
+            );
         });
-    }
+    };
 }
 
-function initNumeralLocales (lang, locale) {
-
+function initNumeralLocales(lang, locale) {
     const language = lang.toLowerCase();
     const LOCAL_NUMERAL_FORMAT = {
         defaultFormat: '0,0.00',
@@ -332,7 +373,6 @@ function initNumeralLocales (lang, locale) {
             numeral.defaultFormat(LOCAL_NUMERAL_FORMAT.defaultFormat);
         }
     }
-
 }
 
 export function languageSuccess(lang) {
@@ -351,10 +391,10 @@ export function enableTutorial(flag = true) {
     return {
         type: types.ENABLE_TUTORIAL,
         flag: flag
-    }
+    };
 }
 
-export function addNotification(title, msg, time, notifType, shortMsg){
+export function addNotification(title, msg, time, notifType, shortMsg) {
     return {
         type: types.ADD_NOTIFICATION,
         title: title,
@@ -363,32 +403,32 @@ export function addNotification(title, msg, time, notifType, shortMsg){
         time: time,
         notifType: notifType,
         id: Date.now()
-    }
+    };
 }
 
-export function setNotificationProgress(key, progress){
+export function setNotificationProgress(key, progress) {
     return {
         type: types.SET_NOTIFICATION_PROGRESS,
         key: key,
         progress: progress
-    }
+    };
 }
 
 export function deleteNotification(key) {
     return {
         type: types.DELETE_NOTIFICATION,
         key: key
-    }
+    };
 }
 
 export function clearNotifications() {
     return {
-        type: types.CLEAR_NOTIFICATIONS,
-    }
+        type: types.CLEAR_NOTIFICATIONS
+    };
 }
 
 export function updateUri(pathname, query, prop, value) {
-    return (dispatch) => {
+    return dispatch => {
         let url = pathname + '?';
 
         // add new prop or overwrite existing
@@ -396,13 +436,16 @@ export function updateUri(pathname, query, prop, value) {
 
         const queryKeys = Object.keys(query);
 
-        for(let i = 0; i < queryKeys.length; i++){
-            url += queryKeys[i] + '=' + query[queryKeys[i]] +
-                (queryKeys.length - 1 !== i  ? '&': '');
+        for (let i = 0; i < queryKeys.length; i++) {
+            url +=
+                queryKeys[i] +
+                '=' +
+                query[queryKeys[i]] +
+                (queryKeys.length - 1 !== i ? '&' : '');
         }
 
         dispatch(replace(url));
-    }
+    };
 }
 
 export function getNotificationsSuccess(notifications, unreadCount) {
@@ -410,7 +453,7 @@ export function getNotificationsSuccess(notifications, unreadCount) {
         type: types.GET_NOTIFICATIONS_SUCCESS,
         notifications: notifications,
         unreadCount: unreadCount
-    }
+    };
 }
 
 export function updateNotification(msg, count) {
@@ -418,7 +461,7 @@ export function updateNotification(msg, count) {
         type: types.UPDATE_NOTIFICATION,
         notification: msg,
         unreadCount: count
-    }
+    };
 }
 
 export function newNotification(msg, count) {
@@ -426,7 +469,7 @@ export function newNotification(msg, count) {
         type: types.NEW_NOTIFICATION,
         notification: msg,
         unreadCount: count
-    }
+    };
 }
 
 export function removeNotification(msg, count) {
@@ -434,33 +477,33 @@ export function removeNotification(msg, count) {
         type: types.REMOVE_NOTIFICATION,
         notification: msg,
         unreadCount: count
-    }
+    };
 }
 
 export function setProcessPending() {
     return {
         type: types.SET_PROCESS_STATE_PENDING
-    }
+    };
 }
 
 export function setProcessSaved() {
     return {
         type: types.SET_PROCESS_STATE_SAVED
-    }
+    };
 }
 
 export function userSessionInit(me) {
     return {
         type: types.USER_SESSION_INIT,
         me
-    }
+    };
 }
 
 export function userSessionUpdate(me) {
     return {
         type: types.USER_SESSION_UPDATE,
         me
-    }
+    };
 }
 
 function traverseRenderedChildren(internalInstance, callback, argument) {
@@ -499,7 +542,8 @@ function forceUpdateIfPending(internalInstance) {
         if (typeof publicInstance.forceUpdate === 'function') {
             publicInstance.forceUpdate();
         } else if (
-          updater && typeof updater.enqueueForceUpdate === 'function'
+            updater &&
+            typeof updater.enqueueForceUpdate === 'function'
         ) {
             updater.enqueueForceUpdate(publicInstance);
         }

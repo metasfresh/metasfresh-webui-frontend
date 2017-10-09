@@ -14,10 +14,7 @@ class Labels extends Component {
         selected: PropTypes.array.isRequired,
         className: PropTypes.string,
         onChange: PropTypes.func.isRequired,
-        tabIndex: PropTypes.oneOfType([
-            PropTypes.string,
-            PropTypes.number
-        ])
+        tabIndex: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
     };
 
     static defaultProps = {
@@ -177,7 +174,9 @@ class Labels extends Component {
 
         return (
             <div
-                ref={ref => { this.wrapper = ref; }}
+                ref={ref => {
+                    this.wrapper = ref;
+                }}
                 className={`${this.props.className} labels`}
                 onClick={this.handleClick}
                 onFocus={this.handleFocus}
@@ -195,7 +194,9 @@ class Labels extends Component {
                     ))}
                     <span
                         className="labels-input"
-                        ref={ref => { this.input = ref; }}
+                        ref={ref => {
+                            this.input = ref;
+                        }}
                         contentEditable
                         onKeyUp={this.handleKeyUp}
                         onKeyDown={this.handleKeyDown}

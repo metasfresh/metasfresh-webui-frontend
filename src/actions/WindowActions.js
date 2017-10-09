@@ -1,4 +1,4 @@
-import * as types from '../constants/ActionTypes'
+import * as types from '../constants/ActionTypes';
 import axios from 'axios';
 import { push, replace } from 'react-router-redux';
 import counterpart from 'counterpart';
@@ -6,16 +6,9 @@ import counterpart from 'counterpart';
 import SockJs from 'sockjs-client';
 import Stomp from 'stompjs/lib/stomp.min.js';
 
-import {
-    getWindowBreadcrumb
-} from './MenuActions';
+import { getWindowBreadcrumb } from './MenuActions';
 
-import {
-    initLayout,
-    getData,
-    patchRequest,
-    openFile
-} from './GenericActions';
+import { initLayout, getData, patchRequest, openFile } from './GenericActions';
 
 import {
     addNotification,
@@ -24,15 +17,13 @@ import {
     setProcessPending
 } from './AppActions';
 
-import {
-    setListIncludedView
-} from './ListActions';
+import { setListIncludedView } from './ListActions';
 
 export function setLatestNewDocument(id) {
     return {
         type: types.SET_LATEST_NEW_DOCUMENT,
         id: id
-    }
+    };
 }
 
 export function openRawModal(windowType, viewId) {
@@ -40,13 +31,13 @@ export function openRawModal(windowType, viewId) {
         type: types.OPEN_RAW_MODAL,
         windowType: windowType,
         viewId: viewId
-    }
+    };
 }
 
 export function closeRawModal() {
     return {
         type: types.CLOSE_RAW_MODAL
-    }
+    };
 }
 
 export function activateTab(scope, tabId) {
@@ -54,7 +45,7 @@ export function activateTab(scope, tabId) {
         type: types.ACTIVATE_TAB,
         scope,
         tabId
-    }
+    };
 }
 
 export function initLayoutSuccess(layout, scope) {
@@ -62,7 +53,7 @@ export function initLayoutSuccess(layout, scope) {
         type: types.INIT_LAYOUT_SUCCESS,
         layout: layout,
         scope: scope
-    }
+    };
 }
 
 export function initDataSuccess({
@@ -85,13 +76,13 @@ export function initDataSuccess({
         type: types.INIT_DATA_SUCCESS,
         validStatus,
         websocket
-    }
+    };
 }
 
 export function clearMasterData() {
     return {
         type: types.CLEAR_MASTER_DATA
-    }
+    };
 }
 
 export function addRowData(data, scope) {
@@ -99,14 +90,17 @@ export function addRowData(data, scope) {
         type: types.ADD_ROW_DATA,
         data,
         scope
-    }
+    };
 }
 
 export function sortTab(scope, tabId, field, asc) {
     return {
         type: types.SORT_TAB,
-        scope, tabId, field, asc
-    }
+        scope,
+        tabId,
+        field,
+        asc
+    };
 }
 
 export function updateRowStatus(scope, tabid, rowid, saveStatus) {
@@ -116,7 +110,7 @@ export function updateRowStatus(scope, tabid, rowid, saveStatus) {
         tabid,
         rowid,
         saveStatus
-    }
+    };
 }
 
 export function updateDataProperty(property, value, scope) {
@@ -125,7 +119,7 @@ export function updateDataProperty(property, value, scope) {
         property,
         value,
         scope
-    }
+    };
 }
 
 export function updateDataSaveStatus(scope, saveStatus) {
@@ -133,7 +127,7 @@ export function updateDataSaveStatus(scope, saveStatus) {
         type: types.UPDATE_DATA_SAVE_STATUS,
         scope,
         saveStatus
-    }
+    };
 }
 
 export function updateDataValidStatus(scope, validStatus) {
@@ -141,7 +135,7 @@ export function updateDataValidStatus(scope, validStatus) {
         type: types.UPDATE_DATA_VALID_STATUS,
         scope,
         validStatus
-    }
+    };
 }
 
 export function updateRowProperty(property, item, tabid, rowid, scope) {
@@ -152,7 +146,7 @@ export function updateRowProperty(property, item, tabid, rowid, scope) {
         tabid,
         rowid,
         scope
-    }
+    };
 }
 
 export function updateDataIncludedTabsInfo(scope, includedTabsInfo) {
@@ -160,7 +154,7 @@ export function updateDataIncludedTabsInfo(scope, includedTabsInfo) {
         type: types.UPDATE_DATA_INCLUDED_TABS_INFO,
         scope,
         includedTabsInfo
-    }
+    };
 }
 
 export function addNewRow(item, tabid, rowid, scope) {
@@ -170,7 +164,7 @@ export function addNewRow(item, tabid, rowid, scope) {
         tabid: tabid,
         rowid: rowid,
         scope: scope
-    }
+    };
 }
 
 export function deleteRow(tabid, rowid, scope) {
@@ -179,14 +173,14 @@ export function deleteRow(tabid, rowid, scope) {
         tabid: tabid,
         rowid: rowid,
         scope: scope
-    }
+    };
 }
 
 export function selectRow(selected) {
     return {
         type: types.SELECT_ROW,
         selected
-    }
+    };
 }
 
 export function updateDataFieldProperty(property, item, scope) {
@@ -195,7 +189,7 @@ export function updateDataFieldProperty(property, item, scope) {
         property: property,
         item: item,
         scope: scope
-    }
+    };
 }
 
 export function updateRowFieldProperty(property, item, tabid, rowid, scope) {
@@ -206,19 +200,27 @@ export function updateRowFieldProperty(property, item, tabid, rowid, scope) {
         tabid: tabid,
         rowid: rowid,
         scope: scope
-    }
+    };
 }
 
 export function noConnection(status) {
     return {
         type: types.NO_CONNECTION,
         status: status
-    }
+    };
 }
 
 export function openModal(
-    title, windowType, type, tabId, rowId, isAdvanced, viewId, viewDocumentIds,
-    dataId, triggerField
+    title,
+    windowType,
+    type,
+    tabId,
+    rowId,
+    isAdvanced,
+    viewId,
+    viewDocumentIds,
+    dataId,
+    triggerField
 ) {
     return {
         type: types.OPEN_MODAL,
@@ -232,13 +234,13 @@ export function openModal(
         isAdvanced: isAdvanced,
         viewDocumentIds: viewDocumentIds,
         triggerField: triggerField
-    }
+    };
 }
 
 export function closeModal() {
     return {
         type: types.CLOSE_MODAL
-    }
+    };
 }
 
 export function updateModal(rowId, dataId) {
@@ -246,7 +248,7 @@ export function updateModal(rowId, dataId) {
         type: types.UPDATE_MODAL,
         rowId,
         dataId
-    }
+    };
 }
 
 // INDICATOR ACTIONS
@@ -255,7 +257,7 @@ export function indicatorState(state) {
     return {
         type: types.CHANGE_INDICATOR_STATE,
         state: state
-    }
+    };
 }
 
 //SELECT ON TABLE
@@ -265,7 +267,7 @@ export function selectTableItems(ids, windowType) {
         type: types.SELECT_TABLE_ITEMS,
         ids,
         windowType
-    }
+    };
 }
 
 // THUNK ACTIONS
@@ -274,42 +276,49 @@ export function selectTableItems(ids, windowType) {
  * Main method to generate window
  */
 export function createWindow(
-    windowType, docId = 'NEW', tabId, rowId, isModal = false, isAdvanced
+    windowType,
+    docId = 'NEW',
+    tabId,
+    rowId,
+    isModal = false,
+    isAdvanced
 ) {
-    return (dispatch) => {
+    return dispatch => {
         if (docId == 'new') {
             docId = 'NEW';
         }
 
         // this chain is really important,
         // to do not re-render widgets on init
-        return dispatch(initWindow(windowType, docId, tabId, rowId, isAdvanced))
-            .then(response => {
-                if(!response){
-                    return;
+        return dispatch(
+            initWindow(windowType, docId, tabId, rowId, isAdvanced)
+        ).then(response => {
+            if (!response) {
+                return;
+            }
+            if (docId == 'NEW' && !isModal) {
+                dispatch(setLatestNewDocument(response.data[0].id));
+                // redirect immedietely
+                return dispatch(
+                    replace('/window/' + windowType + '/' + response.data[0].id)
+                );
+            }
+
+            let elem = 0;
+
+            response.data.forEach((value, index) => {
+                if (value.rowId === rowId) {
+                    elem = index;
                 }
-                if (docId == 'NEW' && !isModal) {
-                    dispatch(setLatestNewDocument(response.data[0].id));
-                    // redirect immedietely
-                    return dispatch(replace(
-                        '/window/' + windowType + '/' + response.data[0].id)
-                    );
-                }
+            });
 
-                let elem = 0;
+            if (docId === 'NEW') {
+                dispatch(updateModal(null, response.data[0].id));
+            }
 
-                response.data.forEach((value, index) => {
-                    if (value.rowId === rowId) {
-                        elem = index;
-                    }
-                });
-
-                if(docId === 'NEW'){
-                    dispatch(updateModal(null, response.data[0].id));
-                }
-
-                docId = response.data[elem].id;
-                dispatch(initDataSuccess({
+            docId = response.data[elem].id;
+            dispatch(
+                initDataSuccess({
                     data: parseToDisplay(response.data[elem].fieldsByName),
                     docId,
                     saveStatus: response.data[0].saveStatus,
@@ -318,69 +327,91 @@ export function createWindow(
                     validStatus: response.data[0].validStatus,
                     includedTabsInfo: response.data[0].includedTabsInfo,
                     websocketEndpoint: response.data[0].websocketEndpoint
-                }));
-
-                if (isModal) {
-                    if(rowId === 'NEW'){
-                        dispatch(mapDataToState(
-                            response.data, false, 'NEW', docId, windowType
-                        ));
-                        dispatch(updateStatus(response.data))
-                        dispatch(updateModal(response.data[0].rowId));
-                    }
-                }else{
-                    dispatch(getWindowBreadcrumb(windowType));
-                }
-
-                initLayout(
-                    'window', windowType, tabId, null, null, isAdvanced
-                ).then(response =>
-                    dispatch(initLayoutSuccess(
-                        response.data, getScope(isModal)
-                    ))
-                ).then(response => {
-                    if(!isModal){
-                        dispatch(initTabs(
-                            response.layout.tabs, windowType, docId, isModal
-                        ))
-                    }
                 })
+            );
+
+            if (isModal) {
+                if (rowId === 'NEW') {
+                    dispatch(
+                        mapDataToState(
+                            response.data,
+                            false,
+                            'NEW',
+                            docId,
+                            windowType
+                        )
+                    );
+                    dispatch(updateStatus(response.data));
+                    dispatch(updateModal(response.data[0].rowId));
+                }
+            } else {
+                dispatch(getWindowBreadcrumb(windowType));
+            }
+
+            initLayout('window', windowType, tabId, null, null, isAdvanced)
+                .then(response =>
+                    dispatch(
+                        initLayoutSuccess(response.data, getScope(isModal))
+                    )
+                )
+                .then(response => {
+                    if (!isModal) {
+                        dispatch(
+                            initTabs(
+                                response.layout.tabs,
+                                windowType,
+                                docId,
+                                isModal
+                            )
+                        );
+                    }
+                });
         });
-    }
+    };
 }
 
 function initTabs(layout, windowType, docId, isModal) {
     return dispatch => {
         let tabTmp = {};
 
-        layout && layout.map((tab, index) => {
-            tabTmp[tab.tabid] = {};
+        layout &&
+            layout.map((tab, index) => {
+                tabTmp[tab.tabid] = {};
 
-            if(index === 0 || !tab.queryOnActivate){
-                getTab(tab.tabid, windowType, docId)
-                    .then(res => {
+                if (index === 0 || !tab.queryOnActivate) {
+                    getTab(tab.tabid, windowType, docId).then(res => {
                         tabTmp[tab.tabid] = res;
-                        dispatch(
-                            addRowData(tabTmp, getScope(isModal))
-                        );
-                    })
-            }
-        })
-    }
+                        dispatch(addRowData(tabTmp, getScope(isModal)));
+                    });
+                }
+            });
+    };
 }
 
 export function getTab(tabId, windowType, docId, orderBy) {
     return getData(
-        'window', windowType, docId, tabId, null, null, null, null, orderBy
-    ).then(res => res.data && res.data.map(row =>
-        Object.assign({}, row, {
-            fieldsByName: parseToDisplay(row.fieldsByName)
-        }
-    )));
+        'window',
+        windowType,
+        docId,
+        tabId,
+        null,
+        null,
+        null,
+        null,
+        orderBy
+    ).then(
+        res =>
+            res.data &&
+            res.data.map(row =>
+                Object.assign({}, row, {
+                    fieldsByName: parseToDisplay(row.fieldsByName)
+                })
+            )
+    );
 }
 
 export function initWindow(windowType, docId, tabId, rowId = null, isAdvanced) {
-    return (dispatch) => {
+    return dispatch => {
         if (docId === 'NEW') {
             //New master document
             return patchRequest({
@@ -401,29 +432,43 @@ export function initWindow(windowType, docId, tabId, rowId = null, isAdvanced) {
             } else if (rowId) {
                 //Existing row document
                 return getData(
-                    'window', windowType, docId, tabId, rowId, null, null,
+                    'window',
+                    windowType,
+                    docId,
+                    tabId,
+                    rowId,
+                    null,
+                    null,
                     isAdvanced
-                )
+                );
             } else {
                 //Existing master document
                 return getData(
-                    'window', windowType, docId, null, null, null, null,
+                    'window',
+                    windowType,
+                    docId,
+                    null,
+                    null,
+                    null,
+                    null,
                     isAdvanced
                 ).catch(() => {
-                    dispatch(initDataSuccess({
-                        data: {},
-                        docId: 'notfound',
-                        includedTabsInfo: {},
-                        scope: 'master',
-                        saveStatus: { saved: true },
-                        standardActions: {},
-                        validStatus: {}
-                    }));
+                    dispatch(
+                        initDataSuccess({
+                            data: {},
+                            docId: 'notfound',
+                            includedTabsInfo: {},
+                            scope: 'master',
+                            saveStatus: { saved: true },
+                            standardActions: {},
+                            validStatus: {}
+                        })
+                    );
                     dispatch(getWindowBreadcrumb(windowType));
                 });
             }
         }
-    }
+    };
 }
 
 /*
@@ -431,7 +476,14 @@ export function initWindow(windowType, docId, tabId, rowId = null, isAdvanced) {
  *  when responses should merge store
  */
 export function patch(
-    entity, windowType, id = 'NEW', tabId, rowId, property, value, isModal,
+    entity,
+    windowType,
+    id = 'NEW',
+    tabId,
+    rowId,
+    property,
+    value,
+    isModal,
     isAdvanced
 ) {
     return dispatch => {
@@ -446,92 +498,155 @@ export function patch(
             property,
             value,
             isAdvanced
-        }).then(response => {
-            dispatch(mapDataToState(
-                response.data, isModal, rowId, id, windowType, isAdvanced
-            ));
+        })
+            .then(response => {
+                dispatch(
+                    mapDataToState(
+                        response.data,
+                        isModal,
+                        rowId,
+                        id,
+                        windowType,
+                        isAdvanced
+                    )
+                );
 
-            dispatch(indicatorState('saved'));
+                dispatch(indicatorState('saved'));
 
-            return response.data;
-        }).catch(() => {
-            getData(
-                entity, windowType, id, tabId, rowId, null, null, isAdvanced
-            ).then(response => {
-                dispatch(mapDataToState(
-                    response.data, isModal, rowId, id, windowType, isAdvanced
-                ));
+                return response.data;
+            })
+            .catch(() => {
+                getData(
+                    entity,
+                    windowType,
+                    id,
+                    tabId,
+                    rowId,
+                    null,
+                    null,
+                    isAdvanced
+                ).then(response => {
+                    dispatch(
+                        mapDataToState(
+                            response.data,
+                            isModal,
+                            rowId,
+                            id,
+                            windowType,
+                            isAdvanced
+                        )
+                    );
+                });
             });
+    };
+}
+
+export function fireUpdateData(
+    entity,
+    windowType,
+    id,
+    tabId,
+    rowId,
+    isModal,
+    isAdvanced
+) {
+    return dispatch => {
+        getData(
+            entity,
+            windowType,
+            id,
+            tabId,
+            rowId,
+            null,
+            null,
+            isAdvanced
+        ).then(response => {
+            dispatch(
+                mapDataToState(
+                    response.data,
+                    isModal,
+                    rowId,
+                    id,
+                    windowType,
+                    isAdvanced
+                )
+            );
         });
-    }
+    };
 }
 
-export function fireUpdateData(entity, windowType, id, tabId, rowId, isModal,
-    isAdvanced){
-
-        return dispatch => {
-            getData(
-                entity, windowType, id, tabId, rowId, null, null, isAdvanced
-            ).then(response => {
-                dispatch(mapDataToState(
-                    response.data, isModal, rowId, id, windowType, isAdvanced
-                ));
-            });
-        }
-}
-
-function updateData(doc, scope){
+function updateData(doc, scope) {
     return dispatch => {
         Object.keys(doc).map(key => {
-            if(key === 'fieldsByName'){
+            if (key === 'fieldsByName') {
                 Object.keys(doc.fieldsByName).map(fieldName => {
-                    dispatch(updateDataFieldProperty(
-                        fieldName, doc.fieldsByName[fieldName], scope
-                    ))
-                })
-            }else if(key === 'includedTabsInfo'){
-                dispatch(updateDataIncludedTabsInfo(
-                    'master', doc[key]
-                ));
-            }else{
-                dispatch(updateDataProperty(key, doc[key], scope))
+                    dispatch(
+                        updateDataFieldProperty(
+                            fieldName,
+                            doc.fieldsByName[fieldName],
+                            scope
+                        )
+                    );
+                });
+            } else if (key === 'includedTabsInfo') {
+                dispatch(updateDataIncludedTabsInfo('master', doc[key]));
+            } else {
+                dispatch(updateDataProperty(key, doc[key], scope));
             }
-        })
-    }
+        });
+    };
 }
 
-function updateRow(row, scope){
+function updateRow(row, scope) {
     return dispatch => {
         Object.keys(row).map(key => {
-            if(key === 'fieldsByName'){
+            if (key === 'fieldsByName') {
                 Object.keys(row.fieldsByName).map(fieldName => {
-                    dispatch(updateRowFieldProperty(
-                        fieldName, row.fieldsByName[fieldName], row.tabid,
-                        row.rowId, scope
-                    ))
+                    dispatch(
+                        updateRowFieldProperty(
+                            fieldName,
+                            row.fieldsByName[fieldName],
+                            row.tabid,
+                            row.rowId,
+                            scope
+                        )
+                    );
                 });
-            }else{
-                dispatch(updateRowProperty(
-                    key, row[key], row.tabid, row.rowId, scope
-                ));
+            } else {
+                dispatch(
+                    updateRowProperty(
+                        key,
+                        row[key],
+                        row.tabid,
+                        row.rowId,
+                        scope
+                    )
+                );
             }
-        })
-    }
+        });
+    };
 }
 
 function mapDataToState(data, isModal, rowId, id, windowType, isAdvanced) {
-    return (dispatch) => {
+    return dispatch => {
         data.map((item, index) => {
-            const parsedItem = item.fieldsByName ? Object.assign({}, item, {
-                fieldsByName: parseToDisplay(item.fieldsByName)
-            }) : item;
+            const parsedItem = item.fieldsByName
+                ? Object.assign({}, item, {
+                      fieldsByName: parseToDisplay(item.fieldsByName)
+                  })
+                : item;
 
             // First item in response is direct one for action that called it.
-            if(index === 0 && rowId === 'NEW'){
-                dispatch(addNewRow(
-                    parsedItem, parsedItem.tabid, parsedItem.rowId, 'master'
-                ))
-            }else{
+            if (index === 0 && rowId === 'NEW') {
+                dispatch(
+                    addNewRow(
+                        parsedItem,
+                        parsedItem.tabid,
+                        parsedItem.rowId,
+                        'master'
+                    )
+                );
+            } else {
                 if (item.rowId && !isModal) {
                     // Update directly to a row by the widget in cell
                     dispatch(updateRow(parsedItem, 'master'));
@@ -542,43 +657,50 @@ function mapDataToState(data, isModal, rowId, id, windowType, isAdvanced) {
                     // Advanced edit
                     isAdvanced && dispatch(updateData(parsedItem, 'master'));
 
-                    dispatch(updateData(
-                        parsedItem, getScope(isModal && index === 0)
-                    ));
+                    dispatch(
+                        updateData(parsedItem, getScope(isModal && index === 0))
+                    );
                 }
             }
-        })
-    }
+        });
+    };
 }
 
 function updateStatus(responseData) {
     return dispatch => {
-        const updateDispatch = (item) => {
-            if(item.rowId){
-                dispatch(updateRowStatus(
-                    'master', item.tabid, item.rowId, item.saveStatus
-                ));
-            }else{
-
+        const updateDispatch = item => {
+            if (item.rowId) {
+                dispatch(
+                    updateRowStatus(
+                        'master',
+                        item.tabid,
+                        item.rowId,
+                        item.saveStatus
+                    )
+                );
+            } else {
                 item.validStatus &&
                     dispatch(updateDataValidStatus('master', item.validStatus));
                 item.saveStatus &&
                     dispatch(updateDataSaveStatus('master', item.saveStatus));
                 item.includedTabsInfo &&
-                    dispatch(updateDataIncludedTabsInfo(
-                        'master', item.includedTabsInfo
-                    ));
+                    dispatch(
+                        updateDataIncludedTabsInfo(
+                            'master',
+                            item.includedTabsInfo
+                        )
+                    );
             }
-        }
+        };
 
-        if(Array.isArray(responseData)){
+        if (Array.isArray(responseData)) {
             responseData.map(item => {
-                updateDispatch(item)
+                updateDispatch(item);
             });
-        }else{
-            updateDispatch(responseData)
+        } else {
+            updateDispatch(responseData);
         }
-    }
+    };
 }
 
 /*
@@ -588,71 +710,119 @@ function updateStatus(responseData) {
 export function updatePropertyValue(property, value, tabid, rowid, isModal) {
     return dispatch => {
         if (tabid && rowid) {
-            dispatch(updateRowFieldProperty(
-                property, {value}, tabid, rowid, 'master'
-            ))
+            dispatch(
+                updateRowFieldProperty(
+                    property,
+                    { value },
+                    tabid,
+                    rowid,
+                    'master'
+                )
+            );
             if (isModal) {
-                dispatch(updateDataFieldProperty(property, {value}, 'modal'))
+                dispatch(updateDataFieldProperty(property, { value }, 'modal'));
             }
         } else {
-            dispatch(updateDataFieldProperty(
-                property, {value}, getScope(isModal)
-            ))
+            dispatch(
+                updateDataFieldProperty(property, { value }, getScope(isModal))
+            );
             if (isModal) {
                 //update the master field too if exist
-                dispatch(updateDataFieldProperty(property, {value}, 'master'))
+                dispatch(
+                    updateDataFieldProperty(property, { value }, 'master')
+                );
             }
         }
-    }
+    };
 }
 
 function handleUploadProgress(dispatch, notificationTitle, progressEvent) {
-    let percentLeft = Math.min(Math.floor((progressEvent.loaded * 100) / progressEvent.total), 98);
+    let percentLeft = Math.min(
+        Math.floor(progressEvent.loaded * 100 / progressEvent.total),
+        98
+    );
 
     dispatch(setNotificationProgress(notificationTitle, percentLeft));
 }
 
-export function attachFileAction(windowType, docId, data){
-    return (dispatch) => {
-        const notificationTitle = counterpart.translate('window.attachment.title');
+export function attachFileAction(windowType, docId, data) {
+    return dispatch => {
+        const notificationTitle = counterpart.translate(
+            'window.attachment.title'
+        );
 
-        dispatch(addNotification(
-            notificationTitle, counterpart.translate('window.attachment.uploading'), 0, 'primary'
-        ));
+        dispatch(
+            addNotification(
+                notificationTitle,
+                counterpart.translate('window.attachment.uploading'),
+                0,
+                'primary'
+            )
+        );
 
         let requestConfig = {
-            onUploadProgress: handleUploadProgress.bind(this, dispatch, notificationTitle)
+            onUploadProgress: handleUploadProgress.bind(
+                this,
+                dispatch,
+                notificationTitle
+            )
         };
 
-        return axios.post(
-            `${config.API_URL}/window/${windowType}/${docId}/attachments`, data, requestConfig
-        ).then(() => {
-            dispatch(setNotificationProgress(notificationTitle, 100));
+        return axios
+            .post(
+                `${config.API_URL}/window/${windowType}/${docId}/attachments`,
+                data,
+                requestConfig
+            )
+            .then(() => {
+                dispatch(setNotificationProgress(notificationTitle, 100));
 
-            dispatch(addNotification(
-                notificationTitle, counterpart.translate('window.attachment.upload.success'), 5000, 'primary'
-            ))
-        })
-        .catch(() => {
-            dispatch(addNotification(
-                notificationTitle, counterpart.translate('window.attachment.upload.error'), 5000, 'error'
-            ))
-        })
-    }
+                dispatch(
+                    addNotification(
+                        notificationTitle,
+                        counterpart.translate(
+                            'window.attachment.upload.success'
+                        ),
+                        5000,
+                        'primary'
+                    )
+                );
+            })
+            .catch(() => {
+                dispatch(
+                    addNotification(
+                        notificationTitle,
+                        counterpart.translate('window.attachment.upload.error'),
+                        5000,
+                        'error'
+                    )
+                );
+            });
+    };
 }
 
 //ZOOM INTO
-export function getZoomIntoWindow(entity, windowId, docId, tabId, rowId, field){
-   return axios.get(
+export function getZoomIntoWindow(
+    entity,
+    windowId,
+    docId,
+    tabId,
+    rowId,
+    field
+) {
+    return axios.get(
         config.API_URL +
-        '/' + entity +
-        '/' + windowId +
-        (docId ? '/' + docId : '') +
-        (tabId ? '/' + tabId : '') +
-        (rowId ? '/' + rowId : '') +
-        '/field' +
-        '/' + field +
-        '/zoomInto?showError=true'
+            '/' +
+            entity +
+            '/' +
+            windowId +
+            (docId ? '/' + docId : '') +
+            (tabId ? '/' + tabId : '') +
+            (rowId ? '/' + rowId : '') +
+            '/field' +
+            '/' +
+            field +
+            '/zoomInto?showError=true'
     );
 }
 
@@ -660,77 +830,93 @@ export function getZoomIntoWindow(entity, windowId, docId, tabId, rowId, field){
 
 export function createProcess(processType, viewId, type, ids, tabId, rowId) {
     let pid = null;
-    return (dispatch) => {
+    return dispatch => {
         dispatch(setProcessPending());
 
-        return getProcessData(
-            processType, viewId, type, ids, tabId, rowId
-        ).then( (response) => {
-            if (response.data) {
-                const preparedData = parseToDisplay(response.data.fieldsByName);
+        return getProcessData(processType, viewId, type, ids, tabId, rowId)
+            .then(response => {
+                if (response.data) {
+                    const preparedData = parseToDisplay(
+                        response.data.fieldsByName
+                    );
 
-                pid = response.data.pinstanceId;
+                    pid = response.data.pinstanceId;
 
-                if (Object.keys(preparedData).length === 0) {
-                    startProcess(processType, pid).then(response => {
-                        dispatch(handleProcessResponse(response, processType, pid));
-                    }).catch(err => {
-                        dispatch(closeModal());
+                    if (Object.keys(preparedData).length === 0) {
+                        startProcess(processType, pid)
+                            .then(response => {
+                                dispatch(
+                                    handleProcessResponse(
+                                        response,
+                                        processType,
+                                        pid
+                                    )
+                                );
+                            })
+                            .catch(err => {
+                                dispatch(closeModal());
 
-                        dispatch(setProcessSaved());
+                                dispatch(setProcessSaved());
 
-                        throw err;
-                    });
+                                throw err;
+                            });
+                    } else {
+                        dispatch(
+                            initDataSuccess({
+                                data: preparedData,
+                                scope: 'modal'
+                            })
+                        );
+                        initLayout('process', processType)
+                            .then(response => {
+                                dispatch(setProcessSaved());
+
+                                const preparedLayout = Object.assign(
+                                    {},
+                                    response.data,
+                                    {
+                                        pinstanceId: pid
+                                    }
+                                );
+
+                                return dispatch(
+                                    initLayoutSuccess(preparedLayout, 'modal')
+                                );
+                            })
+                            .catch(err => {
+                                dispatch(setProcessSaved());
+
+                                throw err;
+                            });
+                    }
                 }
-                else {
-                    dispatch(initDataSuccess({
-                        data: preparedData,
-                        scope: 'modal'
-                    }));
-                    initLayout('process', processType).then(response => {
-                        dispatch(setProcessSaved());
+            })
+            .catch(err => {
+                // Close process modal in case when process start failed
+                dispatch(closeModal());
 
-                        const preparedLayout = Object.assign({}, response.data, {
-                            pinstanceId: pid
-                        });
+                dispatch(setProcessSaved());
 
-                        return dispatch(initLayoutSuccess(preparedLayout, 'modal'))
-                    }).catch(err => {
-                        dispatch(setProcessSaved());
-
-                        throw err;
-                    });
-                }
-            }
-        }).catch(err => {
-            // Close process modal in case when process start failed
-            dispatch(closeModal());
-
-            dispatch(setProcessSaved());
-
-            throw err;
-        });
-    }
+                throw err;
+            });
+    };
 }
 
 export function handleProcessResponse(response, type, id, successCallback) {
-    return (dispatch) => {
-        const {
-            error, summary, action
-        } = response.data;
+    return dispatch => {
+        const { error, summary, action } = response.data;
 
-        if(error){
+        if (error) {
             dispatch(addNotification('Process error', summary, 5000, 'error'));
             dispatch(setProcessSaved());
 
             // Close process modal in case when process has failed
             dispatch(closeModal());
-        }
-        else {
+        } else {
             let closeProcessModal = true;
 
-            if(action){
-                switch(action.type){
+            if (action) {
+                switch (action.type) {
                     case 'openView':
                         dispatch(closeModal());
 
@@ -738,49 +924,57 @@ export function handleProcessResponse(response, type, id, successCallback) {
 
                         break;
                     case 'openReport':
-                        openFile(
-                            'process', type, id, 'print', action.filename
-                        );
+                        openFile('process', type, id, 'print', action.filename);
                         break;
                     case 'openDocument':
                         dispatch(closeModal());
 
-                        if(action.modal) {
+                        if (action.modal) {
                             // Do not close process modal, since it will be re-used with document view
                             closeProcessModal = false;
 
                             dispatch(
                                 openModal(
-                                    '', action.windowId, 'window', null, null,
+                                    '',
+                                    action.windowId,
+                                    'window',
+                                    null,
+                                    null,
                                     action.advanced ? action.advanced : false,
-                                    '', '', action.documentId
+                                    '',
+                                    '',
+                                    action.documentId
                                 )
                             );
                         } else {
-                            dispatch(push(
-                                '/window/' + action.windowId +
-                                '/' + action.documentId
-                            ));
+                            dispatch(
+                                push(
+                                    '/window/' +
+                                        action.windowId +
+                                        '/' +
+                                        action.documentId
+                                )
+                            );
                         }
                         break;
                     case 'openIncludedView':
-                        dispatch(setListIncludedView(
-                            action.windowId, action.viewId
-                        ));
+                        dispatch(
+                            setListIncludedView(action.windowId, action.viewId)
+                        );
                         break;
                     case 'closeIncludedView':
                         dispatch(setListIncludedView());
                         break;
                     case 'selectViewRows':
-                        dispatch(selectTableItems(
-                            action.rowIds, action.windowId
-                        ));
+                        dispatch(
+                            selectTableItems(action.rowIds, action.windowId)
+                        );
                         break;
                 }
             }
 
-            if(summary){
-                dispatch(addNotification('Process', summary, 5000, 'primary'))
+            if (summary) {
+                dispatch(addNotification('Process', summary, 5000, 'primary'));
             }
 
             dispatch(setProcessSaved());
@@ -791,43 +985,46 @@ export function handleProcessResponse(response, type, id, successCallback) {
 
             successCallback && successCallback();
         }
-    }
+    };
 }
 
 function getProcessData(processId, viewId, type, ids, tabId, rowId) {
     return axios.post(
-        config.API_URL +
-        '/process/' + processId,
-        viewId ? {
-            processId: processId,
-            viewId: viewId,
-            viewDocumentIds: ids
-        } : {
-            processId: processId,
-            documentId: Array.isArray(ids) ? ids[0] : ids,
-            documentType: type,
-            tabId: tabId,
-            rowId: rowId
-        }
+        config.API_URL + '/process/' + processId,
+        viewId
+            ? {
+                  processId: processId,
+                  viewId: viewId,
+                  viewDocumentIds: ids
+              }
+            : {
+                  processId: processId,
+                  documentId: Array.isArray(ids) ? ids[0] : ids,
+                  documentType: type,
+                  tabId: tabId,
+                  rowId: rowId
+              }
     );
 }
 
 export function startProcess(processType, pinstanceId) {
     return axios.get(
         config.API_URL +
-        '/process/' + processType +
-        '/' + pinstanceId +
-        '/start'
+            '/process/' +
+            processType +
+            '/' +
+            pinstanceId +
+            '/start'
     );
 }
 
 export function deleteLocal(tabid, rowsid, scope, response) {
-    return (dispatch) => {
+    return dispatch => {
         for (let rowid of rowsid) {
-            dispatch(deleteRow(tabid, rowid, scope))
+            dispatch(deleteRow(tabid, rowid, scope));
         }
-        dispatch(updateStatus(response.data))
-    }
+        dispatch(updateStatus(response.data));
+    };
 }
 
 // END PROCESS ACTIONS
@@ -847,21 +1044,23 @@ function parseDateToReadable(obj) {
 
     return Object.keys(obj).reduce((acc, key) => {
         acc[key] =
-            (dateParse.indexOf(obj[key].widgetType) > -1 && obj[key].value) ?
-                Object.assign({}, obj[key], {
-                    value: obj[key].value ? new Date(obj[key].value) : ''
-                }) : obj[key];
+            dateParse.indexOf(obj[key].widgetType) > -1 && obj[key].value
+                ? Object.assign({}, obj[key], {
+                      value: obj[key].value ? new Date(obj[key].value) : ''
+                  })
+                : obj[key];
         return acc;
     }, {});
 }
 
 function nullToEmptyStrings(obj) {
     return Object.keys(obj).reduce((acc, key) => {
-        acc[key] = (obj[key].value === null) ?
-            Object.assign({}, obj[key], { value: '' }) :
-            obj[key];
+        acc[key] =
+            obj[key].value === null
+                ? Object.assign({}, obj[key], { value: '' })
+                : obj[key];
         return acc;
-    }, {})
+    }, {});
 }
 
 export function findRowByPropName(arr, name) {
@@ -884,18 +1083,17 @@ export function findRowByPropName(arr, name) {
 export function getItemsByProperty(arr, prop, value) {
     let ret = [];
 
-    arr && arr.map((item) => {
-        if (item[prop] === value) {
-            ret.push(item);
-        }
-    });
+    arr &&
+        arr.map(item => {
+            if (item[prop] === value) {
+                ret.push(item);
+            }
+        });
 
     return ret;
 }
 
-export function mapIncluded(
-    node, indent, isParentLastChild = false
-) {
+export function mapIncluded(node, indent, isParentLastChild = false) {
     let ind = indent ? indent : [];
     let result = [];
 
@@ -905,14 +1103,14 @@ export function mapIncluded(
 
     result = result.concat([nodeCopy]);
 
-    if(isParentLastChild){
+    if (isParentLastChild) {
         ind[ind.length - 2] = false;
     }
 
-    if(node.includedDocuments){
-        for(let i = 0; i < node.includedDocuments.length; i++){
+    if (node.includedDocuments) {
+        for (let i = 0; i < node.includedDocuments.length; i++) {
             let copy = node.includedDocuments[i];
-            if(i === node.includedDocuments.length - 1){
+            if (i === node.includedDocuments.length - 1) {
                 copy = Object.assign({}, copy, {
                     lastChild: true
                 });
@@ -920,35 +1118,31 @@ export function mapIncluded(
 
             result = result.concat(
                 mapIncluded(copy, ind.concat([true]), node.lastChild)
-            )
+            );
         }
     }
     return result;
 }
 
-export function collapsedMap(
-    node, isCollapsed, initialMap
-) {
+export function collapsedMap(node, isCollapsed, initialMap) {
     let collapsedMap = [];
-    if(initialMap){
-        if(!isCollapsed) {
+    if (initialMap) {
+        if (!isCollapsed) {
             initialMap.splice(
                 initialMap.indexOf(node.includedDocuments[0]),
                 node.includedDocuments.length
-                );
+            );
             collapsedMap = initialMap;
         } else {
             initialMap.map(item => {
                 collapsedMap.push(item);
-                if(item.id === node.id) {
+                if (item.id === node.id) {
                     collapsedMap = collapsedMap.concat(node.includedDocuments);
-
                 }
             });
         }
-
     } else {
-        if(node.includedDocuments){
+        if (node.includedDocuments) {
             collapsedMap.push(node);
         }
     }
@@ -957,7 +1151,8 @@ export function collapsedMap(
 }
 
 export function connectWS(topic, cb) {
-    (this.sockClient && this.sockClient.connected) &&
+    this.sockClient &&
+        this.sockClient.connected &&
         this.sockClient.disconnect();
 
     this.sock = new SockJs(config.WS_URL);
@@ -971,6 +1166,7 @@ export function connectWS(topic, cb) {
 }
 
 export function disconnectWS() {
-    (this.sockClient && this.sockClient.connected) &&
+    this.sockClient &&
+        this.sockClient.connected &&
         this.sockClient.disconnect();
 }

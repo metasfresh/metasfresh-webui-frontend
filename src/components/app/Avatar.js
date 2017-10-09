@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import defaultAvatar from '../../assets/images/default-avatar.png';
-import {getAvatar} from '../../actions/AppActions';
+import { getAvatar } from '../../actions/AppActions';
 
 class Avatar extends Component {
     constructor(props) {
@@ -8,7 +8,7 @@ class Avatar extends Component {
     }
 
     render() {
-        const {size, className, id, title} = this.props;
+        const { size, className, id, title } = this.props;
         return (
             <img
                 src={id ? getAvatar(id) : defaultAvatar}
