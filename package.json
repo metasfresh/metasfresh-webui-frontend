@@ -2,7 +2,7 @@
     "name": "metasfresh-webui-frontend",
     "scripts": {
         "start": "node server.js",
-        "lint": "eslint src --fix",
+        "lint": "eslint .",
         "stylelint": "stylelint 'src/assets/**/*.css'"
     },
     "devDependencies": {
