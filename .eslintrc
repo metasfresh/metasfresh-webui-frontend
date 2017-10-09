@@ -17,7 +17,10 @@
                 "tabWidth": 4,
                 "singleQuote": true
             }
-        ]
+        ],
+        # Disable prop type checking since code base is in a too bad
+        # condition for this to be viable to refactor
+        "react/prop-types": 0
     },
     "plugins": ["prettier", "react"],
     "globals": {
