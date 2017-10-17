@@ -129,7 +129,7 @@ class QuickActions extends Component {
         this.toggleDropdown();
     }
 
-    fetchActions = (windowType, viewId, selected) => {
+    fetchActions = async (windowType, viewId, selected) => {
 /*
         this.setState({
             loading: true
@@ -137,20 +137,25 @@ class QuickActions extends Component {
 */
 
         if (windowType && viewId && selected) {
-            quickActionsRequest(windowType, viewId, selected)
-                .then(response => {
-                    this.setState({
-                        actions: response.data.actions,
-                        loading: false
-                    })
-                })
-                .catch(() => {
-                    this.setState({
-                        loading: false
-                    })
+            try {
+                const response = await quickActionsRequest(
+                    windowType,
+                    viewId,
+                    selected
+                );
+
+                const { actions } = response.data;
+
+                this.setState({
+                    actions,
+                    loading: false
                 });
-        }
-        else {
+            } catch (error) {
+                this.setState({
+                    loading: false
+                });
+            }
+        } else {
             this.setState({
                 loading: false
             });
