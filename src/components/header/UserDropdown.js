@@ -48,11 +48,35 @@ class UserDropdown extends Component {
         }
     }
 
+    getPluginName(plugin) {
+        const { pluginsRegistry } = window.META_HOST_APP;
+
+        if (plugin && pluginsRegistry) {
+            return pluginsRegistry.getTitle(plugin.name);
+        }
+
+        return '';
+    }
+
     render() {
         const {
             open, handleUDOpen, redirect, shortcut, toggleTooltip, tooltipOpen,
             me
         } = this.props;
+
+        const { pluginsRegistry } = window.META_HOST_APP;
+
+        let hasPlugins = false;
+        let plugins = [];
+
+        if (pluginsRegistry) {
+            if (Array.isArray(pluginsRegistry.plugins)) {
+                plugins = pluginsRegistry.plugins;
+            }
+
+            hasPlugins = plugins && (plugins.length > 0);
+        }
+
         return (
             <div
                 className={
@@ -104,6 +128,30 @@ class UserDropdown extends Component {
                             <i className="meta-icon-settings" />
                             {counterpart.translate('window.settings.caption')}
                         </div>
+
+                        {hasPlugins && (
+                            <hr className="context-menu-separator" />
+                        )}
+
+                        {hasPlugins && plugins.map( (plugin, index) => (
+                            <div
+                                key={index}
+                                className="user-dropdown-item"
+                                onClick={() => {
+                                    redirect('/plugin/' + plugin.name);
+                                    handleUDOpen(false);
+                                    toggleTooltip('')}}
+                                tabIndex={0}
+                            >
+                                <i className="meta-icon-link" />
+                                {this.getPluginName(plugin)}
+                            </div>
+                        ))}
+
+                        {hasPlugins && (
+                            <hr className="context-menu-separator" />
+                        )}
+
                         <div
                             className="user-dropdown-item"
                             onClick={() => {redirect('/logout');
