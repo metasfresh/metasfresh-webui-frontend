@@ -198,62 +198,29 @@ class RawWidget extends Component {
             onBlur: e => this.handleBlur(widgetField, e.target.value, id)
         }
 
-        switch(widgetType){
+        switch (widgetType) {
             case 'Date':
-                if(range){
-                    // Watch out! The datetimerange widget as exception,
-                    // is non-controlled input! For further usage, needs
-                    // upgrade.
-                    return (
-                        <DatetimeRange
-                            onChange={(value, valueTo) =>
-                                this.handlePatch(widgetField,
-                                    value ?
-                                        Moment(value).format(DATE_FORMAT) :
-                                        null,
-                                    null,
-                                    valueTo ?
-                                        Moment(valueTo).format(DATE_FORMAT) :
-                                        null
-                                )
-                            }
-                            mandatory={widgetData[0].mandatory}
-                            validStatus={widgetData[0].validStatus}
-                            onShow={onShow}
-                            onHide={onHide}
-                            value={widgetData[0].value}
-                            valueTo={widgetData[0].valueTo}
-                            tabIndex={fullScreen ? -1 : tabIndex}
-                         />
-                    )
-                }else{
-                    return (
-                        <div className={this.getClassNames({ icon: true })}>
-                            <DatePicker
-                                timeFormat={false}
-                                dateFormat={true}
-                                inputProps={{
-                                    placeholder: fields[0].emptyText,
-                                    disabled:
-                                        widgetData[0].readonly || disabled,
-                                    tabIndex: fullScreen ? -1 : tabIndex
-                                }}
-                                value={widgetValue}
-                                onChange={(date) =>
-                                    handleChange(widgetField, date)}
-                                patch={(date) => this.handlePatch(
-                                    widgetField,
-                                    date ?
-                                        Moment(date).format(DATE_FORMAT) : null
-                                )}
-                                handleBackdropLock={handleBackdropLock}
-                            />
-                            <i
-                                className="meta-icon-calendar input-icon-right"
-                            />
-                        </div>
-                    )
-                }
+                return (
+                    <div className={this.getClassNames({ icon: true })}>
+                        <DatePicker
+                            timeFormat={false}
+                            dateFormat
+                            inputProps={{
+                                placeholder: fields[0].emptyText,
+                                disabled: widgetData[0].readonly || disabled,
+                                tabIndex: fullScreen ? -1 : tabIndex
+                            }}
+                            value={widgetValue}
+                            onChange={date => handleChange(widgetField, date)}
+                            patch={date => this.handlePatch(
+                                widgetField,
+                                date ? Moment(date).format(DATE_FORMAT) : null
+                            )}
+                            handleBackdropLock={handleBackdropLock}
+                        />
+                        <i className="meta-icon-calendar input-icon-right" />
+                    </div>
+                );
             case 'DateTime':
                 if(range){
                     // Watch out! The datetimerange widget as exception,
