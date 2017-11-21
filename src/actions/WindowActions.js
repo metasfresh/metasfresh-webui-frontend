@@ -449,6 +449,9 @@ export function initWindow(windowType, docId, tabId, rowId = null, isAdvanced) {
     }
 }
 
+const LANGUAGE_ENTITY = 'window',
+    LANGUAGE_WINDOW_TYPE = 53100,
+    LANGUAGE_PROPERTY = 'AD_Language';
 /*
  *  Wrapper for patch request of widget elements
  *  when responses should merge store
@@ -476,7 +479,29 @@ export function patch(
                 response.data, isModal, rowId, id, windowType, isAdvanced
             ));
 
-            dispatch(indicatorState('saved'));
+            // reinitialize layout if language is changed
+            if (entity === LANGUAGE_ENTITY &&
+                parseInt(windowType) === LANGUAGE_WINDOW_TYPE &&
+                property === LANGUAGE_PROPERTY
+            ) {
+                initLayout(
+                    'window', windowType, tabId, null, null, isAdvanced
+                ).then(response =>
+                    dispatch(initLayoutSuccess(
+                        response.data, getScope(isModal)
+                    ))
+                ).then(response => {
+                    if (!isModal) {
+                        dispatch(initTabs(
+                            response.layout.tabs, windowType, id, isModal
+                        ))
+                    }
+
+                    dispatch(indicatorState('saved'));
+                })
+            } else {
+                dispatch(indicatorState('saved'));
+            }
 
             return response.data;
         }).catch(() => {
