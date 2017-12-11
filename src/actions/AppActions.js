@@ -176,6 +176,7 @@ export function loginSuccess(auth) {
 
         getUserSession().then(session => {
             dispatch(userSessionInit(session.data));
+
             languageSuccess(Object.keys(session.data.language)[0]);
             initNumeralLocales(
               Object.keys(session.data.language)[0],
@@ -184,11 +185,15 @@ export function loginSuccess(auth) {
 
             auth.initSessionClient(session.data.websocketEndpoint, msg => {
                 const me = JSON.parse(msg.body);
+
                 dispatch(userSessionUpdate(me));
-                me.language && languageSuccess(Object.keys(me.language)[0]);
+
+                me.language && languageSuccess(
+                    Object.keys(me.language)[0]
+                );
+
                 me.locale && initNumeralLocales(
-                  Object.keys(me.language)[0],
-                  me.locale,
+                    Object.keys(me.language)[0], me.locale
                 );
 
                 getNotifications().then(response => {
@@ -270,6 +275,7 @@ function initNumeralLocales (lang, locale) {
 
 export function languageSuccess(lang) {
     localStorage.setItem(LOCAL_LANG, lang);
+
     Moment.locale(lang);
 
     axios.defaults.headers.common['Accept-Language'] = lang;
@@ -394,4 +400,52 @@ export function userSessionUpdate(me) {
         type: types.USER_SESSION_UPDATE,
         me
     }
+}
+
+function traverseRenderedChildren(internalInstance, callback, argument) {
+    callback(internalInstance, argument);
+
+    if (internalInstance._renderedComponent) {
+        traverseRenderedChildren(
+            internalInstance._renderedComponent,
+            callback,
+            argument
+        );
+    } else {
+        for (let key in internalInstance._renderedChildren) {
+            if (internalInstance._renderedChildren.hasOwnProperty(key)) {
+                traverseRenderedChildren(
+                    internalInstance._renderedChildren[key],
+                    callback,
+                    argument
+                );
+            }
+        }
+    }
+}
+
+function setPendingForceUpdate(internalInstance) {
+    if (internalInstance._pendingForceUpdate === false) {
+        internalInstance._pendingForceUpdate = true;
+    }
+}
+
+function forceUpdateIfPending(internalInstance) {
+    if (internalInstance._pendingForceUpdate === true) {
+        const publicInstance = internalInstance._instance;
+        const { updater } = publicInstance;
+
+        if (typeof publicInstance.forceUpdate === 'function') {
+            publicInstance.forceUpdate();
+        }
+        else if (updater && typeof updater.enqueueForceUpdate === 'function') {
+            updater.enqueueForceUpdate(publicInstance);
+        }
+    }
+}
+
+export function deepForceUpdate(instance) {
+    const internalInstance = instance._reactInternalInstance;
+    traverseRenderedChildren(internalInstance, setPendingForceUpdate);
+    traverseRenderedChildren(internalInstance, forceUpdateIfPending);
 }

@@ -1,0 +1,9 @@
+export const LOAD = 'LOAD';
+export const UNLOAD = 'UNLOAD';
+export const MOUNT = 'MOUNT';
+export const UNMOUNT = 'UNMOUNT';
+export const REFRESH = 'REFRESH';
+export const GET_TITLE = 'GET_TITLE';
+export const GET_BREADCRUMBS = 'GET_BREADCRUMBS';
+export const GET_ENABLED = 'GET_ENABLED';
+export const SEND_EVENT = 'SEND_EVENT';
