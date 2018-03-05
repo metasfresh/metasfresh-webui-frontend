@@ -356,7 +356,6 @@ class RawList extends PureComponent {
             'input-dropdown-list-option-key-on': selectedRow,
           }
         )}
-        onMouseEnter={() => this.handleSwitch(option)}
         onClick={() => this.handleSelect(option)}
         {...props}
       >
