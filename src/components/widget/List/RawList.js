@@ -1,5 +1,6 @@
 import React, { PureComponent, Fragment } from 'react';
 import { List } from 'immutable';
+import onClickOutside from 'react-onclickoutside';
 import TetherComponent from 'react-tether';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
@@ -121,35 +122,6 @@ class RawList extends PureComponent {
     });
   }
 
-  handleOpenDropdown = () => {
-    const { handleClickOutside } = this;
-    const { onOpenDropdown, onFocus } = this.props;
-
-    onOpenDropdown();
-    onFocus();
-
-    // Delay attaching so it doesn't fire immediately
-    requestAnimationFrame(() => {
-      window.addEventListener('click', handleClickOutside);
-    });
-  };
-
-  handleCloseDropdown = () => {
-    const { handleClickOutside } = this;
-    const { selected, onCloseDropdown, onBlur } = this.props;
-
-    this.setState(
-      {
-        selected: selected || null,
-      },
-      () => {
-        onCloseDropdown();
-        onBlur();
-        window.removeEventListener('click', handleClickOutside);
-      }
-    );
-  };
-
   scrollIntoView = () => {
     const { list, selected } = this;
 
@@ -158,9 +130,7 @@ class RawList extends PureComponent {
     }
 
     const { direction } = this.state;
-
     const { top: topMax, bottom: bottomMax } = list.getBoundingClientRect();
-
     const { top, bottom } = selected.getBoundingClientRect();
 
     if (top < topMax || bottom > bottomMax) {
@@ -174,8 +144,7 @@ class RawList extends PureComponent {
     }
 
     const { top } = this.list.getBoundingClientRect();
-    const { handleCloseDropdown } = this;
-    const { filter, isToggled } = this.props;
+    const { filter, isToggled, onCloseDropdown } = this.props;
 
     if (
       isToggled &&
@@ -183,8 +152,29 @@ class RawList extends PureComponent {
       (top + 20 > filter.boundingRect.bottom ||
         top - 20 < filter.boundingRect.top)
     ) {
-      handleCloseDropdown();
+      onCloseDropdown();
     }
+  };
+
+  handleOpenDropdown = () => {
+    const { onOpenDropdown } = this.props;
+
+    this.dropdown.focus();
+    onOpenDropdown();
+  };
+
+  handleCloseDropdown = () => {
+    const { selected, onCloseDropdown, onBlur } = this.props;
+
+    this.setState(
+      {
+        selected: selected || null,
+      },
+      () => {
+        onCloseDropdown();
+        onBlur();
+      }
+    );
   };
 
   handleClickOutside = event => {
@@ -211,6 +201,13 @@ class RawList extends PureComponent {
     }
   };
 
+  handleBlur() {
+    const { onBlur } = this.props;
+
+    this.dropdown.blur();
+    onBlur();
+  }
+
   /*
    * Alternative method to open dropdown, in case of disabled opening
    * on focus.
@@ -227,8 +224,7 @@ class RawList extends PureComponent {
   };
 
   handleSelect = selected => {
-    const { handleCloseDropdown } = this;
-    const { onSelect } = this.props;
+    const { onSelect, onCloseDropdown } = this.props;
 
     this.setState(
       {
@@ -240,8 +236,7 @@ class RawList extends PureComponent {
         } else {
           onSelect(selected);
         }
-        // this used to only close the dropdown, without blur
-        handleCloseDropdown();
+        onCloseDropdown();
       }
     );
   };
@@ -253,15 +248,15 @@ class RawList extends PureComponent {
   };
 
   handleKeyDown = event => {
+    const { handleSelect, navigate } = this;
     const {
-      handleOpenDropdown,
-      handleCloseDropdown,
-      handleSelect,
-      navigate,
-    } = this;
-
-    const { onSelect, list, readonly, isToggled } = this.props;
-
+      onSelect,
+      list,
+      readonly,
+      isToggled,
+      onCloseDropdown,
+      onOpenDropdown,
+    } = this.props;
     const { selected } = this.state;
 
     if (event.keyCode > 47 && event.keyCode < 123) {
@@ -273,18 +268,15 @@ class RawList extends PureComponent {
           this.navigate(true);
 
           break;
-
         case 'ArrowDown':
           event.preventDefault();
 
           if (!isToggled) {
-            handleOpenDropdown();
+            onOpenDropdown();
           } else {
             navigate(false);
           }
-
           break;
-
         case 'Enter':
           event.preventDefault();
 
@@ -297,46 +289,32 @@ class RawList extends PureComponent {
           } else {
             onSelect(null);
           }
-
           break;
-
         case 'Escape':
           event.preventDefault();
 
-          // this used to only close the dropdown, without blur
           this.handleSwitch(null);
-          // onCloseDropdown();
-          handleCloseDropdown();
+          onCloseDropdown();
           break;
-
         case 'Tab':
           list.size === 0 && !readonly && onSelect(null);
-
           break;
       }
     }
   };
 
   handleTab = event => {
-    const { handleCloseDropdown } = this;
-    const { isToggled, isFocused } = this.props;
+    const { isToggled, isFocused, onCloseDropdown } = this.props;
 
     if (event.key === 'Tab' && isFocused) {
       if (isToggled) {
         event.preventDefault();
-        handleCloseDropdown();
+        onCloseDropdown();
       } else {
         this.handleBlur();
       }
     }
   };
-
-  handleBlur() {
-    const { onBlur } = this.props;
-
-    this.dropdown.blur();
-    onBlur();
-  }
 
   navigateToAlphanumeric = char => {
     const { handleOpenDropdown } = this;
@@ -414,6 +392,7 @@ class RawList extends PureComponent {
           }
         )}
         onClick={() => this.handleSelect(option)}
+        onMouseEnter={() => this.handleSwitch(option)}
         {...props}
       >
         <p className="input-dropdown-item-title">{option.caption}</p>
@@ -584,4 +563,4 @@ RawList.propTypes = {
   onCloseDropdown: PropTypes.func.isRequired,
 };
 
-export default RawList;
+export default onClickOutside(RawList);
