@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, Fragment } from 'react';
 import { List } from 'immutable';
 import onClickOutside from 'react-onclickoutside';
 import TetherComponent from 'react-tether';
@@ -6,6 +6,9 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
 import RawListDropdown from './RawListDropdown';
+
+const UP = Symbol('up');
+const DOWN = Symbol('down');
 
 const setSelectedValue = function(dropdownList, selected) {
   const changedValues = {};
@@ -34,6 +37,7 @@ class RawList extends PureComponent {
 
     this.state = {
       selected: props.selected || null,
+      direction: null,
       dropdownList: props.list,
     };
   }
@@ -111,19 +115,37 @@ class RawList extends PureComponent {
       );
     }
 
-    this.checkIfDropDownListOutOfFilter();
+    // Delaying with requestAnimationFrame is needed to get the latest ref
+    requestAnimationFrame(() => {
+      this.checkIfDropDownListOutOfFilter();
+      this.scrollIntoView();
+    });
   }
 
-  checkIfDropDownListOutOfFilter = () => {
-    if (
-      !this.tetheredList ||
-      (this.tetheredList && !this.tetheredList.getBoundingClientRect)
-    ) {
+  scrollIntoView = () => {
+    const { list, selected } = this;
+
+    if (!list || !selected) {
       return;
     }
 
-    const { top } = this.tetheredList.getBoundingClientRect();
+    const { direction } = this.state;
+    const { top: topMax, bottom: bottomMax } = list.getBoundingClientRect();
+    const { top, bottom } = selected.getBoundingClientRect();
+
+    if (top < topMax || bottom > bottomMax) {
+      selected.scrollIntoView(direction === UP ? true : false);
+    }
+  };
+
+  checkIfDropDownListOutOfFilter = () => {
+    if (!this.list) {
+      return;
+    }
+
+    const { top } = this.list.getBoundingClientRect();
     const { filter, isToggled, onCloseDropdown } = this.props;
+
     if (
       isToggled &&
       filter.visible &&
@@ -134,20 +156,56 @@ class RawList extends PureComponent {
     }
   };
 
-  handleClickOutside() {
-    const { isToggled, onCloseDropdown, onBlur, selected } = this.props;
+  handleOpenDropdown = () => {
+    const { onOpenDropdown } = this.props;
+
+    this.dropdown.focus();
+    onOpenDropdown();
+  };
+
+  handleCloseDropdown = () => {
+    const { selected, onCloseDropdown, onBlur } = this.props;
+
+    this.setState(
+      {
+        selected: selected || null,
+      },
+      () => {
+        onCloseDropdown();
+        onBlur();
+      }
+    );
+  };
+
+  handleClickOutside = event => {
+    const { list, handleCloseDropdown } = this;
+    const { isToggled } = this.props;
+
+    if (!list || !isToggled) {
+      return;
+    }
+
+    const { top, right, bottom, left } = list.getBoundingClientRect();
+
+    if (
+      event.clientX >= left &&
+      event.clientX <= right &&
+      event.clientY >= top &&
+      event.clientY <= bottom
+    ) {
+      return;
+    }
 
     if (isToggled) {
-      this.setState(
-        {
-          selected: selected || null,
-        },
-        () => {
-          onCloseDropdown();
-          onBlur();
-        }
-      );
+      handleCloseDropdown();
     }
+  };
+
+  handleBlur() {
+    const { onBlur } = this.props;
+
+    this.dropdown.blur();
+    onBlur();
   }
 
   /*
@@ -155,10 +213,14 @@ class RawList extends PureComponent {
    * on focus.
    */
   handleClick = () => {
-    const { onOpenDropdown } = this.props;
+    const { handleOpenDropdown } = this;
+    const { isToggled } = this.props;
 
-    this.dropdown.focus();
-    onOpenDropdown();
+    if (isToggled) {
+      return;
+    }
+
+    handleOpenDropdown();
   };
 
   handleSelect = selected => {
@@ -185,48 +247,51 @@ class RawList extends PureComponent {
     });
   };
 
-  handleKeyDown = e => {
+  handleKeyDown = event => {
+    const { handleSelect, navigate } = this;
     const {
       onSelect,
       list,
       readonly,
       isToggled,
-      onOpenDropdown,
       onCloseDropdown,
+      onOpenDropdown,
     } = this.props;
     const { selected } = this.state;
 
-    if (e.keyCode > 47 && e.keyCode < 123) {
-      this.navigateToAlphanumeric(e.key);
+    if (event.keyCode > 47 && event.keyCode < 123) {
+      this.navigateToAlphanumeric(event.key);
     } else {
-      switch (e.key) {
+      switch (event.key) {
         case 'ArrowUp':
-          e.preventDefault();
-          this.navigate(false);
+          event.preventDefault();
+          this.navigate(true);
+
           break;
         case 'ArrowDown':
-          e.preventDefault();
+          event.preventDefault();
+
           if (!isToggled) {
             onOpenDropdown();
           } else {
-            this.navigate(true);
+            navigate(false);
           }
           break;
         case 'Enter':
-          e.preventDefault();
+          event.preventDefault();
 
           if (isToggled) {
-            e.stopPropagation();
+            event.stopPropagation();
           }
 
           if (selected) {
-            this.handleSelect(selected);
+            handleSelect(selected);
           } else {
             onSelect(null);
           }
           break;
         case 'Escape':
-          e.preventDefault();
+          event.preventDefault();
 
           this.handleSwitch(null);
           onCloseDropdown();
@@ -238,12 +303,12 @@ class RawList extends PureComponent {
     }
   };
 
-  handleTab = e => {
+  handleTab = event => {
     const { isToggled, isFocused, onCloseDropdown } = this.props;
 
-    if (e.key === 'Tab' && isFocused) {
+    if (event.key === 'Tab' && isFocused) {
       if (isToggled) {
-        e.preventDefault();
+        event.preventDefault();
         onCloseDropdown();
       } else {
         this.handleBlur();
@@ -251,20 +316,13 @@ class RawList extends PureComponent {
     }
   };
 
-  handleBlur() {
-    const { onBlur } = this.props;
-
-    this.dropdown.blur();
-    onBlur();
-  }
-
   navigateToAlphanumeric = char => {
-    const { isToggled, onOpenDropdown } = this.props;
+    const { handleOpenDropdown } = this;
+    const { isToggled } = this.props;
     const { selected, dropdownList } = this.state;
 
     if (!isToggled) {
-      this.dropdown.focus();
-      onOpenDropdown();
+      handleOpenDropdown();
     }
 
     const items = dropdownList.filter(
@@ -283,25 +341,26 @@ class RawList extends PureComponent {
   };
 
   navigate = up => {
-    const { isToggled, onOpenDropdown } = this.props;
+    const { handleOpenDropdown } = this;
+    const { isToggled } = this.props;
     const { selected, dropdownList } = this.state;
 
     if (!isToggled) {
-      this.dropdown.focus();
-      onOpenDropdown();
+      handleOpenDropdown();
     }
 
     const selectedIndex = dropdownList.findIndex(
       item => item.caption === selected.caption
     );
 
-    const next = up ? selectedIndex + 1 : selectedIndex - 1;
+    const next = up ? selectedIndex - 1 : selectedIndex + 1;
 
     this.setState({
       selected:
         next >= 0 && next <= dropdownList.size - 1
           ? dropdownList.get(next)
           : selected,
+      direction: up ? UP : DOWN,
     });
   };
 
@@ -317,6 +376,12 @@ class RawList extends PureComponent {
       selectedRow = true;
     }
 
+    const props = {};
+
+    if (selectedRow) {
+      props.ref = ref => (this.selected = ref);
+    }
+
     return (
       <div
         key={option.key}
@@ -326,8 +391,9 @@ class RawList extends PureComponent {
             'input-dropdown-list-option-key-on': selectedRow,
           }
         )}
-        onMouseEnter={() => this.handleSwitch(option)}
         onClick={() => this.handleSelect(option)}
+        onMouseEnter={() => this.handleSwitch(option)}
+        {...props}
       >
         <p className="input-dropdown-item-title">{option.caption}</p>
       </div>
@@ -337,7 +403,7 @@ class RawList extends PureComponent {
   renderOptions = () => {
     const { dropdownList } = this.state;
 
-    return <div>{dropdownList.map(this.getRow)}</div>;
+    return <Fragment>{dropdownList.map(this.getRow)}</Fragment>;
   };
 
   render() {
@@ -450,7 +516,7 @@ class RawList extends PureComponent {
           {isFocused &&
             isToggled && (
               <RawListDropdown
-                ref={c => (this.tetheredList = c)}
+                childRef={ref => (this.list = ref)}
                 isListEmpty={isListEmpty}
                 offsetWidth={this.dropdown.offsetWidth}
                 loading={loading}
