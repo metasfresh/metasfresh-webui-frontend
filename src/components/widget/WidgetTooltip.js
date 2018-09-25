@@ -13,7 +13,6 @@ class WidgetTooltip extends PureComponent {
    */
   handleClick = () => {
     const { onToggle } = this.props;
-\
     onToggle();
   };
 
