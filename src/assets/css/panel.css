@@ -40,13 +40,42 @@
 .panel-distance {
     margin-top: 1.25rem;
     margin-bottom: 1.25rem;
+    transition: margin .5s ease-in-out;
+    position: relative;
+
+    &.collapsed {
+        padding: 1rem 1.25rem;
+        transition: padding .5s ease-in-out;
+
+        .foo {
+            height: 0;
+            // overflow: hidden;
+            transition: height .5s ease-in-out;
+        }
+    }
+
+    .foo {
+        height: auto;
+        transition: height .5s ease-in-out;
+    }
+
+    &.panel-secondary {
+        margin: 0;
+    }
+
+    .panel-size-button {
+        display: block;
+        width: 24px;
+        height: 24px;
+        position: absolute;
+        padding: 0;
+        top: 0;
+        right: 0;
+        z-index: 1000;
+    }
 }
 .row:first-child .panel-distance:first-child {
     margin-top: 2.25rem;
-}
-
-.panel-distance.panel-secondary {
-    margin: 0;
 }
 
 .row:first-child .panel-distance.panel-secondary:first-child {

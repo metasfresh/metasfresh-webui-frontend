@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import ReactDOM from 'react-dom';
+import classnames from 'classnames';
 
 import Table from '../components/table/Table';
 import Tabs from '../components/tabs/Tabs';
@@ -14,6 +15,7 @@ class Window extends PureComponent {
     this.state = {
       fullScreen: null,
       dragActive: false,
+      collapsedPanels: {},
     };
 
     if (props.isModal) {
@@ -132,6 +134,7 @@ class Window extends PureComponent {
     return group.map((elem, id) => {
       const { type, elementsLine } = elem;
       const shouldBeFocused = isFirst && id === 0;
+      const panelCollapsed = this.panelCollapsed(id);
 
       const tabIndex =
         type === 'primary'
@@ -148,18 +151,44 @@ class Window extends PureComponent {
               if (isModal && shouldBeFocused && c) c.focus();
               this.focused = true;
             }}
-            className={
-              'panel panel-spaced panel-distance ' +
-              (type === 'primary'
-                ? 'panel-bordered panel-primary'
-                : 'panel-secondary')
-            }
+            className={classnames('panel panel-spaced panel-distance', {
+              'panel-bordered panel-primary': type === 'primary',
+              'panel-secondary': type !== 'primary',
+              collapsed: panelCollapsed,
+            })}
           >
+            <div className="panel-size-button">
+              <button
+                className={classnames(
+                  'btn btn-meta-outline-secondary btn-sm ignore-react-onclickoutside',
+                  {
+                    'meta-icon-show': !panelCollapsed,
+                    'meta-icon-hide': panelCollapsed,
+                  }
+                )}
+                onClick={() => this.togglePanel(id)}
+              />
+            </div>
+            <div className="foo">
             {this.renderElementsLine(elementsLine, tabIndex, shouldBeFocused)}
+            </div>
           </div>
         )
       );
     });
+  };
+
+  togglePanel = id => {
+    this.setState({
+      collapsedPanels: {
+        ...this.state.collapsedPanels,
+        [`${id}`]: !this.state.collapsedPanels[id],
+      },
+    });
+  };
+
+  panelCollapsed = id => {
+    return this.state.collapsedPanels[id];
   };
 
   renderElementsLine = (elementsLine, tabIndex, shouldBeFocused) => {
