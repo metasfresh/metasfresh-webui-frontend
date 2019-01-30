@@ -118,24 +118,25 @@ class Window extends PureComponent {
   renderColumns = (columns, isSectionFirst) => {
     const maxRows = 12;
     const colWidth = Math.floor(maxRows / columns.length);
-    return columns.map((elem, id) => {
-      const isFirst = id === 0 && isSectionFirst;
+
+    return columns.map((elem, idx) => {
+      const isFirst = idx === 0 && isSectionFirst;
       const elementGroups = elem.elementGroups;
       return (
-        <div className={'col-sm-' + colWidth} key={'col' + id}>
-          {elementGroups && this.renderElementGroups(elementGroups, isFirst)}
+        <div className={'col-sm-' + colWidth} key={'col' + idx}>
+          {elementGroups &&
+            this.renderElementGroups(elementGroups, idx, isFirst)}
         </div>
       );
     });
   };
 
-  renderElementGroups = (group, isFirst) => {
+  renderElementGroups = (group, columnIdx, isFirst) => {
     const { isModal } = this.props;
-    return group.map((elem, id) => {
+    return group.map((elem, idx) => {
       const { type, elementsLine } = elem;
-      const shouldBeFocused = isFirst && id === 0;
-      const panelCollapsed = this.panelCollapsed(id);
-
+      const shouldBeFocused = isFirst && idx === 0;
+      const panelCollapsed = this.panelCollapsed(idx, columnIdx);
       const tabIndex =
         type === 'primary'
           ? this.tabIndex.firstColumn
@@ -144,19 +145,7 @@ class Window extends PureComponent {
       return (
         elementsLine &&
         elementsLine.length > 0 && (
-          <div
-            key={'elemGroups' + id}
-            ref={c => {
-              if (this.focused) return;
-              if (isModal && shouldBeFocused && c) c.focus();
-              this.focused = true;
-            }}
-            className={classnames('panel panel-spaced panel-distance', {
-              'panel-bordered panel-primary': type === 'primary',
-              'panel-secondary': type !== 'primary',
-              collapsed: panelCollapsed,
-            })}
-          >
+          <div className="collapsible-group">
             <div className="panel-size-button">
               <button
                 className={classnames(
@@ -166,11 +155,37 @@ class Window extends PureComponent {
                     'meta-icon-hide': panelCollapsed,
                   }
                 )}
-                onClick={() => this.togglePanel(id)}
+                onClick={() => this.togglePanel(idx, columnIdx)}
               />
             </div>
-            <div className="foo">
-            {this.renderElementsLine(elementsLine, tabIndex, shouldBeFocused)}
+            <div
+              key={'elemGroups' + idx}
+              ref={c => {
+                if (this.focused) return;
+                if (isModal && shouldBeFocused && c) c.focus();
+                this.focused = true;
+              }}
+              className={classnames('panel panel-spaced panel-distance', {
+                'panel-bordered panel-primary': type === 'primary',
+                'panel-secondary': type !== 'primary',
+                collapsed: panelCollapsed,
+              })}
+            >
+{/*              <div className="panel-size-button">
+                <button
+                  className={classnames(
+                    'btn btn-meta-outline-secondary btn-sm ignore-react-onclickoutside',
+                    {
+                      'meta-icon-show': !panelCollapsed,
+                      'meta-icon-hide': panelCollapsed,
+                    }
+                  )}
+                  onClick={() => this.togglePanel(id)}
+                />
+              </div>*/}
+   {/*           <div className="foo">*/}
+              {this.renderElementsLine(elementsLine, tabIndex, shouldBeFocused)}
+  {/*            </div>*/}
             </div>
           </div>
         )
@@ -178,17 +193,19 @@ class Window extends PureComponent {
     });
   };
 
-  togglePanel = id => {
+  togglePanel = (idx, columnIdx) => {
     this.setState({
       collapsedPanels: {
         ...this.state.collapsedPanels,
-        [`${id}`]: !this.state.collapsedPanels[id],
+        [`${columnIdx}-${idx}`]: !this.state.collapsedPanels[
+          `${columnIdx}-${idx}`
+        ],
       },
     });
   };
 
-  panelCollapsed = id => {
-    return this.state.collapsedPanels[id];
+  panelCollapsed = (idx, columnIdx) => {
+    return this.state.collapsedPanels[`${columnIdx}-${idx}`];
   };
 
   renderElementsLine = (elementsLine, tabIndex, shouldBeFocused) => {

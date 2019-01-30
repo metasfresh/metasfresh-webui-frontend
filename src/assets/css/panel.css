@@ -33,6 +33,46 @@
 }
 /*}*/
 
+.collapsible-group {
+    position: relative;
+
+    .panel-size-button {
+        display: block;
+        width: auto;
+        height: auto;
+        position: absolute;
+        padding: 0;
+        top: 0;
+        right: 0;
+        z-index: 1000;
+
+        .btn {
+            padding: .125rem .25rem;
+            line-height: 1rem;
+        }
+    }
+
+    .panel {
+        transition: height, padding .25s ease-in-out;
+
+        &.collapsed {
+            height: 0;
+            padding: .75em;
+            overflow: hidden;
+            transition: height, padding .25s ease-in-out;
+
+            * {
+                visibility: hidden;
+                transition: visibility .25s ease-in-out;
+            }
+        }
+
+        * {
+            transition: visibility .25s ease-in-out;
+        }
+    }
+}
+
 .panel-modal-primary {
     background-color: #F8FAFB;
 }
@@ -42,38 +82,8 @@
     margin-bottom: 1.25rem;
     transition: margin .5s ease-in-out;
     position: relative;
-
-    &.collapsed {
-        padding: 1rem 1.25rem;
-        transition: padding .5s ease-in-out;
-
-        .foo {
-            height: 0;
-            // overflow: hidden;
-            transition: height .5s ease-in-out;
-        }
-    }
-
-    .foo {
-        height: auto;
-        transition: height .5s ease-in-out;
-    }
-
-    &.panel-secondary {
-        margin: 0;
-    }
-
-    .panel-size-button {
-        display: block;
-        width: 24px;
-        height: 24px;
-        position: absolute;
-        padding: 0;
-        top: 0;
-        right: 0;
-        z-index: 1000;
-    }
 }
+
 .row:first-child .panel-distance:first-child {
     margin-top: 2.25rem;
 }
