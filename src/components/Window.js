@@ -171,21 +171,7 @@ class Window extends PureComponent {
                 collapsed: panelCollapsed,
               })}
             >
-{/*              <div className="panel-size-button">
-                <button
-                  className={classnames(
-                    'btn btn-meta-outline-secondary btn-sm ignore-react-onclickoutside',
-                    {
-                      'meta-icon-show': !panelCollapsed,
-                      'meta-icon-hide': panelCollapsed,
-                    }
-                  )}
-                  onClick={() => this.togglePanel(id)}
-                />
-              </div>*/}
-   {/*           <div className="foo">*/}
               {this.renderElementsLine(elementsLine, tabIndex, shouldBeFocused)}
-  {/*            </div>*/}
             </div>
           </div>
         )
