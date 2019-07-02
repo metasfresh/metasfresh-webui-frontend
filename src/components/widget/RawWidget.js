@@ -21,6 +21,7 @@ import Labels from './Labels';
 import Link from './Link';
 import List from './List/List';
 import Lookup from './Lookup/Lookup';
+import { NumberInput } from '../helpers/NumberInput';
 
 export class RawWidget extends Component {
   constructor(props) {
@@ -130,16 +131,6 @@ export class RawWidget extends Component {
   handlePatch = (property, value, id, valueTo, isForce) => {
     const { handlePatch, widgetData } = this.props;
     const willPatch = this.willPatch(property, value, valueTo);
-    //1
-    let fieldData = widgetData.find(widget => widget.field === property);
-
-    //for using comma in Price Fields, input needs to be text
-    //because we want that text to contain only numbers, comma and dot, we use regex for checking that
-    //when patching to redux we look for widget type and most important thing to be number if
-    //widget is CostPrice
-    const isCostPriceWidget = fieldData.widgetType === 'CostPrice';
-    const isDecimalValue = /[0-9]+([.,][0-9]+)?/.test(value);
-    const requiresCommaFix = isCostPriceWidget && isDecimalValue;
 
     // Do patch only when value is not equal state
     // or cache is set and it is not equal value
@@ -149,9 +140,14 @@ export class RawWidget extends Component {
         clearedFieldWarning: false,
       });
 
+      // When patching to redux we look for widget type and most important thing
+      // to be number if widget is CostPrice
+      const fieldData = widgetData.find(widget => widget.field === property);
+      const isCostPriceWidget = fieldData.widgetType === 'CostPrice';
+
       return handlePatch(
         property,
-        requiresCommaFix ? value.replace(',', '.') : value,
+        isCostPriceWidget ? value.replace(',', '.') : value,
         id,
         valueTo
       );
@@ -661,7 +657,7 @@ export class RawWidget extends Component {
               'input-focused': isEdited,
             })}
           >
-            <input {...widgetProperties} type="text" />
+            <NumberInput inputProps={widgetProperties} />
           </div>
         );
       case 'YesNo':
