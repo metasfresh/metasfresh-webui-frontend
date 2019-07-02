@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-const FLOAT_NUMBER_REGEX_FORMAT = /^[0-9]+[.,]*[0-9]*$/;
+const FLOAT_NUMBER_REGEX_FORMAT = /^-?[0-9]+[.,]?[0-9]*$/;
 
 // Helper component to be used for widget with type 'CostPrice' where input needs to be text.
 // Because we want that text to contain only numbers, comma and dot, we use regex for checking that
@@ -10,11 +10,13 @@ const FLOAT_NUMBER_REGEX_FORMAT = /^[0-9]+[.,]*[0-9]*$/;
 export class NumberInput extends Component {
   state = {
     inputValue: '',
+    initDone: false,
   };
 
   static getDerivedStateFromProps(props, state) {
-    if (props.inputProps.value && !state.inputValue) {
+    if (props.inputProps.value && !state.initDone) {
       return {
+        initDone: true,
         inputValue: props.inputProps.value,
       };
     }
