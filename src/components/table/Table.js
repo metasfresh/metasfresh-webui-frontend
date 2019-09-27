@@ -79,6 +79,7 @@ class Table extends Component {
       tabId,
       isModal,
       hasIncluded,
+      page,
     } = this.props;
     const { selected, rows } = this.state;
     const selectedEqual = _.isEqual(prevState.selected, selected);
@@ -92,6 +93,11 @@ class Table extends Component {
     }
 
     if (rows && !_.isEqual(prevState.rows, rows)) {
+      this.setState({
+        collapsedRows: [],
+        collapsedParentsRows: [],
+      });
+
       if (isModal && !hasIncluded) {
         let firstRow = rows[0];
 
@@ -105,6 +111,11 @@ class Table extends Component {
           }
         }
       }
+    } else if (page !== prevProps.page) {
+      this.setState({
+        collapsedRows: [],
+        collapsedParentsRows: [],
+      });
     }
 
     if (mainTable && open) {
@@ -134,8 +145,15 @@ class Table extends Component {
         this.setState({ selected: [] });
       }
 
+      this.setState({
+        collapsedRows: [],
+        collapsedParentsRows: [],
+      });
+
       const firstLoad =
-        prevProps.rowData.get(`${tabId}`).size && rowData.get(`${tabId}`).size
+        prevProps.rowData.get(`${tabId}`) &&
+        prevProps.rowData.get(`${tabId}`).size &&
+        rowData.get(`${tabId}`).size
           ? false
           : true;
 
@@ -206,8 +224,9 @@ class Table extends Component {
     const { selected } = this.state;
     let rowsData = [];
 
-    if (indentSupported && rowData.get(`${tabId}`).size) {
+    if (indentSupported && rowData.get(`${tabId}`).length) {
       rowsData = getRowsData(rowData.get(`${tabId}`));
+
       let stateChange = {
         rows: rowsData,
         pendingInit: !rowsData,
@@ -224,6 +243,7 @@ class Table extends Component {
       this.setState(stateChange, () => {
         const { rows } = this.state;
         const firstRow = rows[0];
+
         let updatedParentsRows = [...this.state.collapsedParentsRows];
         let updatedRows = [...this.state.collapsedRows];
 
@@ -247,7 +267,7 @@ class Table extends Component {
 
         let mapCollapsed = [];
 
-        if (collapsible && rows && rows.length && selectFirst) {
+        if (collapsible && rows && rows.length) {
           rows.map(row => {
             if (row.indent.length >= expandedDepth && row.includedDocuments) {
               mapCollapsed = mapCollapsed.concat(collapsedMap(row));
@@ -277,8 +297,8 @@ class Table extends Component {
       });
     } else {
       rowsData =
-        rowData.get(`${tabId}`) && rowData.get(`${tabId}`).size
-          ? rowData.get(`${tabId}`).toArray()
+        rowData.get(`${tabId}`) && rowData.get(`${tabId}`).length
+          ? rowData.get(`${tabId}`)
           : [];
 
       this.setState({

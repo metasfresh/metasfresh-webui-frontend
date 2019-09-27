@@ -8,12 +8,15 @@ import currentDevice from 'current-device';
 
 import {
   getViewLayout,
-  browseViewRequest,
+  // browseViewRequest,
   createViewRequest,
   deleteStaticFilter,
   filterViewRequest,
   getViewRowsByIds,
 } from '../../api';
+
+import { fetchDocument } from '../../actions/DataFetching';
+
 import {
   closeListIncludedView,
   setListId,
@@ -79,14 +82,13 @@ export class DocumentList extends Component {
       toggleWidth: 0,
       viewId: defaultViewId,
       page: defaultPage || 1,
-      sort: defaultSort,
+      // sort: defaultSort,
       filtersActive: Map(),
       initialValuesNulled: Map(),
       clickOutsideLock: false,
       isShowIncluded: false,
       hasShowIncluded: false,
       triggerSpinner: true,
-      rowDataMap: Map({ 1: List() }),
 
       // in some scenarios we don't want to reload table data
       // after edit, as it triggers request, collapses rows and looses selection
@@ -137,8 +139,9 @@ export class DocumentList extends Component {
       refId,
       windowType,
       dispatch,
+      reduxData,
     } = this.props;
-    const { page, sort, viewId, staticFilterCleared } = this.state;
+    const { page, /*sort,*/ viewId, staticFilterCleared } = this.state;
     const included =
       includedView && includedView.windowType && includedView.viewId;
     const nextIncluded =
@@ -173,7 +176,7 @@ export class DocumentList extends Component {
       this.setState(
         {
           data: null,
-          rowDataMap: Map({ 1: List() }),
+          // rowDataMap: Map({ 1: List() }),
           layout: null,
           filtersActive: Map(),
           initialValuesNulled: Map(),
@@ -193,7 +196,8 @@ export class DocumentList extends Component {
 
     const stateChanges = {};
 
-    if (nextDefaultSort !== defaultSort && nextDefaultSort !== sort) {
+    //TODO: Handle sorting/pagination from
+    if (nextDefaultSort !== defaultSort && nextDefaultSort !== reduxData.sort) {
       stateChanges.sort = nextDefaultSort;
     }
 
@@ -246,12 +250,13 @@ export class DocumentList extends Component {
    * @summary ToDo: Describe the method.
    */
   connectWebSocket = () => {
-    const { windowType, dispatch } = this.props;
-    const { viewId } = this.state;
+    const { windowType, dispatch, viewId } = this.props;
+    // const { viewId } = this.state;
 
     connectWS.call(this, `/view/${viewId}`, msg => {
       const { fullyChanged, changedIds } = msg;
 
+      // TODO: Handle WS data
       if (changedIds) {
         getViewRowsByIds(windowType, viewId, changedIds.join()).then(
           response => {
@@ -286,15 +291,15 @@ export class DocumentList extends Component {
                 ...this.state.data,
                 result: rowsList,
               },
-              rowDataMap: Map({ 1: rowsList }),
+              // rowDataMap: Map({ 1: rowsList }),
             });
           }
         );
       }
 
       if (fullyChanged == true) {
-        const { dispatch, windowType, selections } = this.props;
-        const { viewId } = this.state;
+        const { dispatch, windowType, selections, viewId } = this.props;
+        // const { viewId } = this.state;
         const selection = getSelectionDirect(selections, windowType, viewId);
 
         // Reload Attributes after QuickAction is done
@@ -328,11 +333,12 @@ export class DocumentList extends Component {
    * @summary Load supportAttribute of the selected row from the table.
    */
   loadSupportAttributeFlag = ({ selected }) => {
+    const { reduxData } = this.props;
     const { data } = this.state;
     if (!data) {
       return;
     }
-    const rows = getRowsData(data.result);
+    const rows = getRowsData(reduxData.data);
 
     if (selected.length === 1) {
       const selectedRow = rows.find(row => row.id === selected[0]);
@@ -424,7 +430,6 @@ export class DocumentList extends Component {
         // Check the shouldComponentUpdate method
         this.setState(
           {
-            data: 'notfound',
             layout: 'notfound',
             triggerSpinner: false,
           },
@@ -555,28 +560,29 @@ export class DocumentList extends Component {
       sortingQuery && updateUri('sort', sortingQuery);
     }
 
-    return browseViewRequest({
-      windowId: windowType,
-      viewId: id,
-      page: page,
-      pageLength: this.pageLength,
-      orderBy: sortingQuery,
-    }).then(response => {
-      const result = List(response.data.result);
+    return dispatch(
+      fetchDocument({
+        windowId: windowType,
+        viewId: id,
+        page: page,
+        pageLength: this.pageLength,
+        orderBy: sortingQuery,
+      })
+    ).then(response => {
+      const result = List(response.result);
       result.hashCode();
 
       const selection = getSelectionDirect(selections, windowType, viewId);
       const forceSelection =
         (type === 'includedView' || isIncluded) &&
-        response.data &&
+        response &&
         result.size > 0 &&
         (selection.length === 0 ||
           !doesSelectionExist({
             data: {
-              ...response.data,
+              ...response,
               result,
             },
-            rowDataMap: Map({ 1: result }),
             selected: selection,
           }));
 
@@ -584,29 +590,22 @@ export class DocumentList extends Component {
         row.fieldsByName = parseToDisplay(row.fieldsByName);
       });
 
-      const pageColumnInfosByFieldName = response.data.columnsByFieldName;
-      mergeColumnInfosIntoViewRows(
-        pageColumnInfosByFieldName,
-        response.data.result
-      );
+      const pageColumnInfosByFieldName = response.columnsByFieldName;
+
+      mergeColumnInfosIntoViewRows(pageColumnInfosByFieldName, response.result);
 
       if (this.mounted) {
         const newState = {
-          data: {
-            ...response.data,
-            result,
-          },
-          rowDataMap: Map({ 1: result }),
           pageColumnInfosByFieldName: pageColumnInfosByFieldName,
           triggerSpinner: false,
         };
 
-        if (response.data.filters) {
-          newState.filtersActive = filtersToMap(response.data.filters);
+        if (response.filters) {
+          newState.filtersActive = filtersToMap(response.filters);
         }
 
         this.setState({ ...newState }, () => {
-          if (forceSelection && response.data && result && result.size > 0) {
+          if (forceSelection && response && result && result.size > 0) {
             const selection = [result.get(0).id];
 
             dispatch(
@@ -620,11 +619,7 @@ export class DocumentList extends Component {
         });
 
         // process modal specific
-        const {
-          parentViewId,
-          parentWindowId,
-          headerProperties,
-        } = response.data;
+        const { parentViewId, parentWindowId, headerProperties } = response;
         dispatch(
           updateRawModal(windowType, {
             parentViewId,
@@ -647,12 +642,13 @@ export class DocumentList extends Component {
    * @summary ToDo: Describe the method.
    */
   handleChangePage = index => {
-    const { data, sort, page, viewId } = this.state;
-    let currentPage = page;
+    const { reduxData } = this.props;
+    // const { data } = this.state;
+    let currentPage = reduxData.page;
 
     switch (index) {
       case 'up':
-        currentPage * data.pageLength < data.size ? currentPage++ : null;
+        currentPage * reduxData.pageLength < reduxData.size ? currentPage++ : null;
         break;
       case 'down':
         currentPage != 1 ? currentPage-- : null;
@@ -667,7 +663,7 @@ export class DocumentList extends Component {
         triggerSpinner: true,
       },
       () => {
-        this.getData(viewId, currentPage, sort);
+        this.getData(reduxData.viewId, currentPage, reduxData.sort);
       }
     );
   };
@@ -681,7 +677,7 @@ export class DocumentList extends Component {
 
     this.setState(
       {
-        sort: getSortingQuery(asc, field),
+        // sort: getSortingQuery(asc, field),
         triggerSpinner: true,
       },
       () => {
@@ -767,8 +763,14 @@ export class DocumentList extends Component {
    * @summary ToDo: Describe the method.
    */
   redirectToDocument = id => {
-    const { dispatch, isModal, windowType, isSideListShow } = this.props;
-    const { page, viewId, sort } = this.state;
+    const {
+      dispatch,
+      isModal,
+      windowType,
+      isSideListShow,
+      reduxData,
+    } = this.props;
+    const { sort, page } = this.state;
 
     if (isModal) {
       return;
@@ -780,7 +782,7 @@ export class DocumentList extends Component {
       // Caching last settings
       dispatch(setPagination(page, windowType));
       dispatch(setSorting(sort, windowType));
-      dispatch(setListId(viewId, windowType));
+      dispatch(setListId(reduxData.viewId, windowType));
     }
   };
 
@@ -826,8 +828,8 @@ export class DocumentList extends Component {
       includedView,
       parentWindowType,
       parentDefaultViewId,
+      reduxData: { viewId },
     } = this.props;
-    const { viewId } = this.state;
 
     return {
       selected: getSelectionDirect(selections, windowType, viewId),
@@ -871,12 +873,22 @@ export class DocumentList extends Component {
       updateParentSelectedIds,
       modal,
       dispatch,
+      reduxData,
     } = this.props;
+    const {
+      // page,
+      rowDataMap,
+      viewId,
+      size,
+      staticFilters,
+      orderBy,
+      queryLimitHit,
+    } = reduxData;
 
     const {
       layout,
-      data,
-      viewId,
+      // data,
+      // viewId,
       clickOutsideLock,
       page,
       filtersActive,
@@ -887,7 +899,7 @@ export class DocumentList extends Component {
       toggleWidth,
       rowEdited,
       initialValuesNulled,
-      rowDataMap,
+      // rowDataMap,
     } = this.state;
     let { selected, childSelected, parentSelected } = this.getSelected();
     const modalType = modal ? modal.modalType : null;
@@ -907,7 +919,8 @@ export class DocumentList extends Component {
       includedView.viewId;
 
     const selectionValid = doesSelectionExist({
-      data,
+      // data,
+      reduxData,
       selected,
       hasIncluded,
     });
@@ -919,11 +932,13 @@ export class DocumentList extends Component {
     const blurWhenOpen =
       layout && layout.includedView && layout.includedView.blurWhenOpen;
 
-    if (notfound || layout === 'notfound' || data === 'notfound') {
+    if (notfound || layout === 'notfound' || reduxData.notfound === 'notfound') {
       return (
         <BlankPage what={counterpart.translate('view.error.windowName')} />
       );
     }
+
+    console.log('RowDataMap: ', rowDataMap)
 
     const showQuickActions = true;
 
@@ -979,16 +994,16 @@ export class DocumentList extends Component {
                 />
               )}
 
-              {data && data.staticFilters && (
+              {reduxData.data && staticFilters && (
                 <FiltersStatic
                   {...{ windowType, viewId }}
-                  data={data.staticFilters}
+                  data={staticFilters}
                   clearFilters={this.clearStaticFilters}
                 />
               )}
             </div>
 
-            {data && showQuickActions && (
+            {reduxData.data && showQuickActions && (
               <QuickActions
                 processStatus={processStatus}
                 ref={c => {
@@ -1030,10 +1045,10 @@ export class DocumentList extends Component {
           delay={300}
           iconSize={50}
           displayCondition={!!(layout && this.state.triggerSpinner)}
-          hideCondition={!!(data && !this.state.triggerSpinner)}
+          hideCondition={!!(reduxData.data && !this.state.triggerSpinner)}
         />
 
-        {layout && data && (
+        {layout && reduxData.data && (
           <div className="document-list-body">
             <Table
               entity="documentView"
@@ -1057,21 +1072,21 @@ export class DocumentList extends Component {
               onRowEdited={this.setTableRowEdited}
               keyProperty="id"
               onDoubleClick={this.redirectToDocument}
-              size={data.size}
+              size={size}
               pageLength={this.pageLength}
               handleChangePage={this.handleChangePage}
               onSelectionChanged={updateParentSelectedIds}
               mainTable={true}
               updateDocList={this.fetchLayoutAndData}
               sort={this.sortData}
-              orderBy={data.orderBy}
+              orderBy={orderBy}
               tabIndex={0}
               indentSupported={layout.supportTree}
               disableOnClickOutside={clickOutsideLock}
               limitOnClickOutside={isModal}
               defaultSelected={selected}
               refreshSelection={refreshSelection}
-              queryLimitHit={data.queryLimitHit}
+              queryLimitHit={queryLimitHit}
               showIncludedViewOnSelect={this.showIncludedViewOnSelect}
               openIncludedViewOnSelect={
                 layout.includedView && layout.includedView.openOnSelect
