@@ -95,7 +95,7 @@
     "postcss-loader": "2.1.4",
     "postcss-simple-vars": "4.1.0",
     "postcss-url": "7.3.2",
-    "precss": "3.1.2",
+    "precss": "4.0.0",
     "prettier": "1.17.0",
     "react-hot-loader": "4.12.16",
     "react-test-renderer": "16.8.6",
