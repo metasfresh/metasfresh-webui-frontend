@@ -1,13 +1,10 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
+
 import { getAvatar } from '../../api';
 import defaultAvatar from '../../assets/images/default-avatar.png';
 
-class Avatar extends Component {
-  constructor(props) {
-    super(props);
-  }
-
+export default class Avatar extends PureComponent {
   render() {
     const { size, className, id, title } = this.props;
     return (
@@ -30,5 +27,3 @@ Avatar.propTypes = {
   id: PropTypes.string,
   title: PropTypes.string,
 };
-
-export default Avatar;

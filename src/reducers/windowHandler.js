@@ -114,7 +114,7 @@ export const initialState = {
     layout: {
       activeTab: null,
     },
-    data: [],
+    data: {},
 
     // rowData is an immutable Map with tabId's as keys, and Lists as values.
     // List's elements are plain objects for now

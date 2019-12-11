@@ -347,13 +347,15 @@ class TableCell extends PureComponent {
               getWidgetData,
               viewId,
               rowId,
-              widgetData,
               closeTableField,
               isOpenDatePicker,
               listenOnKeys,
               listenOnKeysFalse,
               listenOnKeysTrue,
               onClickOutside,
+              item,
+              isEditable,
+              supportFieldEdit,
             }}
             clearValue={this.clearWidgetValue}
             entity={entityEffective}

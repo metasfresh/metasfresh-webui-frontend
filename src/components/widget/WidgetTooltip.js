@@ -17,10 +17,10 @@ class WidgetTooltip extends PureComponent {
    * @summary Alternative method to open dropdown, in case of disabled opening
    * on focus.
    */
-  handleClick = () => {
-    const { onToggle, fieldName } = this.props;
+  handleClick = (val) => {
+    const { onToggle, widget } = this.props;
 
-    onToggle(fieldName);
+    onToggle(widget.field, val);
   };
 
   /**
@@ -29,10 +29,10 @@ class WidgetTooltip extends PureComponent {
    * @todo Write the documentation
    */
   handleClickOutside() {
-    const { fieldName, onToggle, isToggled } = this.props;
+    const { widget, onToggle, isToggled } = this.props;
 
     if (isToggled) {
-      onToggle(fieldName, false);
+      onToggle(widget.field, false);
     }
   }
 
@@ -95,7 +95,6 @@ class WidgetTooltip extends PureComponent {
  * @typedef {object} Props Component props
  * @prop {*} widget
  * @prop {*} data
- * @prop {string} [fieldName]
  * @prop {bool} isToggled
  * @prop {func} [onToggle]
  * @todo Check props. Which proptype? Required or optional?
@@ -103,7 +102,6 @@ class WidgetTooltip extends PureComponent {
 WidgetTooltip.propTypes = {
   widget: PropTypes.any.isRequired,
   data: PropTypes.any.isRequired,
-  fieldName: PropTypes.string,
   isToggled: PropTypes.bool.isRequired,
   onToggle: PropTypes.func,
 };

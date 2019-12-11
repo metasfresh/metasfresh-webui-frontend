@@ -1,6 +1,6 @@
 import React from 'react';
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import PropTypes from 'prop-types';
+import { CSSTransition } from 'react-transition-group';
 
 /**
  * @file Fnct component.
@@ -18,15 +18,14 @@ const Loader = (props) => {
       }
     >
       {!loaderType && (
-        <ReactCSSTransitionGroup
-          transitionName="rotate"
-          transitionEnterTimeout={1000}
-          transitionLeaveTimeout={1000}
+        <CSSTransition
+          classNames="rotate"
+          timeout={{ exit: 1000, enter: 1000 }}
         >
           <div className="rotate icon-rotate">
             <i className="meta-icon-settings" />
           </div>
-        </ReactCSSTransitionGroup>
+        </CSSTransition>
       )}
       {loaderType && loaderType === 'bootstrap' && (
         <div className="spinner-border text-success" role="status">
@@ -37,8 +36,6 @@ const Loader = (props) => {
   );
 };
 
-export default Loader;
-
 Loader.propTypes = {
   loaderType: PropTypes.string,
 };
@@ -46,3 +43,5 @@ Loader.propTypes = {
 Loader.defaultProps = {
   loaderType: null,
 };
+
+export default Loader;

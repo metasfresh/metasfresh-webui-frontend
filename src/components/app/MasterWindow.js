@@ -282,6 +282,7 @@ export default class MasterWindow extends Component {
       includedView,
       processStatus,
       enableTutorial,
+      docStatusData,
     } = this.props;
     const {
       dropzoneFocused,
@@ -301,11 +302,6 @@ export default class MasterWindow extends Component {
       activeTab = master.layout.activeTab;
     }
 
-    const docStatusData = {
-      status: master.data.DocStatus || -1,
-      action: master.data.DocAction || -1,
-      displayed: true,
-    };
     const docSummaryData =
       documentSummaryElement &&
       master.data[documentSummaryElement.fields[0].field];
@@ -397,6 +393,7 @@ MasterWindow.propTypes = {
   rawModal: PropTypes.object.isRequired,
   indicator: PropTypes.string.isRequired,
   me: PropTypes.object.isRequired,
+  docStatusData: PropTypes.object,
   pluginModal: PropTypes.object,
   overlay: PropTypes.object,
   allowShortcut: PropTypes.bool,

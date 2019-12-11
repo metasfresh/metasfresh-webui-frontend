@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 
 import { addRowData, updateMasterData } from '../../actions/WindowActions';
@@ -10,7 +10,7 @@ import { getTab } from '../../api';
  * also disconnected from the store.
  *
  */
-class Tab extends Component {
+class Tab extends PureComponent {
   constructor(props) {
     super(props);
 

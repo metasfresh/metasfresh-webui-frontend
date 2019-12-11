@@ -1,11 +1,12 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
+
 import { getRequest } from '../../actions/GenericActions';
 import Indicator from '../charts/Indicator';
 import ChartWidget from './ChartWidget';
 import DndWidget from './DndWidget';
 
-class Sidenav extends Component {
+export default class Sidenav extends PureComponent {
   constructor(props) {
     super(props);
 
@@ -78,5 +79,3 @@ class Sidenav extends Component {
 Sidenav.propTypes = {
   moveCard: PropTypes.func,
 };
-
-export default Sidenav;

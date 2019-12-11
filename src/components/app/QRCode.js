@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import onClickOutside from 'react-onclickoutside';
 import { BrowserQRCodeSvgWriter } from '@zxing/library';
 import currentDevice from 'current-device';
 
-class QRCode extends Component {
+class QRCode extends PureComponent {
   constructor(props) {
     super(props);
 

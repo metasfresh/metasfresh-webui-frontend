@@ -1,6 +1,6 @@
 import Moment from 'moment';
-import React, { Component } from 'react';
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import React, { PureComponent } from 'react';
+import { CSSTransition } from 'react-transition-group';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { List as ImmutableList } from 'immutable';
@@ -32,7 +32,7 @@ import Lookup from './Lookup/Lookup';
  * @module RawWidget
  * @extends Component
  */
-export class RawWidget extends Component {
+export class RawWidget extends PureComponent {
   constructor(props) {
     super(props);
 
@@ -390,6 +390,7 @@ export class RawWidget extends Component {
       dateFormat,
       initialFocus,
       timeZone,
+      filter,
     } = this.props;
 
     let widgetValue = data != null ? data : widgetData[0].value;
@@ -625,10 +626,10 @@ export class RawWidget extends Component {
             {...{
               attribute,
             }}
+            filter={filter}
             entity={entity}
             subentity={subentity}
             subentityId={subentityId}
-            recent={[]}
             dataId={dataId}
             properties={fields}
             windowType={windowType}
@@ -675,6 +676,7 @@ export class RawWidget extends Component {
             {...{
               attribute,
             }}
+            filter={filter}
             widgetField={widgetField}
             dataId={dataId}
             entity={entity}
@@ -1204,17 +1206,17 @@ export class RawWidget extends Component {
               })}
               title={valueDescription}
             >
-              <ReactCSSTransitionGroup
-                transitionName="fade"
-                transitionEnterTimeout={200}
-                transitionLeaveTimeout={200}
-              >
-                {errorPopup &&
-                  validStatus &&
-                  !validStatus.valid &&
-                  !validStatus.initialValue &&
-                  this.renderErrorPopup(validStatus.reason)}
-              </ReactCSSTransitionGroup>
+              {errorPopup &&
+              validStatus &&
+              !validStatus.valid &&
+              !validStatus.initialValue ? (
+                <CSSTransition
+                  classNames="fade"
+                  timeout={{ exit: 200, enter: 200 }}
+                >
+                  {this.renderErrorPopup(validStatus.reason)}
+                </CSSTransition>
+              ) : null}
               {widgetBody}
             </div>
             {fields[0].devices && !widgetData[0].readonly && (
@@ -1239,4 +1241,5 @@ RawWidget.defaultProps = RawWidgetDefaultProps;
 export default connect((state) => ({
   modalVisible: state.windowHandler.modal.visible,
   timeZone: state.appHandler.me.timeZone,
+  filter: state.windowHandler.filter,
 }))(RawWidget);

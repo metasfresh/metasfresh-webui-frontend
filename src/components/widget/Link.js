@@ -1,12 +1,11 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 
-class Link extends Component {
-  constructor(props) {
-    super(props);
-  }
+export default class Link extends PureComponent {
+  handleClick = () => {
+    const { widgetData } = this.props;
+    const url = widgetData[0].value;
 
-  handleClick = (url) => {
     window.open(url, '_blank');
   };
 
@@ -25,7 +24,7 @@ class Link extends Component {
           {icon && <i className="meta-icon-edit input-icon-right" />}
         </div>
         <div
-          onClick={() => this.handleClick(widgetData[0].value)}
+          onClick={this.handleClick}
           className={
             'btn btn-icon btn-meta-outline-secondary btn-inline ' +
             'pointer btn-distance-rev btn-sm ' +
@@ -48,5 +47,3 @@ Link.propTypes = {
   icon: PropTypes.any,
   widgetData: PropTypes.any,
 };
-
-export default Link;
