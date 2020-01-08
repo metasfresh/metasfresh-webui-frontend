@@ -364,7 +364,6 @@ export class RawLookup extends PureComponent {
       handleInputEmptyStatus,
       enableAutofocus,
       isOpen,
-      onDropdownListToggle,
     } = this.props;
 
     enableAutofocus();
@@ -379,7 +378,7 @@ export class RawLookup extends PureComponent {
       !allowEmpty && handleInputEmptyStatus && handleInputEmptyStatus(false);
 
       if (!isOpen) {
-        onDropdownListToggle(true);
+        this.handleDropdownListToggle(true);
       }
 
       this.setState(
