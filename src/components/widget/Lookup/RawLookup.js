@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-import { connect } from 'react-redux';
 import TetherComponent from 'react-tether';
 import ReactDOM from 'react-dom';
 import classnames from 'classnames';
@@ -595,4 +594,4 @@ RawLookup.propTypes = {
   idValue: PropTypes.string,
 };
 
-export default connect()(RawLookup);
+export default RawLookup;
