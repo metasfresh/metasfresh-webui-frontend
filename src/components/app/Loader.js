@@ -19,10 +19,10 @@ const Loader = (props) => {
     >
       {!loaderType && (
         <CSSTransition
-          classNames="rotate"
+          className="rotate icon-rotate"
           timeout={{ exit: 1000, enter: 1000 }}
         >
-          <div className="rotate icon-rotate">
+          <div>
             <i className="meta-icon-settings" />
           </div>
         </CSSTransition>
