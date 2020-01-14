@@ -75,6 +75,10 @@ class FiltersFrequent extends PureComponent {
     }
   };
 
+  // wrappers around props.handleShow to skip creating anonymous functions on render
+  handleShowTrue = () => this.props.handleShow(true);
+  handleShowFalse = () => this.props.handleShow(false);
+
   /**
    * @method render
    * @summary ToDo: Describe the method
@@ -86,7 +90,6 @@ class FiltersFrequent extends PureComponent {
       windowType,
       notValidFields,
       viewId,
-      handleShow,
       applyFilters,
       clearFilters,
       active,
@@ -167,14 +170,14 @@ class FiltersFrequent extends PureComponent {
                     key={index}
                     windowType={windowType}
                     data={item}
-                    closeFilterMenu={() => this.toggleFilter()}
+                    closeFilterMenu={this.toggleFilter}
                     clearFilters={clearFilters}
                     applyFilters={applyFilters}
                     notValidFields={notValidFields}
                     isActive={item.isActive}
                     active={active}
-                    onShow={() => handleShow(true)}
-                    onHide={() => handleShow(false)}
+                    onShow={this.handleShowTrue}
+                    onHide={this.handleShowFalse}
                     viewId={viewId}
                     outsideClick={this.outsideClick}
                     openedFilter={true}
@@ -201,8 +204,8 @@ class FiltersFrequent extends PureComponent {
                     notValidFields={notValidFields}
                     isActive={filter.isActive}
                     active={active}
-                    onShow={() => handleShow(true)}
-                    onHide={() => handleShow(false)}
+                    onShow={this.handleShowTrue}
+                    onHide={this.handleShowFalse}
                     viewId={viewId}
                     outsideClick={this.outsideClick}
                   />
