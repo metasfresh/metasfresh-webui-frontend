@@ -242,6 +242,8 @@ export class RawWidget extends Component {
     const { handlePatch, inProgress, widgetType } = this.props;
     const willPatch = this.willPatch(property, value, valueTo);
 
+    console.log('RawWidget handlePatch: ', property, value, ', ', willPatch);
+
     // Do patch only when value is not equal state
     // or cache is set and it is not equal value
     if ((isForce || willPatch) && handlePatch && !inProgress) {
@@ -347,6 +349,7 @@ export class RawWidget extends Component {
       dropdownOpenCallback,
       autoFocus,
       fullScreen,
+      //@TODO Looks like `fields` and `widgetData` are the very same thing 99.9% of the time.
       fields,
       windowType,
       dataId,
@@ -674,6 +677,7 @@ export class RawWidget extends Component {
             viewId={viewId}
             autoFocus={autoFocus}
             validStatus={widgetData[0].validStatus}
+            onClearFilters={this.props.onClearFilters}
           />
         );
 

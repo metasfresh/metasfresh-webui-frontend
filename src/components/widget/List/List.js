@@ -231,7 +231,8 @@ class ListWidget extends Component {
       enableAutofocus,
       isModal,
       widgetField,
-      id,
+      onClearFilters,
+      filterWidget,
     } = this.props;
 
     if (enableAutofocus) {
@@ -285,7 +286,12 @@ class ListWidget extends Component {
           });
         }
       } else {
-        onChange(widgetField, option, id);
+        onChange(widgetField, option);
+      }
+
+      if (filterWidget && onClearFilters && option === null) {
+        console.log('FOOOO')
+        onClearFilters(widgetField);
       }
     }
   };
@@ -360,7 +366,6 @@ ListWidget.propTypes = {
   onFocus: PropTypes.func,
   onBlur: PropTypes.func,
   widgetField: PropTypes.string,
-  id: PropTypes.string,
   field: PropTypes.string,
   mandatory: PropTypes.bool,
   lastProperty: PropTypes.string,

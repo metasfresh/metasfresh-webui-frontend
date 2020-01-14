@@ -60,10 +60,16 @@ describe("Filters tests", () => {
       }
     });
     const store = mockStore(initialState)
-    const wrapper = render(
+    const wrapper = shallow(
         <Provider store={store}>
           <Filters {...dummyProps} />
         </Provider>
     );
+    const html = wrapper.html();
+
+    expect(html).toContain('filter-wrapper');
+    expect(html).toContain('filters-frequent');
+    expect(html).toContain('btn-filter');
+    expect(html).toContain(': Date');
   });
 });

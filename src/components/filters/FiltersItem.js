@@ -40,21 +40,10 @@ class FiltersItem extends Component {
     };
   }
 
-  /**
-   * @method UNSAFE_componentWillMount
-   * @summary ToDo: Describe the method
-   * @todo Write the documentation
-   */
   UNSAFE_componentWillMount() {
     this.init();
   }
 
-  /**
-   * @method UNSAFE_componentWillReceiveProps
-   * @summary ToDo: Describe the method
-   * @param {*} props
-   * @todo Write the documentation
-   */
   UNSAFE_componentWillReceiveProps(props) {
     const { active } = this.props;
 
@@ -63,11 +52,6 @@ class FiltersItem extends Component {
     }
   }
 
-  /**
-   * @method componentDidMount
-   * @summary ToDo: Describe the method
-   * @todo Write the documentation
-   */
   componentDidMount() {
     if (this.widgetsContainer) {
       this.widgetsContainer.addEventListener('scroll', this.handleScroll);
@@ -102,11 +86,6 @@ class FiltersItem extends Component {
     }
   }
 
-  /**
-   * @method componentWillUnmount
-   * @summary ToDo: Describe the method
-   * @todo Write the documentation
-   */
   componentWillUnmount() {
     const { dispatch } = this.props;
 
@@ -168,13 +147,13 @@ class FiltersItem extends Component {
   setValue = (property, value, id, valueTo = '', filterId, defaultValue) => {
     const { resetInitialValues } = this.props;
 
-    // if user changed field value and  defaultValue is not null, then we need
+    // if user changed field value and defaultValue is not null, then we need
     // to reset it's initial value so that it won't be set
     if (defaultValue != null) {
       resetInitialValues && resetInitialValues(filterId, property);
     }
 
-    //TODO: LOOKUPS GENERATE DIFFERENT TYPE OF PROPERTY parameters
+    //@TODO: LOOKUPS GENERATE DIFFERENT TYPE OF PROPERTY parameters
     // IT HAS TO BE UNIFIED
     //
     // OVERWORKED WORKAROUND
@@ -235,27 +214,36 @@ class FiltersItem extends Component {
         };
       }
 
-      const updatedParameters = activeFilter.parameters.map(param => {
-        if (param.parameterName === property) {
-          paramExists = true;
+      // if paramName === property and not value
+        // remove from parameters
+        // if parameters.length === 0
+          // remove filter from active filters
+      const updatedParameters = [];
 
-          return {
-            ...param,
-            value: this.parseDateToReadable(param.widgetType, activeValue),
-            valueTo: this.parseDateToReadable(param.widgetType, activeValueTo),
-            defaultValue: null,
-            defaultValueTo: null,
-          };
+      activeFilter.parameters.forEach(param => {
+        if (param.parameterName === property) {
+          // if there's no value, remove the parameter from active filter
+          if (value) {
+            paramExists = true;
+
+            updatedParameters.push({
+              ...param,
+              value: this.parseDateToReadable(param.widgetType, activeValue),
+              valueTo: this.parseDateToReadable(param.widgetType, activeValueTo),
+              defaultValue: null,
+              defaultValueTo: null,
+            });
+          }
         } else {
-          return {
+          updatedParameters.push({
             ...param,
             defaultValue: null,
             defaultValueTo: null,
-          };
+          });
         }
       });
 
-      if (!paramExists) {
+      if (!paramExists && value) {
         updatedParameters.push({
           parameterName: property,
           value: activeValue,
@@ -265,10 +253,14 @@ class FiltersItem extends Component {
         });
       }
 
-      activeFilter = {
-        ...activeFilter,
-        parameters: updatedParameters,
-      };
+      if (value) {
+        activeFilter = {
+          ...activeFilter,
+          parameters: updatedParameters,
+        };
+      } else if (!value && updatedParameters.length === 0) {
+        activeFilter = null;
+      }
     }
 
     this.setState(prevState => ({
@@ -346,8 +338,7 @@ class FiltersItem extends Component {
 
   /**
    * @method handleClear
-   * @summary ToDo: Describe the method
-   * @todo Write the documentation
+   * @summary clears this filter completely, removing it from the active filters
    */
   handleClear = () => {
     const {
@@ -365,10 +356,21 @@ class FiltersItem extends Component {
   };
 
   /**
+   * @method handleClearFilters
+   * @summary removes the filter parameter from active filter
+   */
+  handleClearFilters = field => {
+    const { clearFilters } = this.props;
+    const { filter } = this.state;
+
+    clearFilters(filter, field);
+    this.setValue(field, null, null, null, filter.filterId);
+  }
+
+  /**
    * @method toggleTooltip
-   * @summary ToDo: Describe the method
-   * @param {*} visible
-   * @todo Write the documentation
+   * @summary shows/hides tooltip
+   * @param {bool} visible
    */
   toggleTooltip = visible => {
     this.setState({
@@ -376,11 +378,10 @@ class FiltersItem extends Component {
     });
   };
 
-  /**
-   * @method render
-   * @summary ToDo: Describe the method
-   * @todo Write the documentation
-   */
+  // wrappers around toggleTooltip to skip creating anonymous functions on render
+  showTooltip = () => this.toggleTooltip(true);
+  hideTooltip = () => this.toggleTooltip(false);
+
   render() {
     const {
       data,
@@ -395,6 +396,7 @@ class FiltersItem extends Component {
       captionValue,
       openedFilter,
       panelCaption,
+      clearFilters,
     } = this.props;
     const { filter, isTooltipShow, maxWidth, maxHeight } = this.state;
     const style = {};
@@ -490,6 +492,7 @@ class FiltersItem extends Component {
                         caption={item.caption}
                         noLabel={false}
                         filterWidget={true}
+                        onClearFilters={this.handleClearFilters}
                         {...{
                           viewId,
                           windowType,
@@ -528,8 +531,8 @@ class FiltersItem extends Component {
                   <button
                     className="applyBtn btn btn-sm btn-success"
                     onClick={this.handleApply}
-                    onMouseEnter={() => this.toggleTooltip(true)}
-                    onMouseLeave={() => this.toggleTooltip(false)}
+                    onMouseEnter={this.showTooltip}
+                    onMouseLeave={this.hideTooltip}
                   >
                     {counterpart.translate('window.apply.caption')}
                   </button>

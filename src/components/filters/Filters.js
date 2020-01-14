@@ -426,15 +426,38 @@ export default class Filters extends PureComponent {
    * @summary ToDo: Describe the method
    * @param {*} filterToClear
    */
-  clearFilters = filterToClear => {
+  clearFilters = (filterToClear, propertyName) => {
     const { updateDocList } = this.props;
+
+    console.log('CLEARFILTERS: ', filterToClear, propertyName)
 
     let { filtersActive } = this.props;
     let activeFilters = Map(filtersActive);
 
     if (filtersActive.size) {
       activeFilters = activeFilters.filter(
-        (item, id) => id !== filterToClear.filterId
+        (item, id) => {
+
+          if (id === filterToClear.filterId) {
+            console.log('1')
+            if (propertyName && item.parameters && item.parameters.length) {
+              console.log('item.parameters: ', item.parameters)
+              const parametersCopy = item.parameters.filter(
+                param => param.parameterName !== propertyName
+              );
+
+              if (parametersCopy.length > 0) {
+                console.log('3')
+                item.parameters = parametersCopy;
+
+                return item;
+              }
+              return false;
+            }
+            return false;
+          }
+          return item;
+        }
       );
       updateDocList(activeFilters);
     }
@@ -453,10 +476,12 @@ export default class Filters extends PureComponent {
   /**
    * @method annotateFilters
    * @summary I think it creates caption for active filters to show when the widget is closed - Kuba
-   * @param {*} unannotatedFilters
+   * @param {array} unannotatedFilters
    */
   annotateFilters = unannotatedFilters => {
     const { activeFilter } = this.state;
+
+    // console.log('unannotatedFilters: ', unannotatedFilters);
 
     return unannotatedFilters.map(unannotatedFilter => {
       const parameter =
@@ -467,6 +492,8 @@ export default class Filters extends PureComponent {
         : null;
       const activeParameter =
         parameter && isActive && currentFilter && currentFilter.parameters[0];
+
+      // console.log('annotateFilters: ', activeFilter, ', parameter: ', parameter, ', isActive: ', isActive, currentFilter)
 
       const filterType =
         unannotatedFilter.parameters && activeParameter
