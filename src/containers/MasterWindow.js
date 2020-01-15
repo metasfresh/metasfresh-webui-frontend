@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
-import { forEach } from 'lodash';
+import { forEach, cloneDeep } from 'lodash';
 
 import { addNotification } from '../actions/AppActions';
 import { getData } from '../actions/GenericActions';
@@ -130,39 +130,55 @@ class MasterWindow extends Component {
             forEach(includedTabsInfo, (tab, tabId) => {
               const { staleRowIds } = tab;
 
-              staleRowIds.forEach(rowId => {
-                requests.push(
-                  getData(
-                    'window',
-                    params.windowType,
-                    params.docId,
-                    tabId,
-                    rowId
-                  )
-                );
-              });
+              // check if tab is active
+              if (tabId === master.layout.activeTab) {
+                staleRowIds.forEach(rowId => {
+                  requests.push(
+                    getData(
+                      'window',
+                      params.windowType,
+                      params.docId,
+                      tabId,
+                      rowId
+                    ).catch(() => { return { rowId, tabId } })
+                  );
+                });
+              }
             });
 
             // wait for all the rows requests to finish
             return await Promise.all(requests).then(res => {
               const changedTabs = {};
 
-              res.forEach(({ data }) => {
-                const rowZero = data[0];
-                const tabId = rowZero.tabId;
+              res.forEach(response => {
+                const { data } = response;
                 const rowsById = {};
+                const removedRows = {};
+                let tabId;
 
-                data.forEach(row => {
-                  rowsById[row.rowId] = row;
-                });
+                // removed row
+                if (!data) {
+                  removedRows[response.rowId] = true;
+                  tabId = response.tabId;
+                } else {
+                  const rowZero = data[0];
+                  tabId = rowZero.tabId;
 
-                changedTabs[tabId] = rowsById;
+                  data.forEach(row => {
+                    rowsById[row.rowId] = { ...row };
+                  });
+                }
+
+                changedTabs[`${tabId}`] = {
+                  changed: { ...rowsById },
+                  removed: { ...removedRows },
+                };
               });
 
-              forEach(changedTabs, (changedRows, tabId) => {
-                dispatch(updateTabRowsData('master', tabId, changedRows));
+              forEach(changedTabs, (rowsChanged, tabId) => {
+                dispatch(updateTabRowsData('master', tabId, _.cloneDeep(rowsChanged)));
               });
-            });
+            })
 
             // Check my comment in https://github.com/metasfresh/me03/issues/3628 - Kuba
           } else {

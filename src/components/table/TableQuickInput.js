@@ -270,9 +270,6 @@ class TableQuickInput extends Component {
       })
       .then(response => {
         this.initQuickInput();
-        dispatch(
-          addNewRow(response.data, tabId, response.data.rowId, 'master')
-        );
       });
   };
 
