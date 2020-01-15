@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
-import { forEach, cloneDeep } from 'lodash';
+import { forEach } from 'lodash';
 
 import { addNotification } from '../actions/AppActions';
 import { getData } from '../actions/GenericActions';
@@ -140,7 +140,9 @@ class MasterWindow extends Component {
                       params.docId,
                       tabId,
                       rowId
-                    ).catch(() => { return { rowId, tabId } })
+                    ).catch(() => {
+                      return { rowId, tabId };
+                    })
                   );
                 });
               }
@@ -176,9 +178,9 @@ class MasterWindow extends Component {
               });
 
               forEach(changedTabs, (rowsChanged, tabId) => {
-                dispatch(updateTabRowsData('master', tabId, _.cloneDeep(rowsChanged)));
+                dispatch(updateTabRowsData('master', tabId, rowsChanged));
               });
-            })
+            });
 
             // Check my comment in https://github.com/metasfresh/me03/issues/3628 - Kuba
           } else {

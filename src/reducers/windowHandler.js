@@ -425,20 +425,24 @@ export default function windowHandler(state = initialState, action) {
 
     // websocket event
     case UPDATE_TAB_ROWS_DATA: {
-      const { data: { changed, removed }, tabId, scope } = action.payload;
+      const {
+        data: { changed, removed },
+        tabId,
+        scope,
+      } = action.payload;
       const rowData = state[scope].rowData.toJS();
       let rows = get(rowData, `${tabId}`, []);
 
       if (rows.length) {
         if (removed) {
-          rows = rows.filter(row => !removed[row.rowId])
+          rows = rows.filter(row => !removed[row.rowId]);
         }
 
         // find&replace updated rows (unfortunately it's a table so we'll have to traverse it)
         if (changed) {
           rows = rows.map(row => {
             if (changed[row.rowId]) {
-              row = { ...changed[row.rowId] }
+              row = { ...changed[row.rowId] };
 
               delete changed[row.rowId];
 
