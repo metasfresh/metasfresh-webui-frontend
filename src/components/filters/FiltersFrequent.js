@@ -2,7 +2,6 @@ import cx from 'classnames';
 import counterpart from 'counterpart';
 import React, { PureComponent, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import onClickOutside from 'react-onclickoutside';
 import currentDevice from 'current-device';
 
@@ -253,19 +252,4 @@ FiltersFrequent.propTypes = {
   dropdownToggled: PropTypes.any,
 };
 
-/**
- * @method mapStateToProps
- * @summary ToDo: Describe the method
- * @param {object} state
- * @todo Write the documentation
- */
-const mapStateToProps = state => {
-  const { allowOutsideClick, modal } = state.windowHandler;
-
-  return {
-    allowOutsideClick,
-    modalVisible: modal.visible,
-  };
-};
-
-export default connect(mapStateToProps)(onClickOutside(FiltersFrequent));
+export default onClickOutside(FiltersFrequent);

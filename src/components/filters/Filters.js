@@ -1,6 +1,7 @@
 import counterpart from 'counterpart';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
+import { connect } from 'react-redux';
 import { Map } from 'immutable';
 import _ from 'lodash';
 
@@ -9,17 +10,32 @@ import {
   generateMomentObj,
   getFormatForDateField,
 } from '../widget/RawWidgetHelpers';
+import { parseDateWithCurrentTimezone } from '../../utils/documentListHelper';
 
 import TableCell from '../table/TableCell';
 import FiltersFrequent from './FiltersFrequent';
 import FiltersNotFrequent from './FiltersNotFrequent';
 
 /**
+ * @method parseDateToReadable
+ * @summary ToDo: Describe the method
+ * @param {*} widgetType
+ * @param {*} value
+ * @todo Write the documentation
+ */
+export function parseDateToReadable(widgetType, value) {
+  if (DATE_FIELDS.indexOf(widgetType) > -1) {
+    return parseDateWithCurrentTimezone(value, widgetType);
+  }
+  return value;
+}
+
+/**
  * @file Class based component.
  * @module Filters
  * @extends Component
  */
-export default class Filters extends PureComponent {
+class Filters extends PureComponent {
   state = {
     activeFilter: null,
     activeFiltersCaptions: null,
@@ -428,37 +444,28 @@ export default class Filters extends PureComponent {
    */
   clearFilters = (filterToClear, propertyName) => {
     const { updateDocList } = this.props;
-
-    console.log('CLEARFILTERS: ', filterToClear, propertyName)
-
     let { filtersActive } = this.props;
     let activeFilters = Map(filtersActive);
 
     if (filtersActive.size) {
-      activeFilters = activeFilters.filter(
-        (item, id) => {
+      activeFilters = activeFilters.filter((item, id) => {
+        if (id === filterToClear.filterId) {
+          if (propertyName && item.parameters && item.parameters.length) { 
+            const parametersCopy = item.parameters.filter(
+              param => param.parameterName !== propertyName
+            );
 
-          if (id === filterToClear.filterId) {
-            console.log('1')
-            if (propertyName && item.parameters && item.parameters.length) {
-              console.log('item.parameters: ', item.parameters)
-              const parametersCopy = item.parameters.filter(
-                param => param.parameterName !== propertyName
-              );
+            if (parametersCopy.length > 0) {
+              item.parameters = parametersCopy;
 
-              if (parametersCopy.length > 0) {
-                console.log('3')
-                item.parameters = parametersCopy;
-
-                return item;
-              }
-              return false;
+              return item;
             }
             return false;
           }
-          return item;
+          return false;
         }
-      );
+        return item;
+      });
       updateDocList(activeFilters);
     }
   };
@@ -481,8 +488,6 @@ export default class Filters extends PureComponent {
   annotateFilters = unannotatedFilters => {
     const { activeFilter } = this.state;
 
-    // console.log('unannotatedFilters: ', unannotatedFilters);
-
     return unannotatedFilters.map(unannotatedFilter => {
       const parameter =
         unannotatedFilter.parameters && unannotatedFilter.parameters[0];
@@ -492,8 +497,6 @@ export default class Filters extends PureComponent {
         : null;
       const activeParameter =
         parameter && isActive && currentFilter && currentFilter.parameters[0];
-
-      // console.log('annotateFilters: ', activeFilter, ', parameter: ', parameter, ', isActive: ', isActive, currentFilter)
 
       const filterType =
         unannotatedFilter.parameters && activeParameter
@@ -525,7 +528,14 @@ export default class Filters extends PureComponent {
    * @summary ToDo: Describe the method
    */
   render() {
-    const { filterData, windowType, viewId, resetInitialValues } = this.props;
+    const {
+      filterData,
+      windowType,
+      viewId,
+      resetInitialValues,
+      allowOutsideClick,
+      modalVisible,
+    } = this.props;
     const { frequentFilters, notFrequentFilters } = this.sortFilters(
       filterData
     );
@@ -553,6 +563,8 @@ export default class Filters extends PureComponent {
                 notValidFields,
                 viewId,
                 widgetShown,
+                allowOutsideClick,
+                modalVisible,
               }}
               data={frequentFilters}
               handleShow={this.handleShow}
@@ -572,6 +584,8 @@ export default class Filters extends PureComponent {
                 viewId,
                 widgetShown,
                 resetInitialValues,
+                allowOutsideClick,
+                modalVisible,
               }}
               data={notFrequentFilters}
               handleShow={this.handleShow}
@@ -608,4 +622,17 @@ Filters.propTypes = {
   filtersActive: PropTypes.any,
   filterData: PropTypes.any,
   initialValuesNulled: PropTypes.any,
+  allowOutsideClick: PropTypes.bool,
+  modalVisible: PropTypes.bool,
 };
+
+const mapStateToProps = state => {
+  const { allowOutsideClick, modal } = state.windowHandler;
+
+  return {
+    allowOutsideClick,
+    modalVisible: modal.visible,
+  };
+};
+
+export default connect(mapStateToProps)(Filters);
