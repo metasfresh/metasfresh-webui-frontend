@@ -14,11 +14,6 @@ const Checkbox = props => {
     setCheckedState(props.widgetData[0].value);
   }, [props]);
 
-  const updateCheckedState = e => {
-    setCheckedState(!checkedState);
-    handlePatch(widgetField, e.target.checked, id);
-  };
-
   const {
     widgetData,
     disabled,
@@ -34,6 +29,12 @@ const Checkbox = props => {
     const { handlePatch, widgetField, id } = props;
     handlePatch(widgetField, '', id);
   };
+
+  const updateCheckedState = e => {
+    setCheckedState(!checkedState);
+    handlePatch(widgetField, e.target.checked, id);
+  };
+
   return (
     <div>
       <label
