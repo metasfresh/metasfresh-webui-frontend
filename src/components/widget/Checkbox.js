@@ -55,7 +55,7 @@ const Checkbox = props => {
           type="checkbox"
           checked={checkedState}
           disabled={widgetData[0].readonly || disabled}
-          onChange={e => updateCheckedState(e)}
+          onChange={updateCheckedState}
           tabIndex="-1"
         />
         <div
