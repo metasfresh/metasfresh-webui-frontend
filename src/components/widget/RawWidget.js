@@ -677,7 +677,6 @@ export class RawWidget extends Component {
             viewId={viewId}
             autoFocus={autoFocus}
             validStatus={widgetData[0].validStatus}
-            onClearFilters={this.props.onClearFilters}
           />
         );
 

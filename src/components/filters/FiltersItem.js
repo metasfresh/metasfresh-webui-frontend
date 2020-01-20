@@ -1,5 +1,5 @@
 import counterpart from 'counterpart';
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import TetherComponent from 'react-tether';
@@ -13,15 +13,25 @@ import ModalContextShortcuts from '../keyshortcuts/ModalContextShortcuts';
 import Tooltips from '../tooltips/Tooltips.js';
 import RawWidget from '../widget/RawWidget';
 import { openFilterBox, closeFilterBox } from '../../actions/WindowActions';
-import { parseDateWithCurrentTimezone } from '../../utils/documentListHelper';
-import { DATE_FIELDS, DATE_FIELD_FORMATS } from '../../constants/Constants';
+import { DATE_FIELD_FORMATS } from '../../constants/Constants';
+
+import { parseDateToReadable } from './Filters';
 
 /**
  * @file Class based component.
  * @module FiltersItem
  * @extends Component
+ * This component is responsible for rendering the actual widgets for filtering.
+ * It stores a local copy of filters (since filters data come without values,
+ * we need to cross-reference active filters with filters widgets to get the value
+ * of fields) and active filters (to store values before submitting them to the
+ * backend), which are then synced with the API via `Filters` class when applied.
+ *
+ * @TODO: Filters should be stored in the redux state, and the merge should also
+ * happen there. This way we wouldn't have to listen for props changes in the
+ * lifecycle methods as updated props would be passed directly.
  */
-class FiltersItem extends Component {
+class FiltersItem extends PureComponent {
   constructor(props) {
     super(props);
 
@@ -44,10 +54,10 @@ class FiltersItem extends Component {
     this.init();
   }
 
-  UNSAFE_componentWillReceiveProps(props) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { active } = this.props;
 
-    if (JSON.stringify(active) !== JSON.stringify(props.active)) {
+    if (JSON.stringify(active) !== JSON.stringify(nextProps.active)) {
       this.init();
     }
   }
@@ -96,190 +106,233 @@ class FiltersItem extends Component {
     dispatch(closeFilterBox());
   }
 
+  /**
+   * @method init
+   * @summary This function merges filters with applied filters to get the
+   * values for widgets when `active` filter props change, or component is mounted
+   */
   init = () => {
-    const { filter, activeFilter } = this.state;
+    const { data, active } = this.props;
+    let activeFilter = null;
+    if (active) {
+      activeFilter = active.find(item => item.filterId === data.filterId);
+    }
 
-    if (filter.parameters) {
-      filter.parameters.map(item => {
-        this.mergeData(
-          item.parameterName,
-          '',
-          '',
-          // if filter has defaultValue, update local filters data to include
-          // it for displaying
-          item.defaultValue ? true : false,
-          item.defaultValue,
-          item.defaultValueTo
-        );
-      });
+    if (data.parameters) {
+      this.mergeData(data.parameters);
 
       if (
         activeFilter &&
         activeFilter.parameters &&
-        activeFilter.filterId === filter.filterId
+        activeFilter.filterId === data.filterId
       ) {
-        activeFilter.parameters.map(item => {
-          this.mergeData(
-            item.parameterName,
-            item.value != null ? item.value : '',
-            item.valueTo != null ? item.valueTo : '',
-            true,
-            // if filter has value property, use it instead of defaultValue
-            item.value !== undefined ? item.value : item.defaultValue,
-            item.valueTo !== undefined ? item.valueTo : item.defaultValueTo
-          );
-        });
+        this.mergeData(activeFilter.parameters, true);
       }
     }
   };
 
   /**
    * @method setValue
-   * @summary ToDo: Describe the method
-   * @param {*} property
+   * @summary Called from the widgets to set the filter value. It then pushes the
+   * change to the active filter.
+   *
+   * @param {object|array} parameter
    * @param {*} value
    * @param {*} id
    * @param {*} valueTo
    * @param {*} filterId
    * @param {*} defaultValue
-   * @todo Write the documentation
    */
-  setValue = (property, value, id, valueTo = '', filterId, defaultValue) => {
+  setValue = (parameter, value, id, valueTo = '', filterId, defaultValue) => {
     const { resetInitialValues } = this.props;
 
     // if user changed field value and defaultValue is not null, then we need
     // to reset it's initial value so that it won't be set
     if (defaultValue != null) {
-      resetInitialValues && resetInitialValues(filterId, property);
+      resetInitialValues && resetInitialValues(filterId, parameter);
     }
 
-    //@TODO: LOOKUPS GENERATE DIFFERENT TYPE OF PROPERTY parameters
+    //@TODO: LOOKUPS GENERATE DIFFERENT TYPE OF parameters parameters
     // IT HAS TO BE UNIFIED
     //
     // OVERWORKED WORKAROUND
-    if (Array.isArray(property)) {
-      property.map(item => {
-        this.mergeData(
-          item.parameterName,
-          value,
-          valueTo,
-          true,
-          value,
-          valueTo
-        );
-      });
-    } else {
-      this.mergeData(property, value, valueTo, true, value, valueTo);
+    if (!Array.isArray(parameter)) {
+      parameter = [parameter];
     }
-  };
 
-  /**
-   * @method parseDateToReadable
-   * @summary ToDo: Describe the method
-   * @param {*} widgetType
-   * @param {*} value
-   * @todo Write the documentation
-   */
-  parseDateToReadable = (widgetType, value) => {
-    if (DATE_FIELDS.indexOf(widgetType) > -1) {
-      return parseDateWithCurrentTimezone(value, widgetType);
-    }
-    return value;
+    parameter = parameter.map(param => ({
+      parameterName: param,
+      value,
+      valueTo,
+    }));
+
+    const { filter, activeFilter } = this.mergeSingle(parameter, true);
+
+    this.setState({ filter, activeFilter });
   };
 
   /**
    * @method mergeData
-   * @summary ToDo: Describe the method
-   * @todo Write the documentation
+   * @summary Fetches the cross-merged filters/activeFilters data and saves
+   * the result to the local state
+   *
+   * @param {obj} parameters - filter parameters object
+   * @param {bool} active - defines if we're merging filter or active filter
+   * parameters
    */
-  mergeData = (
-    property,
-    value,
-    valueTo,
-    updateActive,
-    activeValue,
-    activeValueTo
-  ) => {
-    let { activeFilter, filter } = this.state;
+  mergeData = (parameters, active = false) => {
+    const { filter, activeFilter } = this.mergeSingle(parameters, active);
 
-    // update values for active filters, as we then bubble them up to use
-    // this data in PATCH request updating them on the server
-    if (updateActive) {
-      let paramExists = false;
+    this.setState({ filter, activeFilter });
+  };
 
-      if (!activeFilter) {
-        activeFilter = {
+  /**
+   * @method mergeSingle
+   * @summary This method syncs values between filters/active filters. It takes an array
+   * of params (be it initial parameters, or updated when the widget value changes) and
+   * traverses the local filter and activeFilter objects updating the values when needed.
+   * If value for parameter exists it will be updated, if not - nulled. In case of active
+   * filters, paremeters without values will be removed (and in case there are no more
+   * parameters left the filter will be removed from active)
+   *
+   * @param {obj} parameters - filter parameters object
+   * @param {bool} active - defines if we're merging filter or active filter
+   * parameters
+   */
+  mergeSingle = (parameters, active) => {
+    const { activeFilter, filter } = this.state;
+    let newActiveFilter = activeFilter
+      ? { ...activeFilter }
+      : {
           filterId: filter.filterId,
           parameters: [],
         };
+    let value = '';
+    let valueTo = '';
+    let activeValue = '';
+    let activeValueTo = '';
+    const paramsMap = {};
+    const updatedParameters = {};
+
+    parameters.forEach(parameter => {
+      const parameterName = parameter.parameterName;
+
+      // if filter has defaultValue, update local filters data to include
+      // it for displaying
+
+      // for active filter
+      if (active) {
+        value = parameter.value != null ? parameter.value : '';
+        valueTo = parameter.valueTo != null ? parameter.valueTo : '';
+
+        // if filter has value property, use it instead of defaultValue
+        activeValue =
+          parameter.value !== undefined
+            ? parameter.value
+            : parameter.defaultValue;
+        activeValueTo =
+          parameter.valueTo !== undefined
+            ? parameter.valueTo
+            : parameter.defaultValueTo;
       }
 
-      // if paramName === property and not value
-        // remove from parameters
-        // if parameters.length === 0
-          // remove filter from active filters
-      const updatedParameters = [];
+      // we need this hashmap to easily now which parameters in the local `filter`
+      // should be updated
+      paramsMap[parameterName] = {
+        value,
+        valueTo,
+        activeValue,
+        activeValueTo,
+      };
 
-      activeFilter.parameters.forEach(param => {
-        if (param.parameterName === property) {
-          // if there's no value, remove the parameter from active filter
-          if (value) {
-            paramExists = true;
+      // update values for active filters, as we then bubble them up to use
+      // this data in PATCH request updating them on the server
+      const updateActive =
+        active || (!active && parameter.defaultValue) ? true : false;
 
-            updatedParameters.push({
-              ...param,
-              value: this.parseDateToReadable(param.widgetType, activeValue),
-              valueTo: this.parseDateToReadable(param.widgetType, activeValueTo),
-              defaultValue: null,
-              defaultValueTo: null,
-            });
-          }
-        } else {
-          updatedParameters.push({
+      if (updateActive) {
+        updatedParameters[parameterName] = {
+          activeValue,
+          activeValueTo,
+        };
+      }
+    });
+
+    // updated activeFilter parameters
+    const parametersArray = [];
+
+    newActiveFilter.parameters.forEach(param => {
+      if (updatedParameters[param.parameterName]) {
+        const { value, activeValue, activeValueTo } = paramsMap[
+          param.parameterName
+        ];
+
+        // if there's no value but param exists in the updated parameters,
+        // remove the parameter from active filter.
+        // Otherwise just update it's value
+        if (value) {
+          parametersArray.push({
             ...param,
+            value: parseDateToReadable(param.widgetType, activeValue),
+            valueTo: parseDateToReadable(param.widgetType, activeValueTo),
             defaultValue: null,
             defaultValueTo: null,
           });
         }
-      });
 
-      if (!paramExists && value) {
-        updatedParameters.push({
-          parameterName: property,
-          value: activeValue,
-          valueTo: activeValueTo,
+        delete updatedParameters[param.parameterName];
+      } else {
+        // copy params that were not updated
+        parametersArray.push({
+          ...param,
           defaultValue: null,
           defaultValueTo: null,
         });
       }
+    });
 
-      if (value) {
-        activeFilter = {
-          ...activeFilter,
-          parameters: updatedParameters,
-        };
-      } else if (!value && updatedParameters.length === 0) {
-        activeFilter = null;
-      }
+    _.forEach(updatedParameters, ({ activeValue, activeValueTo }, key) => {
+      parametersArray.push({
+        parameterName: key,
+        value: activeValue,
+        valueTo: activeValueTo,
+        defaultValue: null,
+        defaultValueTo: null,
+      });
+    });
+
+    // if there are no parameters, filter is not active anymore so null it
+    if (_.size(parametersArray)) {
+      newActiveFilter.parameters = _.map(parametersArray, val => val);
+    } else {
+      newActiveFilter = null;
     }
 
-    this.setState(prevState => ({
-      filter: {
-        ...prevState.filter,
-        parameters: prevState.filter.parameters.map(param => {
-          if (param.parameterName === property) {
+    const returnFilter = {
+      ...filter,
+      parameters: filter.parameters.map(param => {
+        if (paramsMap[param.parameterName]) {
+          const { value, valueTo } = paramsMap[param.parameterName];
+
+          if (value) {
             return {
               ...param,
-              value: this.parseDateToReadable(param.widgetType, value),
-              valueTo: this.parseDateToReadable(param.widgetType, valueTo),
+              value: parseDateToReadable(param.widgetType, value),
+              valueTo: parseDateToReadable(param.widgetType, valueTo),
             };
-          } else {
-            return param;
           }
-        }),
-      },
-      activeFilter,
-    }));
+          return {
+            ...param,
+            value: '',
+            valueTo: '',
+          };
+        }
+
+        return param;
+      }),
+    };
+
+    return { filter: returnFilter, activeFilter: newActiveFilter };
   };
 
   /**
@@ -309,9 +362,10 @@ class FiltersItem extends Component {
     const { filter, activeFilter } = this.state;
 
     if (
-      filter &&
-      filter.parametersLayoutType === 'singleOverlayField' &&
-      !filter.parameters[0].value
+      (filter &&
+        filter.parametersLayoutType === 'singleOverlayField' &&
+        !filter.parameters[0].value) ||
+      activeFilter === null
     ) {
       return this.handleClear();
     }
@@ -356,18 +410,6 @@ class FiltersItem extends Component {
   };
 
   /**
-   * @method handleClearFilters
-   * @summary removes the filter parameter from active filter
-   */
-  handleClearFilters = field => {
-    const { clearFilters } = this.props;
-    const { filter } = this.state;
-
-    clearFilters(filter, field);
-    this.setValue(field, null, null, null, filter.filterId);
-  }
-
-  /**
    * @method toggleTooltip
    * @summary shows/hides tooltip
    * @param {bool} visible
@@ -396,7 +438,6 @@ class FiltersItem extends Component {
       captionValue,
       openedFilter,
       panelCaption,
-      clearFilters,
     } = this.props;
     const { filter, isTooltipShow, maxWidth, maxHeight } = this.state;
     const style = {};
@@ -492,7 +533,6 @@ class FiltersItem extends Component {
                         caption={item.caption}
                         noLabel={false}
                         filterWidget={true}
-                        onClearFilters={this.handleClearFilters}
                         {...{
                           viewId,
                           windowType,
