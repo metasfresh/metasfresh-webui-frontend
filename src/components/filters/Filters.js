@@ -450,7 +450,7 @@ class Filters extends PureComponent {
     if (filtersActive.size) {
       activeFilters = activeFilters.filter((item, id) => {
         if (id === filterToClear.filterId) {
-          if (propertyName && item.parameters && item.parameters.length) { 
+          if (propertyName && item.parameters && item.parameters.length) {
             const parametersCopy = item.parameters.filter(
               param => param.parameterName !== propertyName
             );

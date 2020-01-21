@@ -242,8 +242,6 @@ export class RawWidget extends Component {
     const { handlePatch, inProgress, widgetType } = this.props;
     const willPatch = this.willPatch(property, value, valueTo);
 
-    console.log('RawWidget handlePatch: ', property, value, ', ', willPatch);
-
     // Do patch only when value is not equal state
     // or cache is set and it is not equal value
     if ((isForce || willPatch) && handlePatch && !inProgress) {
