@@ -11,12 +11,13 @@ import Loader from './app/Loader';
  */
 class Process extends PureComponent {
   /**
-   * @method render
+   * @method getWidgetData
    * @summary ToDo: Describe the method
    * @todo Write the documentation
    */
   getWidgetData = (item) => {
-    const widgetData = item.fields.reduce((result) => result, []);
+    const { data } = this.props;
+    const widgetData = item.fields.map(f => data[f.field] || -1);
 
     if (widgetData.length) {
       return widgetData;
