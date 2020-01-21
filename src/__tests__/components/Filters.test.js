@@ -7,6 +7,7 @@ import merge from 'merge';
 
 import { initialState as appHandlerState } from '../../reducers/appHandler';
 import { initialState as windowHandlerState } from '../../reducers/windowHandler';
+import { filtersToMap } from '../../utils/documentListHelper';
 
 import Filters from "../../components/filters/Filters";
 import filtersFixtures from "../../../test_setup/fixtures/filters.json";
@@ -26,24 +27,24 @@ const createStore = function(state = {}) {
   return res;
 }
 
-const createInitialProps = function(basicFixtures = filtersFixtures.data1, additionalProps) {
-    const filterData = additionalProps && additionalProps.filterData
-      ? additionalProps.filterData
-      : basicFixtures.filterData;
-    const filtersActive = additionalProps && additionalProps.filterData
-      ? additionalProps.filtersActive
-      : basicFixtures.filtersActive;
-    const initialValuesNulled = additionalProps && additionalProps.filterData
-      ? additionalProps.initialValuesNulled
-      : basicFixtures.initialValuesNulled;
+const createInitialProps = function(basicFixtures = filtersFixtures.data1, additionalProps = {}) {
+  const filterData = additionalProps.filterData
+    ? additionalProps.filterData
+    : basicFixtures.filterData;
+  const filtersActive = additionalProps.filtersActive
+    ? additionalProps.filtersActive
+    : basicFixtures.filtersActive;
+  const initialValuesNulled = additionalProps.initialValuesNulled
+    ? additionalProps.initialValuesNulled
+    : basicFixtures.initialValuesNulled;
 
   return {
     ...basicFixtures,
     ...additionalProps,
     resetInitialValues: jest.fn(),
     updateDocList: jest.fn(),
-    filterData: Immutable.Map(filterData),
-    filtersActive: Immutable.Map(filtersActive),
+    filterData: filtersToMap(filterData),
+    filtersActive: filtersToMap(filtersActive),
     initialValuesNulled: Immutable.Map(initialValuesNulled),
   };
 };
@@ -71,5 +72,29 @@ describe("Filters tests", () => {
     expect(html).toContain('filters-frequent');
     expect(html).toContain('btn-filter');
     expect(html).toContain(': Date');
+  });
+
+  it("renders active filters caption", () => {
+    const dummyProps = createInitialProps(undefined, { filtersActive: filtersFixtures.filtersActive1 });
+    const initialState = createStore({ 
+      windowHandler: {
+        allowShortcut: true,
+        modal: {
+          visible: false,
+        },
+      }
+    });
+    const store = mockStore(initialState)
+    const wrapper = mount(
+        <Provider store={store}>
+          <Filters {...dummyProps} />
+        </Provider>
+    );
+    const html = wrapper.html();
+
+    expect(html).toContain('filter-wrapper');
+    expect(html).toContain('filters-not-frequent');
+    expect(html).toContain('btn-filter');
+    expect(html).toContain('Akontozahlung, Completed');
   });
 });
