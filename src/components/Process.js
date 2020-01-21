@@ -12,8 +12,7 @@ import Loader from './app/Loader';
 class Process extends PureComponent {
   /**
    * @method getWidgetData
-   * @summary ToDo: Describe the method
-   * @todo Write the documentation
+   * @summary create data array displayed by the process's widgets
    */
   getWidgetData = (item) => {
     const { data } = this.props;
