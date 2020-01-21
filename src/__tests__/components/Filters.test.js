@@ -125,4 +125,49 @@ describe("Filters tests", () => {
     wrapper.find('.filter-option-default').simulate('click');
     expect(wrapper.find('.filter-widget .filter-default').length).toBe(1);
   });
+
+  //@TODO: I expect this to be replaced by a combination of small unit and e2e tests, but
+  // for now it doesn't make sense to write targeted unit tests for Filter descendant components
+  // as the widgets need an architecture overhaul, and filters should be moved to redux state
+  describe('Temporary bloated filter tests', () => {
+    // https://github.com/metasfresh/me03/issues/3649
+    it("clears list filters and applies without error", () => {
+      const dummyProps = createInitialProps(undefined, { filtersActive: filtersFixtures.filtersActive1 });
+      const initialState = createStore({
+        windowHandler: {
+          allowShortcut: true,
+          modal: {
+            visible: false,
+          },
+        }
+      });
+      const store = mockStore(initialState)
+      const wrapper = mount(
+        <ShortcutProvider hotkeys={{}} keymap={{}} >
+          <Provider store={store}>
+            <div className="document-lists-wrapper">
+              <Filters {...dummyProps} />
+            </div>
+          </Provider>
+        </ShortcutProvider>
+      );
+
+      wrapper.find('.filters-not-frequent .btn-filter').simulate('click');
+      expect(wrapper.find('.filters-overlay').length).toBe(1);
+      expect(wrapper.find('.filter-option-default').length).toBe(0);
+
+      expect(wrapper.find('FiltersItem').state().activeFilter).toBeTruthy();
+
+      wrapper.find('.form-field-C_DocType_ID .meta-icon-close-alt').simulate('click');
+      wrapper.update();
+      wrapper.find('.form-field-DocStatus .meta-icon-close-alt').simulate('click');
+      wrapper.update();
+
+      expect(wrapper.find('FiltersItem').state().activeFilter).toBeFalsy();
+      wrapper.find('.filter-widget .filter-btn-wrapper .applyBtn').simulate('click');
+
+      wrapper.update();
+      expect(wrapper.find('.filters-overlay').length).toBe(0);
+    });
+  });
 });
