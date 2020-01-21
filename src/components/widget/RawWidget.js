@@ -1,5 +1,5 @@
 import Moment from 'moment';
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { CSSTransition } from 'react-transition-group';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
@@ -32,7 +32,7 @@ import Lookup from './Lookup/Lookup';
  * @module RawWidget
  * @extends Component
  */
-export class RawWidget extends PureComponent {
+export class RawWidget extends Component {
   constructor(props) {
     super(props);
 
@@ -84,9 +84,17 @@ export class RawWidget extends PureComponent {
    */
   shouldComponentUpdate(nextProps) {
     switch (this.props.widgetType) {
-      case 'YesNo':
-        return nextProps.widgetData[0].value !== this.props.widgetData[0].value;
+      case 'YesNo': {
+        let { widgetData, getWidgetData } = this.props;
+        let {
+          widgetData: nextWidgetData,
+          getWidgetData: nextGetWidgetData,
+        } = nextProps;
+        widgetData = widgetData || getWidgetData();
+        nextWidgetData = nextWidgetData || nextGetWidgetData();
 
+        return nextWidgetData[0].value !== widgetData[0].value;
+      }
       default:
         return true;
     }
