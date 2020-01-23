@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
-import { forEach } from 'lodash';
+import { forEach, cloneDeep, get } from 'lodash';
 
 import { addNotification } from '../actions/AppActions';
 import { getData } from '../actions/GenericActions';
@@ -118,6 +118,10 @@ class MasterWindow extends Component {
     }
 
     if (prevProps.master.websocket !== master.websocket && master.websocket) {
+      // websockets are responsible for pushing info about any updates to the data
+      // displayed in tabs. This is the only place we're updating this apart of
+      // initial load (so contrary to what we used to do, we're not handling responses
+      // from any user actions now, like batch entry for instance)
       connectWS.call(this, master.websocket, async msg => {
         const { includedTabsInfo, stale } = msg;
         const { master } = this.props;
@@ -140,9 +144,7 @@ class MasterWindow extends Component {
                       params.docId,
                       tabId,
                       rowId
-                    ).catch(() => {
-                      return { rowId, tabId };
-                    })
+                    ).catch(() => ({ rowId, tabId }))
                   );
                 });
               }
@@ -161,10 +163,10 @@ class MasterWindow extends Component {
                 // removed row
                 if (!data) {
                   removedRows[response.rowId] = true;
-                  tabId = response.tabId;
+                  tabId = !tabId && response.tabId;
                 } else {
                   const rowZero = data[0];
-                  tabId = rowZero.tabId;
+                  tabId = !tabId && rowZero.tabId;
 
                   data.forEach(row => {
                     rowsById[row.rowId] = { ...row };
@@ -172,13 +174,21 @@ class MasterWindow extends Component {
                 }
 
                 changedTabs[`${tabId}`] = {
-                  changed: { ...rowsById },
-                  removed: { ...removedRows },
+                  changed: {
+                    ...get(changedTabs, `${tabId}.changed`, {}),
+                    ...rowsById,
+                  },
+                  removed: {
+                    ...get(changedTabs, `${tabId}.removed`, {}),
+                    ...removedRows,
+                  },
                 };
               });
 
               forEach(changedTabs, (rowsChanged, tabId) => {
-                dispatch(updateTabRowsData('master', tabId, rowsChanged));
+                dispatch(
+                  updateTabRowsData('master', tabId, cloneDeep(rowsChanged))
+                );
               });
             });
 
