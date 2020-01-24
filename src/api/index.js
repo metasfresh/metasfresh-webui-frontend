@@ -1,4 +1,14 @@
-import { initLayout, getAttributesInstance, topActionsRequest } from './window';
+import {
+  initLayout,
+  getAttributesInstance,
+  topActionsRequest,
+  getZoomIntoWindow,
+  discardNewRow,
+  discardNewDocument,
+  getTab,
+  startProcess,
+  getProcessData,
+} from './window';
 import {
   getViewLayout,
   getViewRowsByIds,
@@ -31,6 +41,12 @@ export {
   initLayout,
   getAttributesInstance,
   topActionsRequest,
+  getZoomIntoWindow,
+  discardNewRow,
+  discardNewDocument,
+  getTab,
+  startProcess,
+  getProcessData,
   getViewLayout,
   getViewRowsByIds,
   browseViewRequest,

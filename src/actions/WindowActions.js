@@ -1,9 +1,7 @@
 import axios from 'axios';
 import counterpart from 'counterpart';
 import { push, replace } from 'react-router-redux';
-import SockJs from 'sockjs-client';
 import currentDevice from 'current-device';
-import Stomp from 'stompjs/lib/stomp.min.js';
 import { Set } from 'immutable';
 
 import {
@@ -58,6 +56,14 @@ import {
   UPDATE_ROW_STATUS,
   UPDATE_TAB_ROWS_DATA,
 } from '../constants/ActionTypes';
+
+import {
+  initLayout,
+  topActionsRequest,
+  getProcessData,
+  getTab,
+  startProcess,
+} from '../api';
 import {
   addNotification,
   setNotificationProgress,
@@ -66,7 +72,6 @@ import {
   deleteNotification,
 } from './AppActions';
 import { getData, openFile, patchRequest } from './GenericActions';
-import { initLayout, topActionsRequest } from '../api';
 import { setListIncludedView } from './ListActions';
 import { getWindowBreadcrumb } from './MenuActions';
 import { toggleFullScreen } from '../utils';
@@ -1253,198 +1258,4 @@ export function deleteLocal(tabid, rowsid, scope, response) {
     }
     dispatch(updateStatus(response.data));
   };
-}
-// END PROCESS ACTIONS
-
-// API CALLS
-
-//ZOOM INTO
-export function getZoomIntoWindow(
-  entity,
-  windowId,
-  docId,
-  tabId,
-  rowId,
-  field
-) {
-  return axios.get(
-    config.API_URL +
-      '/' +
-      entity +
-      '/' +
-      windowId +
-      (docId ? '/' + docId : '') +
-      (tabId ? '/' + tabId : '') +
-      (rowId ? '/' + rowId : '') +
-      '/field' +
-      '/' +
-      field +
-      '/zoomInto?showError=true'
-  );
-}
-
-export function discardNewRow({ windowType, documentId, tabId, rowId } = {}) {
-  return axios.post(
-    config.API_URL +
-      '/window/' +
-      windowType +
-      '/' +
-      documentId +
-      '/' +
-      tabId +
-      '/' +
-      rowId +
-      '/discardChanges'
-  );
-}
-
-export function discardNewDocument({ windowType, documentId } = {}) {
-  return axios.post(
-    config.API_URL +
-      '/window/' +
-      windowType +
-      '/' +
-      documentId +
-      '/discardChanges'
-  );
-}
-
-export function getTab(tabId, windowType, docId, orderBy) {
-  return getData(
-    'window',
-    windowType,
-    docId,
-    tabId,
-    null,
-    null,
-    null,
-    null,
-    orderBy
-  ).then(
-    res =>
-      res.data &&
-      res.data.map(row => ({
-        ...row,
-        fieldsByName: parseToDisplay(row.fieldsByName),
-      }))
-  );
-}
-
-function getProcessData({
-  processId,
-  viewId,
-  type,
-  ids,
-  tabId,
-  rowId,
-  selectedTab,
-  childViewId,
-  childViewSelectedIds,
-  parentViewId,
-  parentViewSelectedIds,
-}) {
-  const payload = {
-    processId: processId,
-  };
-
-  if (viewId) {
-    payload.viewId = viewId;
-    payload.viewDocumentIds = ids;
-
-    if (childViewId) {
-      payload.childViewId = childViewId;
-      payload.childViewSelectedIds = childViewSelectedIds;
-    }
-
-    if (parentViewId) {
-      payload.parentViewId = parentViewId;
-      payload.parentViewSelectedIds =
-        parentViewSelectedIds instanceof Array
-          ? parentViewSelectedIds
-          : [parentViewSelectedIds];
-    }
-  } else {
-    payload.documentId = Array.isArray(ids) ? ids[0] : ids;
-    payload.documentType = type;
-    payload.tabId = tabId;
-    payload.rowId = rowId;
-  }
-
-  if (selectedTab) {
-    const { tabId, rowIds } = selectedTab;
-
-    if (tabId && rowIds) {
-      payload.selectedTab = {
-        tabId,
-        rowIds,
-      };
-    }
-  }
-
-  return axios.post(`${config.API_URL}/process/${processId}`, payload);
-}
-
-export function startProcess(processType, pinstanceId) {
-  return axios.get(
-    `${config.API_URL}/process/${processType}/${pinstanceId}/start`
-  );
-}
-
-export function connectWS(topic, onMessageCallback) {
-  // Avoid disconnecting and reconnecting to same topic.
-  // IMPORTANT: we assume the "onMessageCallback" is same
-  if (this.sockTopic === topic) {
-    // console.log("WS: Skip subscribing because already subscrinbed to %s", this.sockTopic);
-    return;
-  }
-
-  const subscribe = ({ tries = 3 } = {}) => {
-    if (this.sockClient.connected || tries <= 0) {
-      this.sockSubscription = this.sockClient.subscribe(topic, msg => {
-        // console.log("WS: Got event on %s: %s", topic, msg.body);
-        if (topic === this.sockTopic) {
-          onMessageCallback(JSON.parse(msg.body));
-        } else {
-          // console.warn(
-          //   "Discard event because the WS topic changed. Current WS topic is %s",
-          //   this.sockTopic
-          // );
-        }
-      });
-
-      this.sockTopic = topic;
-      // console.log("WS: Subscribed to %s (tries=%s)", this.sockTopic, tries);
-    } else {
-      // not ready yet
-      setTimeout(() => {
-        subscribe({ tries: tries - 1 });
-      }, 200);
-    }
-  };
-
-  const connect = () => {
-    this.sock = new SockJs(config.WS_URL);
-    this.sockClient = Stomp.Stomp.over(this.sock);
-    this.sockClient.debug = null;
-    this.sockClient.connect({}, subscribe);
-  };
-
-  const wasConnected = disconnectWS.call(this, connect);
-  if (!wasConnected) {
-    connect();
-  }
-}
-
-export function disconnectWS(onDisconnectCallback) {
-  const connected =
-    this.sockClient && this.sockClient.connected && this.sockSubscription;
-
-  if (connected) {
-    // console.log("WS: Unsubscribing from %s", this.sockTopic);
-    this.sockSubscription.unsubscribe();
-    this.sockClient.disconnect(onDisconnectCallback);
-    this.sockTopic = null;
-  }
-
-  return connected;
 }
