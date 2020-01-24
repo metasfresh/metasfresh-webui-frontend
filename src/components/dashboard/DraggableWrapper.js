@@ -17,7 +17,7 @@ import {
   removeDashboardWidget,
 } from '../../actions/BoardActions';
 import { patchRequest } from '../../actions/GenericActions';
-import { connectWS, disconnectWS } from '../../actions/WindowActions';
+import { connectWS, disconnectWS } from '../../utils/websockets';
 import logo from '../../assets/images/metasfresh_logo_green_thumb.png';
 import RawChart from '../charts/RawChart';
 import RawList from '../widget/List/RawList';

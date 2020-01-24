@@ -13,8 +13,8 @@ import {
   getRequest,
   patchRequest,
 } from '../actions/GenericActions';
+import { connectWS, disconnectWS } from '../utils/websockets';
 
-import { connectWS, disconnectWS } from '../actions/WindowActions';
 import BlankPage from '../components/BlankPage';
 import Container from '../components/Container';
 import Lanes from '../components/board/Lanes';
