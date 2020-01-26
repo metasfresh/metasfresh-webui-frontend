@@ -30,51 +30,63 @@ class MasterWidget extends Component {
     updated: false,
     edited: false,
     data: '',
+    [this.props.fieldName]: this.props.widgetData,
   };
+  countLine = 0;
 
-  componentDidMount() {
-    const { data, widgetData, clearValue } = this.props;
-
-    // `clearValue` removes current field value for the widget. This is used when
-    // user focuses on table cell and starts typing
-    this.setState({
-      data: data || (clearValue ? '' : widgetData[0].value),
-    });
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    const { widgetData, widgetType } = this.props;
-    const { edited, data } = this.state;
-    let next = nextProps.widgetData[0].value;
-
-    if (
-      !edited &&
-      JSON.stringify(next) !== data &&
-      JSON.stringify(widgetData[0].value) !== JSON.stringify(next)
-    ) {
-      if (next && dateParse.includes(widgetType) && !Moment.isMoment(next)) {
-        next = convertTimeStringToMoment(next);
-        next = Moment(next);
-      }
-      this.setState(
-        {
-          updated: true,
-          data: next,
-        },
-        () => {
-          this.timeout = setTimeout(() => {
-            this.setState({
-              updated: false,
-            });
-          }, 1000);
-        }
-      );
-    } else if (edited) {
-      this.setState({
-        edited: false,
-      });
+  shouldComponentUpdate(nextProps) {
+    if (!_.isEqual(nextProps.widgetData, this.state[nextProps.fieldName])) {
+      return true;
+    } else {
+      return false;
     }
   }
+
+  static getDerivedStateFromProps(props, state) {
+    // `clearValue` removes current field value for the widget. This is used when
+    // user focuses on table cell and starts typing
+    const { data, widgetData, clearValue } = props;
+    if (!_.isEqual(props.widgetData, state[props.fieldName])) {
+      return {
+        [props.fieldName]: props.widgetData,
+        data: data || (clearValue ? '' : widgetData[0].fieldName)
+      }
+    }
+    return null;
+  }
+
+  // UNSAFE_componentWillReceiveProps(nextProps) {
+  //   const { widgetData, widgetType } = this.props;
+  //   const { edited, data } = this.state;
+  //   let next = nextProps.widgetData[0].value;
+  //   if (
+  //     !edited &&
+  //     JSON.stringify(next) !== data &&
+  //     JSON.stringify(widgetData[0].value) !== JSON.stringify(next)
+  //   ) {
+  //     if (next && dateParse.includes(widgetType) && !Moment.isMoment(next)) {
+  //       next = convertTimeStringToMoment(next);
+  //       next = Moment(next);
+  //     }
+  //     this.setState(
+  //       {
+  //         updated: true,
+  //         data: next,
+  //       },
+  //       () => {
+  //         this.timeout = setTimeout(() => {
+  //           this.setState({
+  //             updated: false,
+  //           });
+  //         }, 1000);
+  //       }
+  //     );
+  //   } else if (edited) {
+  //     this.setState({
+  //       edited: false,
+  //     });
+  //   }
+  // }
 
   componentWillUnmount() {
     clearTimeout(this.timeout);
@@ -170,21 +182,21 @@ class MasterWidget extends Component {
     } = this.props;
     let currRowId = rowId;
 
-    this.setState(
-      {
-        edited: true,
-        data: val,
-      },
-      () => {
-        if (!dateParse.includes(widgetType) && !this.validatePrecision(val)) {
-          return;
-        }
-        if (rowId === 'NEW') {
-          currRowId = relativeDocId;
-        }
-        updatePropertyValue(property, val, tabId, currRowId, isModal, entity);
-      }
-    );
+    // this.setState(
+    //   {
+    //     edited: true,
+    //     data: val,
+    //   },
+    //   () => {
+    if (!dateParse.includes(widgetType) && !this.validatePrecision(val)) {
+      return;
+    }
+    if (rowId === 'NEW') {
+      currRowId = relativeDocId;
+    }
+    updatePropertyValue(property, val, tabId, currRowId, isModal, entity);
+    // }
+    // );
   };
 
   /**
@@ -234,13 +246,13 @@ class MasterWidget extends Component {
       .then(res => {
         const url = `/window/${res.data.documentPath.windowId}/${
           res.data.documentPath.documentId
-        }`;
+          }`;
 
         res &&
           res.data &&
           /*eslint-disable */
           window.open(url, '_blank');
-          /*eslint-enable */
+        /*eslint-enable */
       });
   };
 
@@ -260,8 +272,9 @@ class MasterWidget extends Component {
    */
   render() {
     const { handleBackdropLock, onClickOutside } = this.props;
-    const { updated, data } = this.state;
-    const handleFocusFn = handleBackdropLock ? handleBackdropLock : () => {};
+    const { updated } = this.state;
+    const data = this.state[this.props.fieldName][0].value;
+    const handleFocusFn = handleBackdropLock ? handleBackdropLock : () => { };
 
     return (
       <RawWidget

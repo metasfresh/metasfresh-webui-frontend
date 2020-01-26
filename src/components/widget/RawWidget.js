@@ -26,6 +26,7 @@ import Labels from './Labels';
 import Link from './Link';
 import List from './List/List';
 import Lookup from './Lookup/Lookup';
+import { DeepDiffMapper } from 'deep-diff-mapper';
 
 /**
  * @file Class based component.
@@ -1002,6 +1003,9 @@ export class RawWidget extends Component {
           />
         );
       }
+      case 'Color': {
+        return;
+      }
       default:
         return false;
     }
@@ -1042,8 +1046,9 @@ export class RawWidget extends Component {
     const oneLineException =
       ['Switch', 'YesNo', 'Label', 'Button'].indexOf(widgetType) > -1;
 
+
     // Unsupported widget type
-    if (!widgetBody) {
+    if (!widgetBody && typeof widgetBody !== 'undefined') {
       // eslint-disable-next-line no-console
       console.warn(
         'The %c' + widgetType,
@@ -1102,7 +1107,9 @@ export class RawWidget extends Component {
     if (!noLabel && caption && fields[0].supportZoomInto) {
       labelProps.onClick = () => handleZoomInto(fields[0].field);
     }
-
+    if (typeof widgetBody === 'undefined') {  
+      return false;
+    }
     return (
       <div
         className={classnames(
