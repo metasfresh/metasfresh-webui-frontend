@@ -6,6 +6,7 @@ import Moment from 'moment-timezone';
 import * as windowActions from '../../actions/WindowActions';
 import { convertTimeStringToMoment } from '../../utils/documentListHelper';
 import RawWidget from './RawWidget';
+import _ from 'lodash';
 
 function isNumberField(widgetType) {
   switch (widgetType) {
