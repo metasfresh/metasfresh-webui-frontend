@@ -211,7 +211,6 @@ MasterWindowContainer.propTypes = {
   modal: PropTypes.object.isRequired,
   master: PropTypes.object.isRequired,
   breadcrumb: PropTypes.array.isRequired,
-  // dispatch: PropTypes.func.isRequired,
   rawModal: PropTypes.object.isRequired,
   indicator: PropTypes.string.isRequired,
   me: PropTypes.object.isRequired,

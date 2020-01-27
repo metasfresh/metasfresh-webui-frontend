@@ -27,10 +27,6 @@ export default class MasterWindow extends Component {
     introHints: null,
   };
 
-  static contextTypes = {
-    router: PropTypes.object.isRequired,
-  };
-
   componentDidMount() {
     const { master } = this.props;
     const isDocumentNotSaved = !master.saveStatus.saved;
@@ -392,28 +388,7 @@ export default class MasterWindow extends Component {
 }
 
 /**
- * @typedef {object} Props Component props
- * @prop {object} modal
- * @prop {object} master
- * @prop {array} breadcrumb
- * @prop {object} rawModal
- * @prop {string} indicator
- * @prop {object} me
- * @prop {object} [pluginModal]
- * @prop {object} [overlay]
- * @prop {bool} [allowShortcut]
- * @prop {*} [params]
- * @prop {*} [includedView]
- * @prop {*} [processStatus]
- * @prop {*} [enableTutorial]
- * @prop {*} [location]
- * @prop {func} addNotification
- * @prop {func} addRowData
- * @prop {func} attachFileAction
- * @prop {func} sortTab
- * @prop {func} push
- * @prop {func} dispatch
- * @prop {func} dispatch
+ * definition almost identical to /containers/MasterWindow
  */
 MasterWindow.propTypes = {
   modal: PropTypes.object.isRequired,
