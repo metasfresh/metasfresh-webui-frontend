@@ -46,48 +46,26 @@ class MasterWidget extends Component {
   static getDerivedStateFromProps(props, state) {
     // `clearValue` removes current field value for the widget. This is used when
     // user focuses on table cell and starts typing
-    const { data, widgetData, clearValue } = props;
+    const { data, widgetData, clearValue, widgetType } = props;
+    let next = props.widgetData[0].value;
+
     if (!_.isEqual(props.widgetData, state[props.fieldName])) {
-      return {
-        [props.fieldName]: props.widgetData,
-        data: data || (clearValue ? '' : widgetData[0].fieldName)
+      if (next && dateParse.includes(widgetType) && !Moment.isMoment(next)) {
+        next = convertTimeStringToMoment(next);
+        next = Moment(next);
+        return {
+          [props.fieldName]: props.widgetData,
+          data: next,
+        };
+      } else {
+        return {
+          [props.fieldName]: props.widgetData,
+          data: data || (clearValue ? '' : widgetData[0].fieldName),
+        };
       }
     }
     return null;
   }
-
-  // UNSAFE_componentWillReceiveProps(nextProps) {
-  //   const { widgetData, widgetType } = this.props;
-  //   const { edited, data } = this.state;
-  //   let next = nextProps.widgetData[0].value;
-  //   if (
-  //     !edited &&
-  //     JSON.stringify(next) !== data &&
-  //     JSON.stringify(widgetData[0].value) !== JSON.stringify(next)
-  //   ) {
-  //     if (next && dateParse.includes(widgetType) && !Moment.isMoment(next)) {
-  //       next = convertTimeStringToMoment(next);
-  //       next = Moment(next);
-  //     }
-  //     this.setState(
-  //       {
-  //         updated: true,
-  //         data: next,
-  //       },
-  //       () => {
-  //         this.timeout = setTimeout(() => {
-  //           this.setState({
-  //             updated: false,
-  //           });
-  //         }, 1000);
-  //       }
-  //     );
-  //   } else if (edited) {
-  //     this.setState({
-  //       edited: false,
-  //     });
-  //   }
-  // }
 
   componentWillUnmount() {
     clearTimeout(this.timeout);
@@ -247,7 +225,7 @@ class MasterWidget extends Component {
       .then(res => {
         const url = `/window/${res.data.documentPath.windowId}/${
           res.data.documentPath.documentId
-          }`;
+        }`;
 
         res &&
           res.data &&
@@ -275,7 +253,7 @@ class MasterWidget extends Component {
     const { handleBackdropLock, onClickOutside } = this.props;
     const { updated } = this.state;
     const data = this.state[this.props.fieldName][0].value;
-    const handleFocusFn = handleBackdropLock ? handleBackdropLock : () => { };
+    const handleFocusFn = handleBackdropLock ? handleBackdropLock : () => {};
 
     return (
       <RawWidget

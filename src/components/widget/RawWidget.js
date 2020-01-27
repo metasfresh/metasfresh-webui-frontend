@@ -4,6 +4,7 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { List as ImmutableList } from 'immutable';
+import _ from 'lodash';
 
 import { RawWidgetPropTypes, RawWidgetDefaultProps } from './PropTypes';
 import { getClassNames, generateMomentObj } from './RawWidgetHelpers';
@@ -26,7 +27,6 @@ import Labels from './Labels';
 import Link from './Link';
 import List from './List/List';
 import Lookup from './Lookup/Lookup';
-import { DeepDiffMapper } from 'deep-diff-mapper';
 
 /**
  * @file Class based component.
@@ -57,6 +57,7 @@ export class RawWidget extends Component {
       errorPopup: false,
       tooltipToggled: false,
       clearedFieldWarning: false,
+      [this.props.fieldName]: cachedValue,
     };
 
     this.getClassNames = getClassNames.bind(this);
@@ -80,13 +81,20 @@ export class RawWidget extends Component {
    *  Re-rendering conditions by widgetType this to prevent unnecessary re-renders
    *  Performance boost
    */
-  shouldComponentUpdate(nextProps) {
+  shouldComponentUpdate(nextProps, nextState) {
     switch (this.props.widgetType) {
       case 'YesNo':
         return nextProps.widgetData[0].value !== this.props.widgetData[0].value;
-
       default:
-        return true;
+        if (
+          !_.isEqual(
+            nextState[nextProps.fieldName],
+            this.state[nextProps.fieldName]
+          )
+        ) {
+          return true;
+        }
+        return false;
     }
   }
 
@@ -340,6 +348,31 @@ export class RawWidget extends Component {
     );
   };
 
+  handleProxy = (e, applyFunction) => {
+    e.persist();
+    let newInputValue = e.target.value;
+    this.setState({ [this.props.fieldName]: newInputValue });
+    this.applyDebounce(e, applyFunction);
+  };
+
+  applyDebounce = _.debounce((e, applyFunction) => {
+    switch (e.type) {
+      case 'change':
+        if (e.target.value !== this.props.widgetData[0].value) {
+          applyFunction && applyFunction(this.props.fieldName, e.target.value);
+        }
+        break;
+      case 'keydown':
+        applyFunction(
+          e,
+          this.props.fieldName,
+          e.target.value,
+          this.props.widgetType
+        );
+        break;
+    }
+  }, 1000);
+
   /**
    * @method renderWidget
    * @summary ToDo: Describe the method.
@@ -417,16 +450,15 @@ export class RawWidget extends Component {
       //switched to autocomplete=off instead
       autoComplete: 'off',
       className: 'input-field js-input-field',
-      value: widgetValue,
+      value: this.state[this.props.fieldName],
       defaultValue,
       placeholder: fields[0].emptyText,
       disabled: readonly,
       onFocus: this.handleFocus,
       tabIndex: tabIndex,
-      onChange: e => handleChange && handleChange(widgetField, e.target.value),
+      onChange: e => this.handleProxy(e, handleChange),
       onBlur: e => this.handleBlur(widgetField, e.target.value, id),
-      onKeyDown: e =>
-        this.handleKeyDown(e, widgetField, e.target.value, widgetType),
+      onKeyDown: e => this.handleProxy(e, this.handleKeyDown),
       title: widgetValue,
       id,
     };
@@ -1046,7 +1078,6 @@ export class RawWidget extends Component {
     const oneLineException =
       ['Switch', 'YesNo', 'Label', 'Button'].indexOf(widgetType) > -1;
 
-
     // Unsupported widget type
     if (!widgetBody && typeof widgetBody !== 'undefined') {
       // eslint-disable-next-line no-console
@@ -1107,7 +1138,7 @@ export class RawWidget extends Component {
     if (!noLabel && caption && fields[0].supportZoomInto) {
       labelProps.onClick = () => handleZoomInto(fields[0].field);
     }
-    if (typeof widgetBody === 'undefined') {  
+    if (typeof widgetBody === 'undefined') {
       return false;
     }
     return (
