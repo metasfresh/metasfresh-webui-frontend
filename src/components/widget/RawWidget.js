@@ -358,6 +358,15 @@ export class RawWidget extends Component {
    */
   handleProxy = e => {
     let newInputValue = e.target.value;
+    if (e.key === 'Enter') {
+      this.handleKeyDown(
+        e,
+        this.props.widgetField,
+        e.target.value,
+        this.props.widgetType
+      );
+      return false;
+    }
     this.setState({ [this.props.fieldName]: newInputValue });
     return this.applyDebounce();
   };
