@@ -59,7 +59,7 @@ class MasterWidget extends Component {
 
     if (
       !edited &&
-      !_.isEqual(next,data) &&
+      !_.isEqual(next, data) &&
       !_.isEqual(widgetData[0].value, next)
     ) {
       if (next && dateParse.includes(widgetType) && !Moment.isMoment(next)) {

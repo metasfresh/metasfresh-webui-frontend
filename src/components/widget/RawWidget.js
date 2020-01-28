@@ -81,21 +81,12 @@ export class RawWidget extends Component {
    *  Re-rendering conditions by widgetType this to prevent unnecessary re-renders
    *  Performance boost
    */
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps) {
     switch (this.props.widgetType) {
       case 'YesNo':
         return nextProps.widgetData[0].value !== this.props.widgetData[0].value;
       default:
         return true;
-        // if (
-        //   !_.isEqual(
-        //     nextState[nextProps.fieldName],
-        //     this.state[nextProps.fieldName]
-        //   )
-        // ) {
-        //   return true;
-        // }
-        // return false;
     }
   }
 
@@ -364,7 +355,7 @@ export class RawWidget extends Component {
    * @summary It is used to apply a debouncer on input fields
    */
   applyDebounce = _.debounce(() => {
-   return true;
+    return true;
   }, 1000);
 
   /**
@@ -450,9 +441,13 @@ export class RawWidget extends Component {
       disabled: readonly,
       onFocus: this.handleFocus,
       tabIndex: tabIndex,
-      onChange: e => this.handleProxy(e) && handleChange && handleChange(widgetField, e.target.value),
+      onChange: e =>
+        this.handleProxy(e) &&
+        handleChange &&
+        handleChange(widgetField, e.target.value),
       onBlur: e => this.handleBlur(widgetField, e.target.value, id),
-      onKeyDown: e => this.handleProxy(e) && 
+      onKeyDown: e =>
+        this.handleProxy(e) &&
         this.handleKeyDown(e, widgetField, e.target.value, widgetType),
       title: widgetValue,
       id,
@@ -1113,8 +1108,8 @@ export class RawWidget extends Component {
           type === 'primary' && !oneLineException
             ? 'col-sm-12 panel-title'
             : type === 'primaryLongLabels'
-              ? 'col-sm-6'
-              : 'col-sm-3';
+            ? 'col-sm-6'
+            : 'col-sm-3';
       }
 
       fieldClass = dataEntry ? 'col-sm-7' : '';
@@ -1123,8 +1118,8 @@ export class RawWidget extends Component {
           ((type === 'primary' || noLabel) && !oneLineException
             ? 'col-sm-12 '
             : type === 'primaryLongLabels'
-              ? 'col-sm-6'
-              : 'col-sm-9 ') + (fields[0].devices ? 'form-group-flex' : '');
+            ? 'col-sm-6'
+            : 'col-sm-9 ') + (fields[0].devices ? 'form-group-flex' : '');
       }
     }
 
