@@ -4,7 +4,6 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { List as ImmutableList } from 'immutable';
-import _ from 'lodash';
 
 import { RawWidgetPropTypes, RawWidgetDefaultProps } from './PropTypes';
 import { getClassNames, generateMomentObj } from './RawWidgetHelpers';
@@ -27,6 +26,7 @@ import Labels from './Labels';
 import Link from './Link';
 import List from './List/List';
 import Lookup from './Lookup/Lookup';
+import _ from 'lodash';
 
 /**
  * @file Class based component.
@@ -86,15 +86,16 @@ export class RawWidget extends Component {
       case 'YesNo':
         return nextProps.widgetData[0].value !== this.props.widgetData[0].value;
       default:
-        if (
-          !_.isEqual(
-            nextState[nextProps.fieldName],
-            this.state[nextProps.fieldName]
-          )
-        ) {
-          return true;
-        }
-        return false;
+        return true;
+        // if (
+        //   !_.isEqual(
+        //     nextState[nextProps.fieldName],
+        //     this.state[nextProps.fieldName]
+        //   )
+        // ) {
+        //   return true;
+        // }
+        // return false;
     }
   }
 
@@ -348,29 +349,22 @@ export class RawWidget extends Component {
     );
   };
 
-  handleProxy = (e, applyFunction) => {
-    e.persist();
+  /**
+   * @method handleProxy
+   * @summary Sets value in state and apply debounce
+   */
+  handleProxy = e => {
     let newInputValue = e.target.value;
     this.setState({ [this.props.fieldName]: newInputValue });
-    this.applyDebounce(e, applyFunction);
+    return this.applyDebounce();
   };
 
-  applyDebounce = _.debounce((e, applyFunction) => {
-    switch (e.type) {
-      case 'change':
-        if (e.target.value !== this.props.widgetData[0].value) {
-          applyFunction && applyFunction(this.props.fieldName, e.target.value);
-        }
-        break;
-      case 'keydown':
-        applyFunction(
-          e,
-          this.props.fieldName,
-          e.target.value,
-          this.props.widgetType
-        );
-        break;
-    }
+  /**
+   * @method applyDebounce
+   * @summary It is used to apply a debouncer on input fields
+   */
+  applyDebounce = _.debounce(() => {
+   return true;
   }, 1000);
 
   /**
@@ -456,9 +450,10 @@ export class RawWidget extends Component {
       disabled: readonly,
       onFocus: this.handleFocus,
       tabIndex: tabIndex,
-      onChange: e => this.handleProxy(e, handleChange),
+      onChange: e => this.handleProxy(e) && handleChange && handleChange(widgetField, e.target.value),
       onBlur: e => this.handleBlur(widgetField, e.target.value, id),
-      onKeyDown: e => this.handleProxy(e, this.handleKeyDown),
+      onKeyDown: e => this.handleProxy(e) && 
+        this.handleKeyDown(e, widgetField, e.target.value, widgetType),
       title: widgetValue,
       id,
     };
@@ -1118,8 +1113,8 @@ export class RawWidget extends Component {
           type === 'primary' && !oneLineException
             ? 'col-sm-12 panel-title'
             : type === 'primaryLongLabels'
-            ? 'col-sm-6'
-            : 'col-sm-3';
+              ? 'col-sm-6'
+              : 'col-sm-3';
       }
 
       fieldClass = dataEntry ? 'col-sm-7' : '';
@@ -1128,8 +1123,8 @@ export class RawWidget extends Component {
           ((type === 'primary' || noLabel) && !oneLineException
             ? 'col-sm-12 '
             : type === 'primaryLongLabels'
-            ? 'col-sm-6'
-            : 'col-sm-9 ') + (fields[0].devices ? 'form-group-flex' : '');
+              ? 'col-sm-6'
+              : 'col-sm-9 ') + (fields[0].devices ? 'form-group-flex' : '');
       }
     }
 
@@ -1138,9 +1133,7 @@ export class RawWidget extends Component {
     if (!noLabel && caption && fields[0].supportZoomInto) {
       labelProps.onClick = () => handleZoomInto(fields[0].field);
     }
-    if (typeof widgetBody === 'undefined') {
-      return false;
-    }
+
     return (
       <div
         className={classnames(
