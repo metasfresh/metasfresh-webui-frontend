@@ -81,12 +81,24 @@ export class RawWidget extends Component {
    *  Re-rendering conditions by widgetType this to prevent unnecessary re-renders
    *  Performance boost
    */
-  shouldComponentUpdate(nextProps) {
+  shouldComponentUpdate(nextProps, nextState) {
     switch (this.props.widgetType) {
       case 'YesNo':
         return nextProps.widgetData[0].value !== this.props.widgetData[0].value;
       default:
-        return true;
+        if (
+          !_.isEqual(
+            nextState[nextProps.fieldName],
+            this.state[nextProps.fieldName]
+          ) ||
+          !_.isEqual(
+            nextProps.widgetData[0].value,
+            this.state[nextProps.fieldName]
+          )
+        ) {
+          return true;
+        }
+        return false;
     }
   }
 
