@@ -23,6 +23,7 @@ import {
   DISABLE_SHORTCUT,
   DISABLE_OUTSIDE_CLICK,
   HIDE_SPINNER,
+  INIT_WINDOW,
   INIT_DATA_SUCCESS,
   INIT_LAYOUT_SUCCESS,
   FETCHED_QUICK_ACTIONS,
@@ -58,6 +59,8 @@ import {
 } from '../constants/ActionTypes';
 
 import {
+  getData,
+  patchRequest,
   initLayout,
   topActionsRequest,
   getProcessData,
@@ -71,7 +74,7 @@ import {
   setProcessSaved,
   deleteNotification,
 } from './AppActions';
-import { getData, openFile, patchRequest } from './GenericActions';
+import { openFile } from './GenericActions';
 import { setListIncludedView } from './ListActions';
 import { getWindowBreadcrumb } from './MenuActions';
 import { toggleFullScreen } from '../utils';
@@ -486,6 +489,89 @@ export function deselectTableItems(ids, windowType, viewId) {
 
 // THUNK ACTIONS
 
+function initTabs(layout, windowType, docId, isModal) {
+  return dispatch => {
+    let tabTmp = {};
+
+    layout &&
+      layout.map((tab, index) => {
+        tabTmp[tab.tabId] = {};
+
+        if (index === 0 || !tab.queryOnActivate) {
+          getTab(tab.tabId, windowType, docId).then(res => {
+            tabTmp[tab.tabId] = res;
+            dispatch(addRowData(tabTmp, getScope(isModal)));
+          });
+        }
+      });
+  };
+}
+
+export function initWindow(windowType, docId, tabId, rowId = null, isAdvanced) {
+  return dispatch => {
+    dispatch({
+      type: INIT_WINDOW,
+    });
+
+    if (docId === 'NEW') {
+      //New master document
+      return patchRequest({
+        entity: 'window',
+        docType: windowType,
+        docId,
+      });
+    } else {
+      if (rowId === 'NEW') {
+        //New row document
+        return patchRequest({
+          entity: 'window',
+          docType: windowType,
+          docId,
+          tabId,
+          rowId,
+        });
+      } else if (rowId) {
+        //Existing row document
+        return getData(
+          'window',
+          windowType,
+          docId,
+          tabId,
+          rowId,
+          null,
+          null,
+          isAdvanced
+        );
+      } else {
+        //Existing master document
+        return getData(
+          'window',
+          windowType,
+          docId,
+          null,
+          null,
+          null,
+          null,
+          isAdvanced
+        ).catch(() => {
+          dispatch(
+            initDataSuccess({
+              data: {},
+              docId: 'notfound',
+              includedTabsInfo: {},
+              scope: 'master',
+              saveStatus: { saved: true },
+              standardActions: Set(),
+              validStatus: {},
+            })
+          );
+          dispatch(getWindowBreadcrumb(windowType));
+        });
+      }
+    }
+  };
+}
+
 /*
  * Main method to generate window
  */
@@ -497,6 +583,9 @@ export function createWindow(
   isModal = false,
   isAdvanced
 ) {
+
+  console.log('createWindow: ', windowId, docId, tabId, rowId, isModal, isAdvanced)
+
   return dispatch => {
     if (docId == 'new') {
       docId = 'NEW';
@@ -568,85 +657,6 @@ export function createWindow(
           });
       }
     );
-  };
-}
-
-function initTabs(layout, windowType, docId, isModal) {
-  return dispatch => {
-    let tabTmp = {};
-
-    layout &&
-      layout.map((tab, index) => {
-        tabTmp[tab.tabId] = {};
-
-        if (index === 0 || !tab.queryOnActivate) {
-          getTab(tab.tabId, windowType, docId).then(res => {
-            tabTmp[tab.tabId] = res;
-            dispatch(addRowData(tabTmp, getScope(isModal)));
-          });
-        }
-      });
-  };
-}
-
-export function initWindow(windowType, docId, tabId, rowId = null, isAdvanced) {
-  return dispatch => {
-    if (docId === 'NEW') {
-      //New master document
-      return patchRequest({
-        entity: 'window',
-        docType: windowType,
-        docId,
-      });
-    } else {
-      if (rowId === 'NEW') {
-        //New row document
-        return patchRequest({
-          entity: 'window',
-          docType: windowType,
-          docId,
-          tabId,
-          rowId,
-        });
-      } else if (rowId) {
-        //Existing row document
-        return getData(
-          'window',
-          windowType,
-          docId,
-          tabId,
-          rowId,
-          null,
-          null,
-          isAdvanced
-        );
-      } else {
-        //Existing master document
-        return getData(
-          'window',
-          windowType,
-          docId,
-          null,
-          null,
-          null,
-          null,
-          isAdvanced
-        ).catch(() => {
-          dispatch(
-            initDataSuccess({
-              data: {},
-              docId: 'notfound',
-              includedTabsInfo: {},
-              scope: 'master',
-              saveStatus: { saved: true },
-              standardActions: Set(),
-              validStatus: {},
-            })
-          );
-          dispatch(getWindowBreadcrumb(windowType));
-        });
-      }
-    }
   };
 }
 

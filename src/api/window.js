@@ -1,6 +1,6 @@
 import { post, get } from 'axios';
 
-import { getData } from '../actions/GenericActions';
+import { getData } from './global';
 import { parseToDisplay } from '../utils/documentListHelper';
 
 export function initLayout(

@@ -6,7 +6,6 @@ import { push } from 'react-router-redux';
 import { forEach, cloneDeep, get } from 'lodash';
 
 import { addNotification } from '../actions/AppActions';
-import { getData } from '../actions/GenericActions';
 import {
   addRowData,
   attachFileAction,
@@ -16,7 +15,7 @@ import {
   updateTabRowsData,
 } from '../actions/WindowActions';
 import { connectWS, disconnectWS } from '../utils/websockets';
-import { getTab } from '../api';
+import { getTab, getData } from '../api';
 
 import MasterWindow from '../components/app/MasterWindow';
 

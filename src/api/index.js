@@ -1,3 +1,4 @@
+import { getData, patchRequest } from './global';
 import {
   initLayout,
   getAttributesInstance,
@@ -38,6 +39,8 @@ import {
 } from './login';
 
 export {
+  getData,
+  patchRequest,
   initLayout,
   getAttributesInstance,
   topActionsRequest,
