@@ -3,6 +3,7 @@ import counterpart from 'counterpart';
 import { push, replace } from 'react-router-redux';
 import currentDevice from 'current-device';
 import { Set } from 'immutable';
+import { cloneDeep } from 'lodash';
 
 import {
   ACTIVATE_TAB,
@@ -274,7 +275,7 @@ export function updateTabRowsData(scope, tabId, data) {
   return {
     type: UPDATE_TAB_ROWS_DATA,
     payload: {
-      data,
+      data: cloneDeep(data),
       tabId,
       scope,
     },

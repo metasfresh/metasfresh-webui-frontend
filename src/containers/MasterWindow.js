@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
-import { forEach, cloneDeep, get } from 'lodash';
+import { forEach, get } from 'lodash';
 
 import { addNotification } from '../actions/AppActions';
 import {
@@ -71,15 +71,17 @@ class MasterWindowContainer extends Component {
 
               res.forEach(response => {
                 const { data } = response;
-                const rowsById = {};
-                const removedRows = {};
+                let rowsById = null;
+                let removedRows = null;
                 let tabId;
 
                 // removed row
                 if (!data) {
+                  removedRows = removedRows || {};
                   removedRows[response.rowId] = true;
                   tabId = !tabId && response.tabId;
                 } else {
+                  rowsById = rowsById || {};
                   const rowZero = data[0];
                   tabId = !tabId && rowZero.tabId;
 
@@ -88,20 +90,24 @@ class MasterWindowContainer extends Component {
                   });
                 }
 
-                changedTabs[`${tabId}`] = {
-                  changed: {
+                changedTabs[tabId] = {};
+
+                if (rowsById) {
+                  changedTabs[tabId].changed = {
                     ...get(changedTabs, `${tabId}.changed`, {}),
                     ...rowsById,
-                  },
-                  removed: {
+                  };
+                }
+                if (removedRows) {
+                  changedTabs[tabId].removed = {
                     ...get(changedTabs, `${tabId}.removed`, {}),
                     ...removedRows,
-                  },
-                };
+                  };
+                }
               });
 
               forEach(changedTabs, (rowsChanged, tabId) => {
-                updateTabRowsData('master', tabId, cloneDeep(rowsChanged));
+                updateTabRowsData('master', tabId, rowsChanged);
               });
             });
 
