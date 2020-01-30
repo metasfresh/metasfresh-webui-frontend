@@ -96,6 +96,14 @@ export class RawWidget extends Component {
             this.state[nextProps.fieldName]
           )
         ) {
+          if (
+            !_.isEqual(nextProps.widgetData, this.state[nextProps.fieldName]) &&
+            !nextState.isEdited
+          ) {
+            nextState[nextProps.fieldName] = nextProps.widgetData[0].value;
+            return true;
+          }
+
           // Apply filter/patches on input value of type string
           let inputValue = nextProps.widgetData[0].value;
           let inputValueinState = this.state[nextProps.fieldName];
