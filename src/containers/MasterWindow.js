@@ -1,4 +1,3 @@
-// import { Hints, Steps } from 'intro.js-react';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -30,7 +29,14 @@ class MasterWindowContainer extends Component {
   };
 
   componentDidUpdate(prevProps) {
-    const { master, modal, params } = this.props;
+    const {
+      master,
+      modal,
+      params,
+      updateTabRowsData,
+      fireUpdateData,
+      addRowData,
+    } = this.props;
 
     if (prevProps.master.websocket !== master.websocket && master.websocket) {
       // websockets are responsible for pushing info about any updates to the data
