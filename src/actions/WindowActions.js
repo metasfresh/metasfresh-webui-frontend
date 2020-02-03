@@ -491,20 +491,34 @@ export function deselectTableItems(ids, windowType, viewId) {
 // THUNK ACTIONS
 
 function initTabs(layout, windowType, docId, isModal) {
-  return dispatch => {
-    let tabTmp = {};
+  return async dispatch => {
+    const requests = [];
+    const tabTmp = {};
 
-    layout &&
+    if (layout) {
       layout.map((tab, index) => {
         tabTmp[tab.tabId] = {};
 
-        if (index === 0 || !tab.queryOnActivate) {
-          getTab(tab.tabId, windowType, docId).then(res => {
-            tabTmp[tab.tabId] = res;
-            dispatch(addRowData(tabTmp, getScope(isModal)));
-          });
+        if ((tab.tabId && index === 0) || !tab.queryOnActivate) {
+          requests.push(getTab(tab.tabId, windowType, docId));
         }
       });
+
+      return await Promise.all(requests).then(responses => {
+        responses.forEach(res => {
+          // needed for finding tabId
+          const rowZero = res && res[0];
+          if (rowZero) {
+            const tabId = rowZero.tabId;
+            tabTmp[tabId] = res;
+          }
+        });
+
+        dispatch(addRowData(tabTmp, getScope(isModal)));
+      });
+    }
+
+    return Promise.resolve(null);
   };
 }
 
@@ -554,7 +568,8 @@ export function initWindow(windowType, docId, tabId, rowId = null, isAdvanced) {
           null,
           null,
           isAdvanced
-        ).catch(() => {
+        ).catch(e => {
+          dispatch(getWindowBreadcrumb(windowType));
           dispatch(
             initDataSuccess({
               data: {},
@@ -566,7 +581,8 @@ export function initWindow(windowType, docId, tabId, rowId = null, isAdvanced) {
               validStatus: {},
             })
           );
-          dispatch(getWindowBreadcrumb(windowType));
+
+          return { status: e.status, message: e.statusText };
         });
       }
     }
@@ -593,9 +609,10 @@ export function createWindow(
     // to do not re-render widgets on init
     return dispatch(initWindow(windowId, docId, tabId, rowId, isAdvanced)).then(
       response => {
-        if (!response) {
-          return;
+        if (!response || !response.data) {
+          return Promise.resolve(null);
         }
+
         if (docId == 'NEW' && !isModal) {
           dispatch(setLatestNewDocument(response.data[0].id));
           // redirect immedietely
@@ -642,16 +659,17 @@ export function createWindow(
           dispatch(getWindowBreadcrumb(windowId));
         }
 
-        initLayout('window', windowId, tabId, null, null, isAdvanced)
+        return initLayout('window', windowId, tabId, null, null, isAdvanced)
           .then(response =>
             dispatch(initLayoutSuccess(response.data, getScope(isModal)))
           )
           .then(response => {
             if (!isModal) {
-              dispatch(
+              return dispatch(
                 initTabs(response.layout.tabs, windowId, docId, isModal)
               );
             }
+            return Promise.resolve(null);
           });
       }
     );
