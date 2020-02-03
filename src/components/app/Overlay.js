@@ -43,7 +43,7 @@ class Overlay extends Component {
 Overlay.propTypes = {
   toggleOverlay: PropTypes.func,
   data: PropTypes.object,
-  showOverlay: PropTypes.func,
+  showOverlay: PropTypes.bool,
 };
 
 export default connect(

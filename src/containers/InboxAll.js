@@ -49,4 +49,12 @@ class InboxAll extends Component {
   }
 }
 
+InboxAll.PropTypes = {
+  modal: PropTypes.any,
+  rawModal: PropTypes.any,
+  processStatus: PropTypes.any,
+  indicator: PropTypes.any,
+  includedView: PropTypes.any,
+};
+
 export default connect(mapStateToProps)(InboxAll);

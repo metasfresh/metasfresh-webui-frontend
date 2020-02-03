@@ -547,6 +547,12 @@ const mapStateToProps = state => ({
 });
 
 RawLookup.propTypes = {
+  item: PropTypes.object,
+  defaultValue: PropTypes.any,
+  initialFocus: PropTypes.func,
+  autoFocus: PropTypes.bool,
+  filter: PropTypes.object,
+  handleInputEmptyStatus: PropTypes.func,
   isOpen: PropTypes.bool,
   selected: PropTypes.object,
   forcedWidth: PropTypes.number,
@@ -554,6 +560,7 @@ RawLookup.propTypes = {
   dispatch: PropTypes.func.isRequired,
   onDropdownListToggle: PropTypes.func,
   isComposed: PropTypes.bool,
+  mainProperty: PropTypes.any,
 };
 
 export default connect(mapStateToProps)(RawLookup);
