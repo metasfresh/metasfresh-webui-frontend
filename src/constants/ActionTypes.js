@@ -57,7 +57,7 @@ export const SET_PROCESS_STATE_PENDING = 'SET_PROCESS_STATE_PENDING';
 /**
  * @constant
  * Window is being initialized, data requests are triggered
- * @type {string} 
+ * @type {string}
  */
 export const INIT_WINDOW = 'INIT_WINDOW';
 

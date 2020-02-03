@@ -584,9 +584,6 @@ export function createWindow(
   isModal = false,
   isAdvanced
 ) {
-
-  console.log('createWindow: ', windowId, docId, tabId, rowId, isModal, isAdvanced)
-
   return dispatch => {
     if (docId == 'new') {
       docId = 'NEW';

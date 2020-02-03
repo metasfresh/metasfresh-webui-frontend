@@ -2,11 +2,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import classnames from 'classnames';
 
-import {
-  getAttributesInstance,
-  initLayout,
-  patchRequest,
-} from '../../../api';
+import { getAttributesInstance, initLayout, patchRequest } from '../../../api';
 import { completeRequest } from '../../../actions/GenericActions';
 import { parseToDisplay } from '../../../utils/documentListHelper';
 import AttributesDropdown from './AttributesDropdown';

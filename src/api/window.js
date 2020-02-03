@@ -37,7 +37,6 @@ export function topActionsRequest(windowId, documentId, tabId) {
   `);
 }
 
-
 export function getZoomIntoWindow(
   entity,
   windowId,
