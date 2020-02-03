@@ -402,6 +402,8 @@ LoginForm.propTypes = {
   dispatch: PropTypes.func.isRequired,
   path: PropTypes.string,
   token: PropTypes.string,
+  redirect: PropTypes.any,
+  auth: PropTypes.object,
 };
 
 LoginForm.contextTypes = {
