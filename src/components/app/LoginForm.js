@@ -392,12 +392,6 @@ class LoginForm extends Component {
   }
 }
 
-/**
- * @typedef {object} Props Component props
- * @prop {func} dispatch
- * @prop {string} path
- * @prop {string} token
- */
 LoginForm.propTypes = {
   dispatch: PropTypes.func.isRequired,
   path: PropTypes.string,
