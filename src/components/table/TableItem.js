@@ -40,19 +40,31 @@ class TableItem extends Component {
       multilineText,
       multilineTextLines,
       [this.props.rowId]: this.props,
+      lastSelected: null,
     };
   }
 
-  shouldComponentUpdate(nextProps) {
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.selected[0] === this.props.rowId) {
+      nextState.lastSelected = this.props.rowId;
+    }
     if (
       !_.isEqual(
         _.omit(nextProps, 'dataHash'),
         _.omit(this.state[nextProps.rowId], 'dataHash')
       ) &&
-      nextProps.selected[0] === this.props.rowId
+      (nextProps.selected[0] === this.props.rowId ||
+        nextProps.page !== this.props.page)
     ) {
       return true;
     } else {
+      if (
+        nextState.lastSelected &&
+        nextProps.selected[0] &&
+        nextState.lastSelected !== nextProps.selected[0]
+      ) {
+        return true;
+      }
       return false;
     }
   }
@@ -692,6 +704,7 @@ TableItem.propTypes = {
   modalVisible: PropTypes.bool,
   isGerman: PropTypes.bool,
   keyProperty: PropTypes.string,
+  page: PropTypes.number,
 };
 
 export default TableItem;
