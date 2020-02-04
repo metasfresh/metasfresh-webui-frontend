@@ -575,6 +575,21 @@ RawLookup.propTypes = {
   mandatory: PropTypes.bool,
   windowType: PropTypes.string,
   dataId: PropTypes.string,
+  tabId: PropTypes.string,
+  rowId: PropTypes.string,
+  entity: PropTypes.any,
+  subentityId: PropTypes.string,
+  viewId: PropTypes.string,
+  isModal: PropTypes.bool,
+  placeholder: PropTypes.string,
+  recent: PropTypes.any,
+  enableAutofocus: PropTypes.func,
+  resetLocalClearing: PropTypes.any,
+  align: PropTypes.bool,
+  readonly: PropTypes.bool,
+  disabled: PropTypes.bool,
+  tabIndex: PropTypes.number,
+  idValue: PropTypes.string,
 };
 
 export default connect(mapStateToProps)(RawLookup);
