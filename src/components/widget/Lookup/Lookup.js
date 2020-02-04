@@ -602,7 +602,7 @@ Lookup.propTypes = {
   dataId: PropTypes.string,
   tabId: PropTypes.number,
   subentity: PropTypes.any,
-  subentityId: PropTypes.number,
+  subentityId: PropTypes.string,
   viewId: PropTypes.number,
   onSelectBarcode: PropTypes.any,
   onScanBarcode: PropTypes.any,
