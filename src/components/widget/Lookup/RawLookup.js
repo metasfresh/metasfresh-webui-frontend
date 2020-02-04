@@ -549,7 +549,7 @@ const mapStateToProps = state => ({
 RawLookup.propTypes = {
   item: PropTypes.object,
   defaultValue: PropTypes.any,
-  initialFocus: PropTypes.func,
+  initialFocus: PropTypes.bool,
   autoFocus: PropTypes.bool,
   filter: PropTypes.object,
   handleInputEmptyStatus: PropTypes.func,
@@ -561,6 +561,20 @@ RawLookup.propTypes = {
   onDropdownListToggle: PropTypes.func,
   isComposed: PropTypes.bool,
   mainProperty: PropTypes.any,
+  filterWidget: PropTypes.any,
+  lookupEmpty: PropTypes.any,
+  localClearing: PropTypes.any,
+  fireDropdownList: PropTypes.any,
+  parentElement: PropTypes.any,
+  onChange: PropTypes.func,
+  setNextProperty: PropTypes.any,
+  subentity: PropTypes.any,
+  newRecordWindowId: PropTypes.any,
+  newRecordCaption: PropTypes.any,
+  parameterName: PropTypes.string,
+  mandatory: PropTypes.bool,
+  windowType: PropTypes.string,
+  dataId: PropTypes.string,
 };
 
 export default connect(mapStateToProps)(RawLookup);
