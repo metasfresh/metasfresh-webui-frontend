@@ -123,7 +123,7 @@ class TableHeader extends PureComponent {
 TableHeader.propTypes = {
   orderBy: PropTypes.array,
   sort: PropTypes.any,
-  tabId: PropTypes.string,
+  tabId: PropTypes.any,
   deselect: PropTypes.any,
   page: PropTypes.any,
   getSizeClass: PropTypes.func,
