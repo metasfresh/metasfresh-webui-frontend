@@ -603,7 +603,7 @@ Lookup.propTypes = {
   tabId: PropTypes.number,
   subentity: PropTypes.any,
   subentityId: PropTypes.string,
-  viewId: PropTypes.number,
+  viewId: PropTypes.string,
   onSelectBarcode: PropTypes.any,
   onScanBarcode: PropTypes.any,
   rank: PropTypes.any,
