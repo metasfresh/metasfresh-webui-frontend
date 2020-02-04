@@ -613,7 +613,7 @@ Lookup.propTypes = {
   isModal: PropTypes.bool,
   updated: PropTypes.bool,
   filterWidget: PropTypes.any,
-  rowId: PropTypes.number,
+  rowId: PropTypes.string,
   tabIndex: PropTypes.number,
   autoFocus: PropTypes.bool,
   newRecordWindowId: PropTypes.string,
