@@ -600,7 +600,7 @@ Lookup.propTypes = {
   parameterName: PropTypes.string,
   entity: PropTypes.any,
   dataId: PropTypes.string,
-  tabId: PropTypes.number,
+  tabId: PropTypes.string,
   subentity: PropTypes.any,
   subentityId: PropTypes.string,
   viewId: PropTypes.string,

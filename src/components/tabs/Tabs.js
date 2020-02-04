@@ -13,20 +13,6 @@ const TabSingleEntry = props => (
 );
 
 class Tabs extends Component {
-  propTypes = {
-    tabs: PropTypes.array,
-    parentTab: PropTypes.string,
-    children: PropTypes.array,
-    dispatch: PropTypes.func.isRequired,
-    modalVisible: PropTypes.bool.isRequired,
-    windowId: PropTypes.string,
-    tabsByIds: PropTypes.any,
-    onChange: PropTypes.func,
-    tabIndex: PropTypes.string,
-    toggleTableFullScreen: PropTypes.any,
-    fullScreen: PropTypes.any,
-  };
-
   constructor(props) {
     super(props);
 
@@ -224,6 +210,20 @@ class Tabs extends Component {
     );
   }
 }
+
+Tabs.propTypes = {
+  tabs: PropTypes.array,
+  parentTab: PropTypes.string,
+  children: PropTypes.array,
+  dispatch: PropTypes.func.isRequired,
+  modalVisible: PropTypes.bool.isRequired,
+  windowId: PropTypes.string,
+  tabsByIds: PropTypes.any,
+  onChange: PropTypes.func,
+  tabIndex: PropTypes.number,
+  toggleTableFullScreen: PropTypes.any,
+  fullScreen: PropTypes.any,
+};
 
 export default connect(state => ({
   modalVisible: state.windowHandler.modal.visible,

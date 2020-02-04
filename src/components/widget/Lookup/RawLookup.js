@@ -552,7 +552,7 @@ RawLookup.propTypes = {
   initialFocus: PropTypes.bool,
   autoFocus: PropTypes.bool,
   filter: PropTypes.object,
-  handleInputEmptyStatus: PropTypes.func,
+  handleInputEmptyStatus: PropTypes.any,
   isOpen: PropTypes.bool,
   selected: PropTypes.object,
   forcedWidth: PropTypes.number,
