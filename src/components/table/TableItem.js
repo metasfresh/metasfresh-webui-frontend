@@ -41,20 +41,28 @@ class TableItem extends Component {
       multilineTextLines,
       [this.props.rowId]: this.props,
       lastSelected: null,
+      currentPage: null,
     };
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    // page check logic
+    if (nextProps.page !== nextState.currentPage) {
+      nextState.currentPage = nextState.page;
+      return true;
+    }
+
+    // item selection logic
     if (nextProps.selected[0] === this.props.rowId) {
       nextState.lastSelected = this.props.rowId;
     }
+
     if (
       !_.isEqual(
         _.omit(nextProps, 'dataHash'),
         _.omit(this.state[nextProps.rowId], 'dataHash')
       ) &&
-      (nextProps.selected[0] === this.props.rowId ||
-        nextProps.page !== this.props.page)
+      nextProps.selected[0] === this.props.rowId
     ) {
       return true;
     } else {
