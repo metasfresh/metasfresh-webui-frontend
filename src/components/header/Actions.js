@@ -402,7 +402,7 @@ Actions.propTypes = {
   docId: PropTypes.any,
   notfound: PropTypes.bool,
   activeTab: PropTypes.any,
-  activeTabSelected: PropTypes.object,
+  activeTabSelected: PropTypes.array,
   rowId: PropTypes.any,
   closeSubheader: PropTypes.func,
   openModal: PropTypes.func,
