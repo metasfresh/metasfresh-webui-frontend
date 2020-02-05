@@ -66,10 +66,11 @@ export default class FileInput extends Component {
   }
 }
 
-FileInput.PropTypes = {
+FileInput.propTypes = {
   onChange: PropTypes.func,
   name: PropTypes.string,
   className: PropTypes.string,
   disabled: PropTypes.bool,
   placeholder: PropTypes.string,
+  accept: PropTypes.any,
 };
