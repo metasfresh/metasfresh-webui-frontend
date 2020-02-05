@@ -394,7 +394,7 @@ class TableCell extends PureComponent {
 }
 
 TableCell.propTypes = {
-  tabId: PropTypes.number,
+  tabId: PropTypes.any,
   windowId: PropTypes.any,
   keyProperty: PropTypes.string,
   tabIndex: PropTypes.number,
