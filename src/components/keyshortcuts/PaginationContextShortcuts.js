@@ -83,4 +83,5 @@ PaginationContextShortcuts.propTypes = {
   handleNextPage: PropTypes.func,
   handlePrevPage: PropTypes.func,
   pages: PropTypes.number,
+  handleSelectAll: PropTypes.func,
 };
