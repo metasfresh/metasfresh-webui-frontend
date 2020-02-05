@@ -4,6 +4,7 @@
  */
 
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 export default class FileInput extends Component {
   state = {
@@ -64,3 +65,11 @@ export default class FileInput extends Component {
     );
   }
 }
+
+FileInput.PropTypes = {
+  onChange: PropTypes.func,
+  name: PropTypes.string,
+  className: PropTypes.string,
+  disabled: PropTypes.bool,
+  placeholder: PropTypes.string,
+};
