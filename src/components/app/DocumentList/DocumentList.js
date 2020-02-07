@@ -1,14 +1,54 @@
 import counterpart from 'counterpart';
-import classnames from 'classnames';
+import cx from 'classnames';
 import React, { Component } from 'react';
+// import { connect } from 'react-redux';
+// import { push } from 'react-router-redux';
+// import { Map, List, Set } from 'immutable';
+// import currentDevice from 'current-device';
+// import { get } from 'lodash';
 
+// import {
+//   getViewLayout,
+//   locationSearchRequest,
+//   locationConfigRequest,
+//   createViewRequest,
+//   deleteStaticFilter,
+//   filterViewRequest,
+//   getViewRowsByIds,
+// } from '../../api';
+
+// import { fetchDocument } from '../../actions/DataFetching';
+
+// import {
+//   closeListIncludedView,
+//   setListId,
+//   setListIncludedView,
+//   setPagination,
+//   setSorting,
+// } from '../../actions/ListActions';
+// import {
+//   updateRawModal,
+//   indicatorState,
+//   selectTableItems,
+//   deselectTableItems,
+//   removeSelectedTableItems,
+// } from '../../actions/WindowActions';
+// import { connectWS, disconnectWS } from '../../utils/websockets';
+import { getRowsData } from '../../../utils/documentListHelper';
+// import { getSelectionDirect } from '../../reducers/windowHandler';
 import {
+  // DLpropTypes,
+  // DLmapStateToProps,
+  // NO_SELECTION,
   NO_VIEW,
   PANEL_WIDTHS,
+  GEO_PANEL_STATES,
+  // getSortingQuery,
   redirectToNewDocument,
   doesSelectionExist,
   filtersToMap,
-  getRowsData,
+  // mergeColumnInfosIntoViewRows,
+  // mergeRows,
 } from '../../../utils/documentListHelper';
 import Spinner from '../../app/SpinnerOverlay';
 import BlankPage from '../../BlankPage';
@@ -18,6 +58,7 @@ import FiltersStatic from '../../filters/FiltersStatic';
 import Table from '../../table/Table';
 import QuickActions from '../QuickActions';
 import SelectionAttributes from '../SelectionAttributes';
+import GeoMap from '../../maps/GeoMap';
 
 /**
  * @file Class based component.
@@ -28,8 +69,52 @@ export default class DocumentList extends Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      clickOutsideLock: false,
+      toggleWidth: 0,
+      // toggleState: GEO_PANEL_STATES[0],
+    };
+
     this.supportAttribute = false;
   }
+
+  /**
+   * @method setClickOutsideLock
+   * @summary ToDo: Describe the method.
+   */
+  setClickOutsideLock = value => {
+    this.setState({
+      clickOutsideLock: !!value,
+    });
+  };
+
+  /**
+   * @method adjustWidth
+   * @summary ToDo: Describe the method.
+   */
+  adjustWidth = () => {
+    const widthIdx =
+      this.state.toggleWidth + 1 === PANEL_WIDTHS.length
+        ? 0
+        : this.state.toggleWidth + 1;
+
+    this.setState({
+      toggleWidth: widthIdx,
+    });
+  };
+
+  collapseGeoPanels = () => {
+    const { onToggleState, panelsState } = this.props;
+    const stateIdx = GEO_PANEL_STATES.indexOf(panelsState);
+    const newStateIdx =
+      stateIdx + 1 === GEO_PANEL_STATES.length ? 0 : stateIdx + 1;
+
+    // TODO: Pass function from the container to set this
+    // this.setState({
+    //   toggleState: GEO_PANEL_STATES[newStateIdx],
+    // });
+    onToggleState(GEO_PANEL_STATES[newStateIdx]);
+  };
 
   /**
    * @method updateQuickActions
@@ -66,16 +151,6 @@ export default class DocumentList extends Component {
         supportAttribute: false,
       });
     }
-  };
-
-  /**
-   * @method setClickOutsideLock
-   * @summary ToDo: Describe the method.
-   */
-  setClickOutsideLock = value => {
-    this.setState({
-      clickOutsideLock: !!value,
-    });
   };
 
   /**
@@ -153,26 +228,26 @@ export default class DocumentList extends Component {
       updateParentSelectedIds,
       modal,
       dispatch,
+      parentWindowType,
       reduxData,
-      pageLength,
-
+      layout,
       page,
       sort,
-      viewId,
-
+      panelsState,
       onGetSelected,
-      onShowIncludedViewOnSelect,
-      onSortData,
       onFetchLayoutAndData,
-      onChangePage,
-      onFilterChange,
-      onRedirectToDocument,
-      onClearStaticFilters,
+
+      filtersActive,
+      isShowIncluded,
+      hasShowIncluded,
+      refreshSelection,
+      mapConfig,
+      initialValuesNulled,
     } = this.props;
     const {
       // page,
       rowDataMap,
-      // viewId,
+      viewId,
       size,
       staticFilters,
       orderBy,
@@ -180,18 +255,23 @@ export default class DocumentList extends Component {
     } = reduxData;
 
     const {
-      layout,
-      clickOutsideLock,
+      // layout,
+      // data,
+      // viewId,
       // page,
-      filtersActive,
-      isShowIncluded,
-      hasShowIncluded,
-      refreshSelection,
+      // rowDataMap,
+      
+      // filtersActive,
+      // isShowIncluded,
+      // hasShowIncluded,
+      // refreshSelection, 
+      // mapConfig,
+      // initialValuesNulled,
+
       supportAttribute,
-      toggleWidth,
       rowEdited,
-      initialValuesNulled,
-      triggerSpinner,
+      clickOutsideLock,
+      toggleWidth,
     } = this.state;
     let { selected, childSelected, parentSelected } = onGetSelected();
     const modalType = modal ? modal.modalType : null;
@@ -211,6 +291,7 @@ export default class DocumentList extends Component {
       includedView.viewId;
 
     const selectionValid = doesSelectionExist({
+      // data,
       reduxData,
       selected,
       hasIncluded,
@@ -229,20 +310,30 @@ export default class DocumentList extends Component {
       );
     }
 
+    // console.log('RowDataMap: ', rowDataMap)
+
     const showQuickActions = true;
+    const showModalResizeBtn =
+      layout && isModal && hasIncluded && hasShowIncluded;
+    const showGeoResizeBtn =
+      layout &&
+      layout.supportGeoLocations &&
+      reduxData &&
+      reduxData.locationData &&
+      mapConfig.provider !== 'OpenStreetMap';
 
     return (
       <div
-        className={classnames('document-list-wrapper', {
+        className={cx('document-list-wrapper', {
           'document-list-included': isShowIncluded || isIncluded,
           'document-list-has-included': hasShowIncluded || hasIncluded,
         })}
         style={styleObject}
       >
-        {layout && isModal && hasIncluded && hasShowIncluded && (
+        {showModalResizeBtn && (
           <div className="column-size-button col-xxs-3 col-md-0 ignore-react-onclickoutside">
             <button
-              className={classnames(
+              className={cx(
                 'btn btn-meta-outline-secondary btn-sm ignore-react-onclickoutside',
                 {
                   normal: toggleWidth === 0,
@@ -256,8 +347,15 @@ export default class DocumentList extends Component {
         )}
 
         {layout && !readonly && (
-          <div className="panel panel-primary panel-spaced panel-inline document-list-header">
-            <div className={hasIncluded ? 'disabled' : ''}>
+          <div
+            className={cx(
+              'panel panel-primary panel-spaced panel-inline document-list-header',
+              {
+                posRelative: showGeoResizeBtn,
+              }
+            )}
+          >
+            <div className={cx('header-element', { disabled: hasIncluded })}>
               {layout.supportNewRecord && !isModal && (
                 <button
                   className="btn btn-meta-outline-secondary btn-distance btn-sm hidden-sm-down btn-new-document"
@@ -278,7 +376,7 @@ export default class DocumentList extends Component {
                     initialValuesNulled,
                   }}
                   filterData={filtersToMap(layout.filters)}
-                  updateDocList={onFilterChange}
+                  updateDocList={this.handleFilterChange}
                   resetInitialValues={this.resetInitialFilters}
                 />
               )}
@@ -287,16 +385,40 @@ export default class DocumentList extends Component {
                 <FiltersStatic
                   {...{ windowType, viewId }}
                   data={staticFilters}
-                  clearFilters={onClearStaticFilters}
+                  clearFilters={this.clearStaticFilters}
                 />
               )}
             </div>
 
+            {showGeoResizeBtn && (
+              <div className="header-element pane-size-button ignore-react-onclickoutside">
+                <button
+                  className={cx(
+                    'btn btn-meta-outline-secondary btn-sm btn-switch ignore-react-onclickoutside'
+                  )}
+                  onClick={this.collapseGeoPanels}
+                >
+                  <i
+                    className={cx('icon icon-grid', {
+                      greyscaled: panelsState === 'map',
+                    })}
+                  />
+                  <i className="icon text-middle">/</i>
+                  <i
+                    className={cx('icon icon-map', {
+                      greyscaled: panelsState === 'grid',
+                    })}
+                  />
+                </button>
+              </div>
+            )}
+
             {reduxData.data && showQuickActions && (
               <QuickActions
+                className="header-element align-items-center"
                 processStatus={processStatus}
                 ref={c => {
-                  this.quickActionsComponent = c && c.getWrappedInstance();
+                  this.quickActionsComponent = c;
                 }}
                 selected={selected}
                 viewId={viewId}
@@ -313,6 +435,7 @@ export default class DocumentList extends Component {
                     ? {
                         viewId: includedView.viewId,
                         viewSelectedIds: childSelected,
+                        windowType: includedView.windowType,
                       }
                     : NO_VIEW
                 }
@@ -321,9 +444,11 @@ export default class DocumentList extends Component {
                     ? {
                         viewId: parentDefaultViewId,
                         viewSelectedIds: parentSelected,
+                        windowType: parentWindowType,
                       }
                     : NO_VIEW
                 }
+                onInvalidViewId={onFetchLayoutAndData}
               />
             )}
           </div>
@@ -333,85 +458,90 @@ export default class DocumentList extends Component {
           parent={this}
           delay={300}
           iconSize={50}
-          displayCondition={!!(layout && triggerSpinner)}
-          hideCondition={!!(reduxData.data && !triggerSpinner)}
+          displayCondition={!!(layout && this.state.triggerSpinner)}
+          hideCondition={!!(reduxData.data && !this.state.triggerSpinner)}
         />
 
         {layout && reduxData.data && (
           <div className="document-list-body">
-            <Table
-              entity="documentView"
-              ref={c =>
-                (this.table =
-                  c &&
-                  c.getWrappedInstance() &&
-                  c.getWrappedInstance().instanceRef)
-              }
-              rowData={rowDataMap}
-              cols={layout.elements}
-              collapsible={layout.collapsible}
-              expandedDepth={layout.expandedDepth}
-              tabId={1}
-              windowId={windowType}
-              emptyText={layout.emptyResultText}
-              emptyHint={layout.emptyResultHint}
-              readonly={true}
-              supportOpenRecord={layout.supportOpenRecord}
-              rowEdited={rowEdited}
-              onRowEdited={this.setTableRowEdited}
-              keyProperty="id"
-              onDoubleClick={onRedirectToDocument}
-              size={size}
-              pageLength={pageLength}
-              handleChangePage={onChangePage}
-              onSelectionChanged={updateParentSelectedIds}
-              mainTable={true}
-              updateDocList={onFetchLayoutAndData}
-              sort={onSortData}
-              orderBy={orderBy}
-              tabIndex={0}
-              indentSupported={layout.supportTree}
-              disableOnClickOutside={clickOutsideLock}
-              limitOnClickOutside={isModal}
-              defaultSelected={selected}
-              refreshSelection={refreshSelection}
-              queryLimitHit={queryLimitHit}
-              showIncludedViewOnSelect={onShowIncludedViewOnSelect}
-              openIncludedViewOnSelect={
-                layout.includedView && layout.includedView.openOnSelect
-              }
-              blurOnIncludedView={blurWhenOpen}
-              {...{
-                isIncluded,
-                disconnectFromState,
-                autofocus,
-                open,
-                page,
-                closeOverlays,
-                inBackground,
-                disablePaginationShortcuts,
-                isModal,
-                hasIncluded,
-                viewId,
-                windowType,
-              }}
-            >
-              {layout.supportAttributes && !isIncluded && !hasIncluded && (
-                <DataLayoutWrapper
-                  className="table-flex-wrapper attributes-selector js-not-unselect"
-                  entity="documentView"
-                  {...{ windowType, viewId }}
-                  onRowEdited={this.setTableRowEdited}
-                >
-                  <SelectionAttributes
-                    supportAttribute={supportAttribute}
-                    setClickOutsideLock={this.setClickOutsideLock}
-                    selected={selectionValid ? selected : undefined}
-                    shouldNotUpdate={inBackground}
-                  />
-                </DataLayoutWrapper>
-              )}
-            </Table>
+            <div className="row table-row">
+              <Table
+                entity="documentView"
+                ref={c => (this.table = c)}
+                rowData={rowDataMap}
+                cols={layout.elements}
+                collapsible={layout.collapsible}
+                expandedDepth={layout.expandedDepth}
+                tabId={1}
+                windowId={windowType}
+                emptyText={layout.emptyResultText}
+                emptyHint={layout.emptyResultHint}
+                readonly={true}
+                supportOpenRecord={layout.supportOpenRecord}
+                rowEdited={rowEdited}
+                onRowEdited={this.setTableRowEdited}
+                keyProperty="id"
+                onDoubleClick={this.redirectToDocument}
+                size={size}
+                pageLength={this.pageLength}
+                handleChangePage={this.handleChangePage}
+                onSelectionChanged={updateParentSelectedIds}
+                mainTable={true}
+                updateDocList={onFetchLayoutAndData}
+                sort={this.sortData}
+                orderBy={orderBy}
+                tabIndex={0}
+                indentSupported={layout.supportTree}
+                disableOnClickOutside={clickOutsideLock}
+                limitOnClickOutside={isModal}
+                defaultSelected={selected}
+                refreshSelection={refreshSelection}
+                queryLimitHit={queryLimitHit}
+                showIncludedViewOnSelect={this.showIncludedViewOnSelect}
+                openIncludedViewOnSelect={
+                  layout.includedView && layout.includedView.openOnSelect
+                }
+                blurOnIncludedView={blurWhenOpen}
+                focusOnFieldName={layout.focusOnFieldName}
+
+                toggleState={panelsState}
+                {...{
+                  isIncluded,
+                  disconnectFromState,
+                  autofocus,
+                  open,
+                  page,
+                  closeOverlays,
+                  inBackground,
+                  disablePaginationShortcuts,
+                  isModal,
+                  hasIncluded,
+                  viewId,
+                  windowType,
+                }}
+              >
+                {layout.supportAttributes && !isIncluded && !hasIncluded && (
+                  <DataLayoutWrapper
+                    className="table-flex-wrapper attributes-selector js-not-unselect"
+                    entity="documentView"
+                    {...{ windowType, viewId }}
+                    onRowEdited={this.setTableRowEdited}
+                  >
+                    <SelectionAttributes
+                      supportAttribute={supportAttribute}
+                      setClickOutsideLock={this.setClickOutsideLock}
+                      selected={selectionValid ? selected : undefined}
+                      shouldNotUpdate={inBackground}
+                    />
+                  </DataLayoutWrapper>
+                )}
+              </Table>
+              <GeoMap
+                toggleState={panelsState}
+                mapConfig={mapConfig}
+                data={reduxData.locationData}
+              />
+            </div>
           </div>
         )}
       </div>

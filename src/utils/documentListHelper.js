@@ -21,7 +21,7 @@ const DLpropTypes = {
   updateParentSelectedIds: PropTypes.func,
 
   // from @connect
-  dispatch: PropTypes.func.isRequired,
+  // dispatch: PropTypes.func.isRequired,
   selections: PropTypes.object.isRequired,
   childSelected: PropTypes.array.isRequired,
   parentSelected: PropTypes.array.isRequired,
@@ -39,18 +39,15 @@ const DLpropTypes = {
 // const DLcontextTypes = {
 //   store: PropTypes.object.isRequired,
 // };
-const DLmapStateToProps = (state, { master, location, ...props }) => {
+const DLmapStateToProps = (state, { location, ...props }) => {
   const { query } = location;
-  // const { dataHandler } = master;
-  // _defaultViewId={query.viewId}
-  // _defaultSort={query.sort}
-  // _defaultPage={parseInt(query.page)}
-  // _refType={query.refType}
-  // _refId={query.refId}
-  // _refTabId={query.refTabId}
-  const sort = master.sort ? master.sort : query.sort;
+  const { viewHandler } = state;
+
+  // console.log('master: ', viewHandler, location)
+  // const { viewHandler } = master;
+  const sort = viewHandler.master.sort ? viewHandler.master.sort : query.sort;
   const page = 1;
-  const viewId = query.viewId ? query.viewId : master.viewId;
+  const viewId = query.viewId ? query.viewId : viewHandler.master.viewId;
 
     // if (nextDefaultViewId !== viewId) {
     //   dispatch(removeSelectedTableItems({ viewId: viewId, windowType }));
@@ -66,15 +63,20 @@ const DLmapStateToProps = (state, { master, location, ...props }) => {
     // if (nextDefaultPage !== defaultPage && nextDefaultPage !== page) {
     //   stateChanges.page = nextDefaultPage || 1;
     // }
-
-            // const defaultSort={query.sort}
-            // defaultPage={parseInt(query.page)}
-
-            // viewId: location.hash === '#notification' ? this.state.viewId : null,
-
+    // const defaultSort={query.sort}
+    // defaultPage={parseInt(query.page)}
+    // viewId: location.hash === '#notification' ? this.state.viewId : null,
 
   return {
-    reduxData: master,
+    reduxData: viewHandler.master,
+    layout: viewHandler.master.layout,
+    defaultViewId: query.viewId,
+    defaultSort: query.sort,
+    defaultPage: parseInt(query.page),
+    refType: query.refType,
+    refId: query.refId,
+    refTabId: query.refTabId,
+
     page,
     sort,
     viewId,

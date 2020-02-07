@@ -162,14 +162,6 @@ class DocList extends Component {
             type="grid"
             updateUri={this.updateUriCallback}
             windowType={windowType}
-            
-            _defaultViewId={query.viewId}
-            _defaultSort={query.sort}
-            _defaultPage={parseInt(query.page)}
-            _refType={query.refType}
-            _refId={query.refId}
-            _refTabId={query.refTabId}
-
             refRowIds={refRowIds}
             includedView={includedView}
             inBackground={rawModal.visible}
