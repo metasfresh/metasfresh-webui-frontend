@@ -5,14 +5,14 @@ import listHandler from './listHandler';
 import menuHandler from './menuHandler';
 import windowHandler from './windowHandler';
 import pluginsHandler from './pluginsHandler';
-import dataHandler from './dataHandler';
+import viewHandler from './viewHandler';
 
 export default {
   appHandler,
   listHandler,
   menuHandler,
   windowHandler,
-  dataHandler,
+  viewHandler,
   pluginsHandler,
   routing,
 };

@@ -1,5 +1,5 @@
 // import update from 'immutability-helper';
-import { Map /*, List, Set*/ } from 'immutable';
+import { Map, List, /*Set*/ } from 'immutable';
 // import _ from 'lodash';
 // import { createSelector } from 'reselect';
 // import uuid from 'uuid/v4';
@@ -8,13 +8,19 @@ import {
   FETCH_DOCUMENT_PENDING,
   FETCH_DOCUMENT_SUCCESS,
   FETCH_DOCUMENT_ERROR,
-} from '../actions/DataFetching';
+  FETCH_LAYOUT_PENDING,
+  FETCH_LAYOUT_SUCCESS,
+  FETCH_LAYOUT_ERROR,
+} from '../actions/ViewActions';
 
 const initialState = {
   master: {
-    // layout: {
-    //   activeTab: null,
-    // },
+    layout: {
+      activeTab: null,
+      data: [],
+      pending: false,
+      error: null,
+    },
     data: [],
     // rowData is an immutable Map with tabId's as keys, and Lists as values.
     // List's elements are plain objects for now
@@ -48,18 +54,16 @@ const initialState = {
   },
 };
 
-export default function dataHandler(state = initialState, action) {
+export default function viewHandler(state = initialState, action) {
   switch (action.type) {
     case FETCH_DOCUMENT_PENDING:
       return {
         ...state,
         pending: true,
-        notFound: true,
         error: null,
       };
     case FETCH_DOCUMENT_SUCCESS: {
       const {
-        filters,
         firstRow,
         headerProperties,
         pageLength,
@@ -68,11 +72,13 @@ export default function dataHandler(state = initialState, action) {
         type,
         viewId,
         windowId,
+        orderBy,
+        // queryLimit,
+        // queryLimitHit,
       } = action.payload;
 
       const master = {
         ...state.master,
-        filters,
         firstRow,
         headerProperties,
         pageLength,
@@ -80,6 +86,7 @@ export default function dataHandler(state = initialState, action) {
         type,
         viewId,
         windowId,
+        orderBy,
         data: result,
         rowDataMap: Map({ 1: result }),
         pending: false,
@@ -96,6 +103,39 @@ export default function dataHandler(state = initialState, action) {
         pending: false,
         notfound: true,
         error: action.error,
+      };
+
+    // LAYOUT
+    case FETCH_LAYOUT_PENDING:
+      return {
+        ...state,
+        layout: {
+          ...state.layout,
+          pending: true,
+        },
+      };
+    case FETCH_LAYOUT_SUCCESS: {
+      return {
+        ...state,
+        master: {
+          ...state.master,
+          layout: {
+            ...state.master.layout,
+            ...action.payload,
+            pending: false,
+            error: null,
+          },
+        },
+      };
+    }
+    case FETCH_LAYOUT_ERROR:
+      return {
+        ...state,
+        layout: {
+          ...state.layout,
+          pending: false,
+          error: action.error,
+        },
       };
     default:
       return state;
