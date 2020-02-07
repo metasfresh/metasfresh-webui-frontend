@@ -402,13 +402,16 @@ export class RawLookup extends Component {
   };
 
   handleValueChanged() {
-    const { defaultValue, filterWidget, mandatory, placeholder } = this.props;
+    const { defaultValue, filterWidget, mandatory } = this.props;
     const { oldValue, isInputEmpty } = this.state;
 
     if (!filterWidget && !!defaultValue && this.inputSearch) {
       const init = [defaultValue];
       const inputValue = defaultValue.caption;
-
+      const clearValueText = this.props.mainProperty[0].clearValueText;
+      const placeholder = clearValueText
+        ? clearValueText
+        : this.props.placeholder;
       if (!mandatory) {
         init.push({
           caption: placeholder,
