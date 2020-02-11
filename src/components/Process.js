@@ -16,7 +16,7 @@ class Process extends PureComponent {
    */
   getWidgetData = (item) => {
     const { data } = this.props;
-    const widgetData = item.fields.map(f => data[f.field] || -1);
+    const widgetData = item.fields.map((f) => data[f.field] || -1);
 
     if (widgetData.length) {
       return widgetData;
