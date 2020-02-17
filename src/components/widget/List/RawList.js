@@ -13,7 +13,7 @@ import SelectionDropdown from '../SelectionDropdown';
  * to the top of the list. In case it's not in the list (changed partner for instance),
  * use defaultValue
  */
-const setSelectedValue = function(dropdownList, selected, defaultValue) {
+const setSelectedValue = function (dropdownList, selected, defaultValue) {
   const changedValues = {};
   let idx = 0;
   let selectedOption = selected;
@@ -353,6 +353,7 @@ export class RawList extends PureComponent {
       isToggled,
       isFocused,
       clearable,
+      isMultiselect,
     } = this.props;
 
     let value = '';
@@ -374,7 +375,7 @@ export class RawList extends PureComponent {
       ? this.props.properties.emptyText
       : placeholder;
 
-    return (
+    const classicDropdown = (
       <TetherComponent
         attachment="top left"
         targetAttachment="bottom left"
@@ -466,6 +467,19 @@ export class RawList extends PureComponent {
         )}
       </TetherComponent>
     );
+
+    const multiSelectDropdown = (
+       <div>
+         TEST
+       </div>
+    );
+
+    return (
+      <React.Fragment>
+        {isMultiselect && multiSelectDropdown}
+        {!isMultiselect && classicDropdown}
+      </React.Fragment>
+    );
   }
 }
 
@@ -537,6 +551,7 @@ RawList.propTypes = {
   onSelect: PropTypes.func.isRequired,
   onOpenDropdown: PropTypes.func.isRequired,
   onCloseDropdown: PropTypes.func.isRequired,
+  isMultiselect: PropTypes.bool,
 };
 
 RawList.defaultProps = {
