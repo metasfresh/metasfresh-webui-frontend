@@ -8,15 +8,17 @@ import { get } from 'lodash';
 
 import {
   locationSearchRequest,
-  locationConfigRequest,
   deleteStaticFilter,
   getViewRowsByIds,
 } from '../../../api';
 import {
+  createView,
   fetchDocument,
   fetchLayout,
-  createView,
+  fetchLocationConfig,
   filterView,
+  resetView,
+  updateViewData,
 } from '../../../actions/ViewActions';
 import {
   closeListIncludedView,
@@ -63,7 +65,6 @@ class DocumentListContainer extends Component {
     this.state = {
       pageColumnInfosByFieldName: null,
       panelsState: GEO_PANEL_STATES[0],
-      mapConfig: null,
       filtersActive: Map(),
       initialValuesNulled: Map(),
       isShowIncluded: false,
@@ -75,15 +76,8 @@ class DocumentListContainer extends Component {
     this.fetchLayoutAndData();
   }
 
-  // TODO: Handle location
   UNSAFE_componentWillMount() {
-    locationConfigRequest().then(resp => {
-      if (resp.data.provider === 'GoogleMaps') {
-        this.setState({
-          mapConfig: resp.data,
-        });
-      }
-    });
+    this.props.fetchLocationConfig();
   }
 
   componentDidMount = () => {
@@ -93,6 +87,8 @@ class DocumentListContainer extends Component {
   componentWillUnmount() {
     this.mounted = false;
     disconnectWS.call(this);
+
+    this.props.resetView();
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -113,6 +109,7 @@ class DocumentListContainer extends Component {
       // TODO: sorting
       // sort,
       viewId,
+      resetView,
     } = this.props;
     const { staticFilterCleared } = this.state;
 
@@ -147,6 +144,9 @@ class DocumentListContainer extends Component {
           location.hash === '#notification')) ||
       nextRefId !== refId
     ) {
+      // TODO: This should be probably handled by a middleware
+      resetView();
+
       this.setState(
         {
           filtersActive: Map(),
@@ -190,37 +190,39 @@ class DocumentListContainer extends Component {
   //   }
   // }
 
+
+
   // TODO: Handle websockets...
   /**
    * @method connectWebSocket
    * @summary ToDo: Describe the method.
    */
   connectWebSocket = () => {
-    const { windowType, deselectTableItems, viewId } = this.props;
-    // const { viewId } = this.state;
+    const {
+      windowType,
+      deselectTableItems,
+      viewId,
+      updateViewData,
+      reduxData,
+    } = this.props;
 
     connectWS.call(this, `/view/${viewId}`, msg => {
       const { fullyChanged, changedIds } = msg;
 
-      // TODO: Handle WS data
       if (changedIds) {
         getViewRowsByIds(windowType, viewId, changedIds.join()).then(
           response => {
-            const {
-              data,
-              pageColumnInfosByFieldName,
-              filtersActive,
-            } = this.state;
+            const { pageColumnInfosByFieldName, filtersActive } = this.state;
 
             // Here we have to just call some action and save the result in the store
-            const toRows = data.result;
+            const toRows = reduxData.rowDataMap.get('1');
             const { rows, removedRows } = mergeRows({
               toRows,
               fromRows: [...response.data],
               columnInfosByFieldName: pageColumnInfosByFieldName,
               changedIds,
             });
-            const rowsList = List(rows);
+            // const rowsList = List(rows);
 
             if (removedRows.length) {
               deselectTableItems(removedRows, windowType, viewId);
@@ -233,13 +235,15 @@ class DocumentListContainer extends Component {
               this.updateQuickActions();
             }
 
-            this.setState({
-              data: {
-                ...this.state.data,
-                result: rowsList,
-              },
-              // rowDataMap: Map({ 1: rowsList }),
-            });
+            updateViewData(rows);
+
+            // this.setState({
+            //   data: {
+            //     ...this.state.data,
+            //     result: rowsList,
+            //   },
+            //   // rowDataMap: Map({ 1: rowsList }),
+            // });
           }
         );
       }
@@ -279,10 +283,10 @@ class DocumentListContainer extends Component {
   loadSupportAttributeFlag = ({ selected }) => {
     const { reduxData } = this.props;
 
-    if (!reduxData.data) {
+    if (!reduxData.rowDataMap) {
       return;
     }
-    const rows = getRowsData(reduxData.data);
+    const rows = getRowsData(reduxData.rowDataMap.get('1'));
 
     if (selected.length === 1) {
       const selectedRow = rows.find(row => row.id === selected[0]);
@@ -522,7 +526,7 @@ class DocumentListContainer extends Component {
         sortingQuery
       )
         .then(response => {
-          const result = List(response.result);
+          const result = response.result; //List(response.result);
           // result.hashCode();
 
           console.log('index FETCH DOCUMENT RESPONSE: ', response)
@@ -532,8 +536,9 @@ class DocumentListContainer extends Component {
           const forceSelection =
             (type === 'includedView' || isIncluded) &&
             response &&
-            result.size > 0 &&
+            result.length > 0 &&
             (selection.length === 0 ||
+              // TODO: Selections
               !doesSelectionExist({
                 data: {
                   ...response,
@@ -560,9 +565,6 @@ class DocumentListContainer extends Component {
             const newState = {
               pageColumnInfosByFieldName: pageColumnInfosByFieldName,
               triggerSpinner: false,
-              // rowDataMap: Map({ 1: result }),
-              // pageColumnInfosByFieldName: pageColumnInfosByFieldName,
-              // triggerSpinner: false,
             };
 
             if (response.filters) {
@@ -578,8 +580,8 @@ class DocumentListContainer extends Component {
             }
 
             this.setState({ ...newState }, () => {
-              if (forceSelection && response && result && result.size > 0) {
-                const selection = [result.get(0).id];
+              if (forceSelection && response && result && result.length > 0) {
+                const selection = [result[0].id];
 
                 selectTableItems({
                   windowType,
@@ -610,8 +612,11 @@ class DocumentListContainer extends Component {
 
   // TODO: Handle location search
   getLocationData = resultById => {
-    const { windowType, viewId } = this.props;
-    const { /*viewId,*/ mapConfig } = this.state;
+    const {
+      windowType,
+      viewId,
+      reduxData: { mapConfig },
+    } = this.props;
 
     locationSearchRequest({ windowId: windowType, viewId }).then(({ data }) => {
       const locationData = data.locations.map(location => {
@@ -627,12 +632,14 @@ class DocumentListContainer extends Component {
         };
       });
 
-      const newState = {
-        data: {
-          ...this.state.data,
-          locationData,
-        },
-      };
+      console.log('index getLocationData: ', data, locationData);
+
+      // const newState = {
+      //   data: {
+      //     ...this.state.data,
+      //     locationData,
+      //   },
+      // };
 
       if (mapConfig && mapConfig.provider) {
         // for mobile show map
@@ -640,7 +647,7 @@ class DocumentListContainer extends Component {
         newState.panelsState = GEO_PANEL_STATES[1];
       }
 
-      this.setState(newState);
+      // this.setState(newState);
     });
   };
 
@@ -869,6 +876,7 @@ export default withRouter(
   connect(
     DLmapStateToProps,
     {
+      resetView,
       fetchDocument,
       fetchLayout,
       createView,
@@ -884,6 +892,8 @@ export default withRouter(
       selectTableItems,
       deselectTableItems,
       removeSelectedTableItems,
+      updateViewData,
+      fetchLocationConfig,
     },
     null,
     { forwardRef: true }
