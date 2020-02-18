@@ -4,8 +4,8 @@ import TetherComponent from 'react-tether';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { isEqual } from 'lodash';
-
 import SelectionDropdown from '../SelectionDropdown';
+import MultiSelect from '../MultiSelect';
 
 /*
  * We want the selected option to be displayed first,
@@ -468,11 +468,7 @@ export class RawList extends PureComponent {
       </TetherComponent>
     );
 
-    const multiSelectDropdown = (
-       <div>
-         TEST
-       </div>
-    );
+    const multiSelectDropdown = <MultiSelect placeholder="" />;
 
     return (
       <React.Fragment>
