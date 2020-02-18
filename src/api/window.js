@@ -1,6 +1,6 @@
 import { post, get } from 'axios';
 
-import { getData } from './data';
+import { getData } from './view';
 import { parseToDisplay } from '../utils/documentListHelper';
 
 /**

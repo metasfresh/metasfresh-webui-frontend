@@ -1,6 +1,7 @@
 import {
   browseViewRequest,
   createViewRequest,
+  filterViewRequest,
   getViewLayout,
   /*,getLayout*/
 } from '../api';
@@ -14,6 +15,9 @@ export const FETCH_LAYOUT_ERROR = 'FETCH_LAYOUT_ERROR';
 export const CREATE_VIEW = 'CREATE_VIEW';
 export const CREATE_VIEW_SUCCESS = 'CREATE_VIEW_SUCCESS';
 export const CREATE_VIEW_ERROR = 'CREATE_VIEW_ERROR';
+export const FILTER_VIEW_PENDING = 'FILTER_VIEW_PENDING';
+export const FILTER_VIEW_SUCCESS = 'FILTER_VIEW_SUCCESS';
+export const FILTER_VIEW_ERROR = 'FILTER_VIEW_ERROR';
 
 function fetchDocumentPending() {
   return {
@@ -64,16 +68,38 @@ function createViewPending() {
 function createViewSuccess(data) {
   return {
     type: CREATE_VIEW_SUCCESS,
-    payload: { ...data },
+    payload: { viewId: data.viewId },
   };
 }
 
-export function createViewError(error) {
+function createViewError(error) {
   return {
     type: CREATE_VIEW_ERROR,
     error,
   };
 }
+
+function filterViewPending() {
+  return {
+    type: FILTER_VIEW_PENDING,
+  };
+}
+
+function filterViewSuccess(data) {
+  return {
+    type: FILTER_VIEW_SUCCESS,
+    payload: { ...data },
+  };
+}
+
+function filterViewError(error) {
+  return {
+    type: FILTER_VIEW_ERROR,
+    error,
+  };
+}
+
+// THUNK ACTIONS
 
 export function fetchDocument(windowId, viewId, page, pageLength, orderBy) {
   return dispatch => {
@@ -142,7 +168,25 @@ export function fetchLayout(windowId, viewType, viewProfileId = null) {
       .catch(error => {
         dispatch(fetchLayoutError(error));
 
-        //show error message ?
+        return Promise.resolve(error);
+      });
+  };
+}
+
+export function filterView(windowId, viewId, filters) {
+  return dispatch => {
+    dispatch(filterViewPending());
+
+    // TODO: This should send object, like with other requests
+    return filterViewRequest(windowId, viewId, filters)
+      .then(response => {
+        dispatch(filterViewSuccess(response.data));
+
+        return Promise.resolve(response.data);
+      })
+      .catch(error => {
+        dispatch(filterViewError(error));
+
         return Promise.resolve(error);
       });
   };
