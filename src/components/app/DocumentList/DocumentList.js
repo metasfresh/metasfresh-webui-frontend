@@ -132,8 +132,8 @@ export default class DocumentList extends Component {
    */
   loadSupportAttributeFlag = ({ selected }) => {
     const { reduxData } = this.props;
-    const { data } = this.state;
-    if (!data) {
+    // const { data } = this.state;
+    if (!reduxData.data) {
       return;
     }
     const rows = getRowsData(reduxData.data);
@@ -232,10 +232,12 @@ export default class DocumentList extends Component {
       reduxData,
       layout,
       page,
+      pageLength,
       sort,
       panelsState,
       onGetSelected,
       onFetchLayoutAndData,
+      onChangePage,
 
       filtersActive,
       isShowIncluded,
@@ -243,11 +245,14 @@ export default class DocumentList extends Component {
       refreshSelection,
       mapConfig,
       initialValuesNulled,
+
+      viewId,
+      onFilterChange,
     } = this.props;
     const {
       // page,
       rowDataMap,
-      viewId,
+      // viewId,
       size,
       staticFilters,
       orderBy,
@@ -304,6 +309,7 @@ export default class DocumentList extends Component {
     const blurWhenOpen =
       layout && layout.includedView && layout.includedView.blurWhenOpen;
 
+    // TODO: handle notfound properly both in store and here (DocList too?)
     if (notfound || layout === 'notfound' || reduxData.notfound === 'notfound') {
       return (
         <BlankPage what={counterpart.translate('view.error.windowName')} />
@@ -376,7 +382,7 @@ export default class DocumentList extends Component {
                     initialValuesNulled,
                   }}
                   filterData={filtersToMap(layout.filters)}
-                  updateDocList={this.handleFilterChange}
+                  updateDocList={onFilterChange}
                   resetInitialValues={this.resetInitialFilters}
                 />
               )}
@@ -483,8 +489,8 @@ export default class DocumentList extends Component {
                 keyProperty="id"
                 onDoubleClick={this.redirectToDocument}
                 size={size}
-                pageLength={this.pageLength}
-                handleChangePage={this.handleChangePage}
+                pageLength={pageLength}
+                handleChangePage={onChangePage}
                 onSelectionChanged={updateParentSelectedIds}
                 mainTable={true}
                 updateDocList={onFetchLayoutAndData}

@@ -14,7 +14,7 @@ import {
   locationConfigRequest,
   // createViewRequest,
   deleteStaticFilter,
-  filterViewRequest,
+  // filterViewRequest,
   getViewRowsByIds,
 } from '../../../api';
 
@@ -22,6 +22,7 @@ import {
   fetchDocument,
   fetchLayout,
   createView,
+  filterView,
 } from '../../../actions/ViewActions';
 import {
   closeListIncludedView,
@@ -64,7 +65,7 @@ class DocumentListContainer extends Component {
   constructor(props) {
     super(props);
 
-    const { defaultViewId, defaultPage /*, defaultSort*/ } = props;
+    // const { defaultViewId, defaultPage /*, defaultSort*/ } = props;
 
     // TODO: Why it's not in the state?
     this.pageLength =
@@ -74,14 +75,14 @@ class DocumentListContainer extends Component {
     // this.supportAttribute = false;
 
     this.state = {
-      data: null, // view result (result, firstRow, pageLength etc)
+      // data: null, // view result (result, firstRow, pageLength etc)
       // layout: null,
       pageColumnInfosByFieldName: null,
       // toggleWidth: 0,
       panelsState: GEO_PANEL_STATES[0],
       mapConfig: null,
-      viewId: defaultViewId,
-      page: defaultPage || 1,
+      // viewId: defaultViewId,
+      // page: defaultPage || 1,
       // sort: defaultSort,
       filtersActive: Map(),
       initialValuesNulled: Map(),
@@ -98,6 +99,7 @@ class DocumentListContainer extends Component {
     this.fetchLayoutAndData();
   }
 
+  // TODO: Handle location
   UNSAFE_componentWillMount() {
     locationConfigRequest().then(resp => {
       if (resp.data.provider === 'GoogleMaps') {
@@ -117,11 +119,12 @@ class DocumentListContainer extends Component {
     disconnectWS.call(this);
   }
 
-  _UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const {
-      defaultPage: nextDefaultPage,
-      defaultSort: nextDefaultSort,
-      defaultViewId: nextDefaultViewId,
+      // defaultPage: nextDefaultPage,
+      // defaultSort: nextDefaultSort,
+      // defaultViewId: nextDefaultViewId,
+      viewId: nextViewId,
       includedView: nextIncludedView,
       isIncluded: nextIsIncluded,
       refId: nextRefId,
@@ -129,20 +132,20 @@ class DocumentListContainer extends Component {
     } = nextProps;
 
     const {
-      defaultPage,
-      defaultSort,
-      defaultViewId,
+      // defaultPage,
+      // defaultSort,
+      // defaultViewId,
       includedView,
       isIncluded,
       refId,
       windowType,
-      reduxData,
-      removeSelectedTableItems,
+      // reduxData,
+      // removeSelectedTableItems,
       closeListIncludedView,
 
       // TODO: pagination & sorting
-      sort,
-      page,
+      // sort,
+      // page,
       viewId,
     } = this.props;
     // const { viewId } = reduxData;
@@ -170,12 +173,11 @@ class DocumentListContainer extends Component {
     if (
       staticFilterCleared ||
       nextWindowType !== windowType ||
-      (nextDefaultViewId === undefined &&
-        nextDefaultViewId !== defaultViewId) ||
+      // (nextDefaultViewId === undefined &&
+      //   nextDefaultViewId !== defaultViewId) ||
       (nextWindowType === windowType &&
-        ((nextDefaultViewId !== defaultViewId &&
-          isIncluded &&
-          nextIsIncluded) ||
+        // ((nextDefaultViewId !== defaultViewId &&
+        ((nextViewId !== viewId && isIncluded && nextIsIncluded) ||
           location.hash === '#notification')) ||
       nextRefId !== refId
     ) {
@@ -186,7 +188,7 @@ class DocumentListContainer extends Component {
           // layout: null,
           filtersActive: Map(),
           initialValuesNulled: Map(),
-          viewId: location.hash === '#notification' ? viewId : null,
+          // viewId: location.hash === '#notification' ? viewId : null,
           staticFilterCleared: false,
           triggerSpinner: true,
           panelsState: 0,
@@ -202,23 +204,23 @@ class DocumentListContainer extends Component {
     }
 
     const stateChanges = {};
-
+  // TODO: Handle default values
     //TODO: Handle sorting/pagination from redux
-    if (nextDefaultSort !== defaultSort && nextDefaultSort !== sort) {
-      stateChanges.sort = nextDefaultSort;
-    }
+    // if (nextDefaultSort !== defaultSort && nextDefaultSort !== sort) {
+    //   stateChanges.sort = nextDefaultSort;
+    // }
 
-    if (nextDefaultPage !== defaultPage && nextDefaultPage !== page) {
-      stateChanges.page = nextDefaultPage || 1;
-    }
+    // if (nextDefaultPage !== defaultPage && nextDefaultPage !== page) {
+    //   stateChanges.page = nextDefaultPage || 1;
+    // }
 
-    if (nextDefaultViewId !== viewId) {
-      // TODO: Handle selection
-      removeSelectedTableItems({ viewId: viewId, windowType });
+    // if (nextDefaultViewId !== viewId) {
+    //   // TODO: Handle selection
+    //   removeSelectedTableItems({ viewId: viewId, windowType });
 
-      stateChanges.viewId = nextDefaultViewId;
-      stateChanges.refreshSelection = true;
-    }
+    //   stateChanges.viewId = nextDefaultViewId;
+    //   stateChanges.refreshSelection = true;
+    // }
 
     if (included && !nextIncluded) {
       stateChanges.isShowIncluded = false;
@@ -247,6 +249,7 @@ class DocumentListContainer extends Component {
   //   }
   // }
 
+  // TODO: Handle websockets...
   /**
    * @method connectWebSocket
    * @summary ToDo: Describe the method.
@@ -267,6 +270,8 @@ class DocumentListContainer extends Component {
               pageColumnInfosByFieldName,
               filtersActive,
             } = this.state;
+
+            // Here we have to just call some action and save the result in the store
             const toRows = data.result;
             const { rows, removedRows } = mergeRows({
               toRows,
@@ -354,6 +359,7 @@ class DocumentListContainer extends Component {
   //   }
   // };
 
+  // TODO: I think this should be handled too
   /**
    * @method clearStaticFilters
    * @summary ToDo: Describe the method.
@@ -387,8 +393,7 @@ class DocumentListContainer extends Component {
     } = this.props;
     // const { viewId } = this.state;
 
-    // console.log('A: ', windowType, type, viewProfileId);
-
+    // TODO: Spin the spinner
     fetchLayout(windowType, type, viewProfileId)
       .then(response => {
         // console.log('RESPONSE FETCH: ', this.mounted, response)
@@ -477,6 +482,7 @@ class DocumentListContainer extends Component {
     } = this.props;
     const { filtersActive } = this.state;
 
+    // TODO: spin the spinner
     createView(
       windowType,
       type,
@@ -486,7 +492,7 @@ class DocumentListContainer extends Component {
       refTabId,
       refRowIds
     )
-      .then(response => {
+      .then(({ viewId }) => {
         this.mounted &&
           this.setState(
             {
@@ -497,8 +503,8 @@ class DocumentListContainer extends Component {
               triggerSpinner: false,
             },
             () => {
-              this.connectWebSocket(response.viewId);
-              this.getData(response.viewId, page, sort);
+              this.connectWebSocket(viewId);
+              this.getData(viewId, page, sort);
             }
           );
       })
@@ -519,16 +525,14 @@ class DocumentListContainer extends Component {
       sort,
       viewId,
       setListIncludedView,
+      filterView,
     } = this.props;
     const { /*page, sort, viewId, */ filtersActive } = this.state;
 
-    filterViewRequest(
-      windowType,
-      viewId,
-      filtersActive.toIndexedSeq().toArray()
-    )
+    filterView(windowType, viewId, filtersActive.toIndexedSeq().toArray())
       .then(response => {
-        const viewId = response.data.viewId;
+        console.log('filterView response: ', response);
+        const viewId = response.viewId;
 
         if (isIncluded) {
           setListIncludedView({ windowType, viewId });
@@ -537,10 +541,10 @@ class DocumentListContainer extends Component {
         this.mounted &&
           this.setState(
             {
-              data: {
-                ...response.data,
-              },
-              viewId: viewId,
+              // data: {
+              //   ...response.data,
+              // },
+              // viewId: viewId,
               triggerSpinner: false,
             },
             () => {
@@ -569,10 +573,11 @@ class DocumentListContainer extends Component {
       indicatorState,
       selectTableItems,
       updateRawModal,
+      viewId,
     } = this.props;
-    const { viewId } = this.state;
+    // const { viewId } = this.state;
 
-    console.log('B')
+    console.log('B: ', page, sortingQuery, this.pageLength)
 
     if (setNotFound) {
       setNotFound(false);
@@ -596,7 +601,9 @@ class DocumentListContainer extends Component {
       )
         .then(response => {
           const result = List(response.result);
-          result.hashCode();
+          // result.hashCode();
+
+          console.log('index FETCH DOCUMENT RESPONSE: ', response)
 
           const resultById = {};
           const selection = getSelectionDirect(selections, windowType, viewId);
@@ -608,7 +615,7 @@ class DocumentListContainer extends Component {
               !doesSelectionExist({
                 data: {
                   ...response,
-                  result,
+                  // result,
                   // resultById,
                 },
                 selected: selection,
@@ -681,8 +688,8 @@ class DocumentListContainer extends Component {
 
   // TODO: Handle location search
   getLocationData = resultById => {
-    const { windowType } = this.props;
-    const { viewId, mapConfig } = this.state;
+    const { windowType, viewId } = this.props;
+    const { /*viewId,*/ mapConfig } = this.state;
 
     locationSearchRequest({ windowId: windowType, viewId }).then(({ data }) => {
       const locationData = data.locations.map(location => {
@@ -726,9 +733,13 @@ class DocumentListContainer extends Component {
     // const { data } = this.state;
     let currentPage = reduxData.page;
 
+    console.log('index handleChangePage: ', index)
+
     switch (index) {
       case 'up':
-        currentPage * reduxData.pageLength < reduxData.size ? currentPage++ : null;
+        currentPage * reduxData.pageLength < reduxData.size
+          ? currentPage++
+          : null;
         break;
       case 'down':
         currentPage != 1 ? currentPage-- : null;
@@ -739,7 +750,7 @@ class DocumentListContainer extends Component {
 
     this.setState(
       {
-        page: currentPage,
+        // page: currentPage,
         triggerSpinner: true,
       },
       () => {
@@ -753,7 +764,10 @@ class DocumentListContainer extends Component {
    * @summary ToDo: Describe the method.
    */
   sortData = (asc, field, startPage) => {
-    const { viewId, page } = this.state;
+    const { viewId, page } = this.props;
+    // const { viewId, page } = this.state;
+
+    console.log('index sortData')
 
     this.setState(
       {
@@ -889,6 +903,7 @@ class DocumentListContainer extends Component {
     }
   };
 
+  // TODO: Cleanup the selections mess
   /**
    * @method getSelected
    * @summary ToDo: Describe the method.
@@ -901,10 +916,12 @@ class DocumentListContainer extends Component {
       parentWindowType,
       parentDefaultViewId,
       reduxData: { viewId },
+      // selected,
     } = this.props;
 
     return {
       selected: getSelectionDirect(selections, windowType, viewId),
+      // selected,
       childSelected:
         includedView && includedView.windowType
           ? getSelectionDirect(
@@ -953,6 +970,7 @@ export default withRouter(
       fetchDocument,
       fetchLayout,
       createView,
+      filterView,
       setListIncludedView,
       indicatorState,
       closeListIncludedView,

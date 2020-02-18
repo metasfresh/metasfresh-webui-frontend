@@ -5,7 +5,7 @@ import Moment from 'moment-timezone';
 import currentDevice from 'current-device';
 
 import { getItemsByProperty, nullToEmptyStrings } from './index';
-import { getSelection, getSelectionInstant } from '../reducers/windowHandler';
+import { getSelection, getSelectionInstant, getSelectionDirect } from '../reducers/windowHandler';
 import { TIME_REGEX_TEST } from '../constants/Constants';
 
 /**
@@ -41,13 +41,24 @@ const DLpropTypes = {
 // };
 const DLmapStateToProps = (state, { location, ...props }) => {
   const { query } = location;
-  const { viewHandler } = state;
+  const {
+    viewHandler: { master },
+  } = state;
+  const sort = master.sort ? master.sort : query.sort;
+  const page = master.page ? master.page : query.page;
+  let viewId = master.viewId ? master.viewId : query.viewId;
 
-  // console.log('master: ', viewHandler, location)
-  // const { viewHandler } = master;
-  const sort = viewHandler.master.sort ? viewHandler.master.sort : query.sort;
-  const page = 1;
-  const viewId = query.viewId ? query.viewId : viewHandler.master.viewId;
+  if (location.hash === '#notification') {
+    viewId = null;
+  }
+
+  // console.log('master: ', master, sort, page)
+
+  // TODO: Do we still need that ?
+    // defaultViewId: query.viewId,
+    // defaultSort: query.sort,
+    // defaultPage: parseInt(query.page),
+
 
     // if (nextDefaultViewId !== viewId) {
     //   dispatch(removeSelectedTableItems({ viewId: viewId, windowType }));
@@ -67,19 +78,23 @@ const DLmapStateToProps = (state, { location, ...props }) => {
     // defaultPage={parseInt(query.page)}
     // viewId: location.hash === '#notification' ? this.state.viewId : null,
 
+
+    // selected: getSelectionDirect(selections, windowType, viewId),
+
   return {
-    reduxData: viewHandler.master,
-    layout: viewHandler.master.layout,
-    defaultViewId: query.viewId,
-    defaultSort: query.sort,
-    defaultPage: parseInt(query.page),
+    page,
+    sort,
+    viewId,
+    reduxData: master,
+    layout: master.layout,
+    // defaultViewId: query.viewId,
+    // defaultSort: query.sort,
+    // defaultPage: parseInt(query.page),
     refType: query.refType,
     refId: query.refId,
     refTabId: query.refTabId,
 
-    page,
-    sort,
-    viewId,
+    // TODO: This should use redux as data source
     selections: state.windowHandler.selections,
     selected: getSelectionInstant(
       state,
