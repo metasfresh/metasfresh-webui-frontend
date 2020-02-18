@@ -13,7 +13,7 @@ import MultiSelect from '../MultiSelect';
  * to the top of the list. In case it's not in the list (changed partner for instance),
  * use defaultValue
  */
-const setSelectedValue = function (dropdownList, selected, defaultValue) {
+const setSelectedValue = function(dropdownList, selected, defaultValue) {
   const changedValues = {};
   let idx = 0;
   let selectedOption = selected;
@@ -468,7 +468,16 @@ export class RawList extends PureComponent {
       </TetherComponent>
     );
 
-    const multiSelectDropdown = <MultiSelect placeholder="" />;
+    const multiSelectDropdown = (
+      <MultiSelect
+        placeholder=""
+        options={this.state.dropdownList}
+        onOpenDropdown={this.props.onOpenDropdown}
+        onCloseDropdown={this.props.onCloseDropdown}
+        isToggled={this.props.isToggled}
+        onFocus={this.props.onFocus}
+      />
+    );
 
     return (
       <React.Fragment>
