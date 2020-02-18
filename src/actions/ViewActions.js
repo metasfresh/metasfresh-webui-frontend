@@ -3,9 +3,11 @@ import {
   createViewRequest,
   filterViewRequest,
   getViewLayout,
-  /*,getLayout*/
+  // locationSearchRequest,
+  locationConfigRequest,
 } from '../api';
 
+export const RESET_VIEW = 'RESET_VIEW';
 export const FETCH_DOCUMENT_PENDING = 'FETCH_DOCUMENT_PENDING';
 export const FETCH_DOCUMENT_SUCCESS = 'FETCH_DOCUMENT_SUCCESS';
 export const FETCH_DOCUMENT_ERROR = 'FETCH_DOCUMENT_ERROR';
@@ -18,6 +20,14 @@ export const CREATE_VIEW_ERROR = 'CREATE_VIEW_ERROR';
 export const FILTER_VIEW_PENDING = 'FILTER_VIEW_PENDING';
 export const FILTER_VIEW_SUCCESS = 'FILTER_VIEW_SUCCESS';
 export const FILTER_VIEW_ERROR = 'FILTER_VIEW_ERROR';
+export const UPDATE_VIEW_DATA = 'UPDATE_VIEW_DATA';
+export const FETCH_LOCATION_CONFIG_SUCCESS = 'FETCH_LOCATION_CONFIG_SUCCESS';
+
+export function resetView() {
+  return {
+    type: RESET_VIEW,
+  };
+}
 
 function fetchDocumentPending() {
   return {
@@ -99,19 +109,36 @@ function filterViewError(error) {
   };
 }
 
+export function updateViewData(rows, tabId) {
+  return {
+    type: UPDATE_VIEW_DATA,
+    payload: {
+      rows,
+      tabId,
+    },
+  };
+}
+
+function fetchLocationConfigSuccess(data) {
+  return {
+    type: FETCH_LOCATION_CONFIG_SUCCESS,
+    payload: { data },
+  };
+}
+
 // THUNK ACTIONS
 
 export function fetchDocument(windowId, viewId, page, pageLength, orderBy) {
-  return dispatch => {
+  return (dispatch) => {
     dispatch(fetchDocumentPending());
 
     return browseViewRequest({ windowId, viewId, page, pageLength, orderBy })
-      .then(response => {
+      .then((response) => {
         dispatch(fetchDocumentSuccess(response.data));
 
         return Promise.resolve(response.data);
       })
-      .catch(error => {
+      .catch((error) => {
         dispatch(fetchDocumentError(error));
 
         //show error message ?
@@ -129,7 +156,7 @@ export function createView(
   refTabId,
   refRowIds
 ) {
-  return dispatch => {
+  return (dispatch) => {
     dispatch(createViewPending());
 
     return createViewRequest({
@@ -141,12 +168,12 @@ export function createView(
       refTabId,
       refRowIds,
     })
-      .then(response => {
+      .then((response) => {
         dispatch(createViewSuccess(response.data));
 
         return Promise.resolve(response.data);
       })
-      .catch(error => {
+      .catch((error) => {
         dispatch(createViewError(error));
 
         //show error message ?
@@ -156,11 +183,11 @@ export function createView(
 }
 
 export function fetchLayout(windowId, viewType, viewProfileId = null) {
-  return dispatch => {
+  return (dispatch) => {
     dispatch(fetchLayoutPending());
 
     return getViewLayout(windowId, viewType, viewProfileId)
-      .then(response => {
+      .then((response) => {
         dispatch(fetchLayoutSuccess(response.data));
 
         return Promise.resolve(response.data);
@@ -174,19 +201,31 @@ export function fetchLayout(windowId, viewType, viewProfileId = null) {
 }
 
 export function filterView(windowId, viewId, filters) {
-  return dispatch => {
+  return (dispatch) => {
     dispatch(filterViewPending());
 
     // TODO: This should send object, like with other requests
     return filterViewRequest(windowId, viewId, filters)
-      .then(response => {
+      .then((response) => {
         dispatch(filterViewSuccess(response.data));
 
         return Promise.resolve(response.data);
       })
-      .catch(error => {
+      .catch((error) => {
         dispatch(filterViewError(error));
 
+        return Promise.resolve(error);
+      });
+  };
+}
+
+export function fetchLocationConfig() {
+  return (dispatch) => {
+    return locationConfigRequest()
+      .then((response) => {
+        dispatch(fetchLocationConfigSuccess(response.data));
+      })
+      .catch((error) => {
         return Promise.resolve(error);
       });
   };

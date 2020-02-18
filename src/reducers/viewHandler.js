@@ -1,5 +1,5 @@
 // import update from 'immutability-helper';
-import { Map, List, /*Set*/ } from 'immutable';
+import { Map, List /*Set*/ } from 'immutable';
 // import _ from 'lodash';
 // import { createSelector } from 'reselect';
 // import uuid from 'uuid/v4';
@@ -17,8 +17,13 @@ import {
   FILTER_VIEW,
   FILTER_VIEW_SUCCESS,
   FILTER_VIEW_ERROR,
+  UPDATE_VIEW_DATA,
+
+  FETCH_LOCATION_CONFIG_SUCCESS,
+  FETCH_LOCATION_CONFIG_ERROR,
   // SET_NOT_FOUND,
   // RESET_NOT_FOUND,
+  RESET_VIEW,
 } from '../actions/ViewActions';
 
 const initialState = {
@@ -29,7 +34,7 @@ const initialState = {
     error: null,
     notfound: false,
   },
-  data: List(),
+  // data: List(),
   // rowData is an immutable Map with tabId's as keys, and Lists as values.
   // List's elements are plain objects for now
   rowDataMap: Map(),
@@ -48,6 +53,7 @@ const initialState = {
   staticFilters: null,
   orderBy: null,
   queryLimitHit: null,
+  mapConfig: null,
 
   // columnsByFieldName: null,
   // websocket: null,
@@ -190,16 +196,40 @@ export default function viewHandler(state = initialState, action) {
         error: action.error,
       };
 
+    case UPDATE_VIEW_DATA: {
+      const tabId = action.payload.tabId || '1';
+      const updatedRowsData = this.state.rowDataMap.set(
+        tabId,
+        action.payload.rows
+      );
+
+      return {
+        ...state,
+        rowDataMap: updatedRowsData,
+      };
+    }
+
+    case FETCH_LOCATION_CONFIG_SUCCESS: {
+      const { payload } = action;
+
+      if (payload.data.provider === 'GoogleMaps') {
+        return {
+          ...state,
+          mapConfig: payload.data,
+        };
+      }
+
+      return state;
+    }
     // case SET_NOT_FOUND:
     //   return {
     //     ...state,
     //     notfound: true,
     //   };
-    // case RESET_NOT_FOUND:
-    //   return {
-    //     ...state,
-    //     notfound: false,
-    //   }
+    case RESET_VIEW:
+      return {
+        ...initialState,
+      };
     default:
       return state;
   }
