@@ -470,7 +470,7 @@ export class RawList extends PureComponent {
 
     const multiSelectDropdown = (
       <MultiSelect
-        placeholder=""
+        placeholder="Select options"
         options={this.state.dropdownList}
         onOpenDropdown={this.props.onOpenDropdown}
         onCloseDropdown={this.props.onCloseDropdown}

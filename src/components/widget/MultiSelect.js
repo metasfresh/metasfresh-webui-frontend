@@ -18,6 +18,11 @@ class MultiSelect extends Component {
       placeholderBox: {
         color: 'lightgray',
         display: 'inline',
+        padding: '5px',
+      },
+      chkItemsBox: {
+        color: 'black',
+        padding: '5px',
       },
       headerBox: {
         display: 'box',
@@ -55,7 +60,8 @@ class MultiSelect extends Component {
       isSelectBoxVisible: false,
       data: this.props.options,
       filter: '',
-      checkedItems: [],
+      checkedItems: {},
+      checkboxSelectAll: false,
       activeSearch: false,
     };
   }
@@ -67,6 +73,10 @@ class MultiSelect extends Component {
       };
     }
     return null;
+  }
+
+  componentDidMount() {
+    this.props.onFocus();
   }
 
   applyFilter = (e) => {
@@ -81,9 +91,26 @@ class MultiSelect extends Component {
     }
   };
 
-  componentDidMount() {
-    this.props.onFocus();
-  }
+  selectAll = () => {
+    let allItems = {};
+    let optSet = false;
+    if (!this.state.checkboxSelectAll) {
+      optSet = true;
+    } else {
+      optSet = false;
+    }
+    this.state.data.map((item) => {
+      allItems[item.key] = {
+        key: item.key,
+        caption: item.caption,
+        value: optSet,
+      };
+    });
+    this.setState({
+      checkedItems: allItems,
+      checkboxSelectAll: !this.state.checkboxSelectAll,
+    });
+  };
 
   headerboxClick = () => {
     this.props.onFocus();
@@ -91,25 +118,22 @@ class MultiSelect extends Component {
   };
 
   selectItem = (key, caption) => {
-    const foundInCheckedItems = this.state.checkedItems.find(
-      (item) => item.key === key
-    );
-    if (!foundInCheckedItems) {
-      this.setState({
-        checkedItems: [
-          ...this.state.checkedItems,
-          { key: key, caption: caption },
-        ],
-      });
+    let newCheckedItems = JSON.parse(JSON.stringify(this.state.checkedItems));
+    if (typeof this.state.checkedItems[key] === 'undefined') {
+      newCheckedItems[key] = { key: key, caption: caption, value: true };
     } else {
-      // otherwise remove it from checked items
-      let newCheckedItems = this.state.checkedItems.filter(
-        (obj) => obj.key !== key
-      );
-      this.setState({
-        checkedItems: newCheckedItems,
-      });
+      newCheckedItems[key].value = !this.state.checkedItems[key].value;
     }
+    this.setState({ checkedItems: newCheckedItems });
+  };
+
+  haveChecked = () => {
+    let resultCheck = false;
+    Object.keys(this.state.checkedItems).map((item) => {
+      if (this.state.checkedItems[item].value) resultCheck = true;
+      return item;
+    });
+    return resultCheck;
   };
 
   render() {
@@ -118,6 +142,8 @@ class MultiSelect extends Component {
       searchBox,
       searchInput,
       isSelectBoxVisible,
+      checkboxSelectAll,
+      checkedItems,
       data,
     } = this.state;
     const { placeholder } = this.props;
@@ -135,10 +161,21 @@ class MultiSelect extends Component {
       </div>
     );
 
+    let itemsSelected = '';
+    Object.keys(this.state.checkedItems).map((item) => {
+      if (this.state.checkedItems[item].value) {
+        itemsSelected += ' ' + this.state.checkedItems[item].caption + ' ';
+      }
+      return item;
+    });
+
     return (
       <div style={this.state.mainBoxStyle}>
         <div style={this.state.headerBox} onClick={this.headerboxClick}>
-          <div style={this.state.placeholderBox}>{placeholder}</div>
+          {!this.haveChecked() && (
+            <div style={this.state.placeholderBox}>{placeholder}</div>
+          )}
+
           {!this.state.isSelectBoxVisible && (
             <div
               className="input-icon input-readonly float-right"
@@ -155,6 +192,10 @@ class MultiSelect extends Component {
               <i className="meta-icon-close-1" />
             </div>
           )}
+          {/* render the selected items */}
+          {this.haveChecked() && (
+            <div style={this.state.chkItemsBox}>{itemsSelected}</div>
+          )}
         </div>
         {isSelectBoxVisible && <div style={this.state.horizontalRule} />}
 
@@ -168,10 +209,15 @@ class MultiSelect extends Component {
 
         {isSelectBoxVisible && (
           <div style={this.state.selectBox}>
-            <div className="btn-meta-default">
+            <div className="btn-meta-default" onClick={this.selectAll}>
               <div className="float-left">Select All</div>
               <div className="float-right">
-                <input type="checkbox" />
+                <input
+                  type="checkbox"
+                  checked={checkboxSelectAll}
+                  value={checkboxSelectAll}
+                  onChange={this.selectAll}
+                />
               </div>
               <div className="clearfix" />
             </div>
@@ -184,7 +230,15 @@ class MultiSelect extends Component {
               >
                 <div className="float-left">{item.caption}</div>
                 <div className="float-right">
-                  <input type="checkbox" />
+                  <input
+                    type="checkbox"
+                    checked={
+                      typeof checkedItems[item.key] !== 'undefined'
+                        ? checkedItems[item.key].value
+                        : false
+                    }
+                    onChange={() => this.selectItem(item.key, item.caption)}
+                  />
                 </div>
                 <div className="clearfix" />
               </div>
