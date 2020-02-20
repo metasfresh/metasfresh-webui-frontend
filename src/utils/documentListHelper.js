@@ -5,7 +5,11 @@ import Moment from 'moment-timezone';
 import currentDevice from 'current-device';
 
 import { getItemsByProperty, nullToEmptyStrings } from './index';
-import { getSelection, getSelectionInstant, getSelectionDirect } from '../reducers/windowHandler';
+import {
+  getSelection,
+  getSelectionInstant,
+  getSelectionDirect,
+} from '../reducers/windowHandler';
 import { TIME_REGEX_TEST } from '../constants/Constants';
 
 /**
@@ -36,9 +40,6 @@ const DLpropTypes = {
  * @typedef {object} Props Component context
  * @prop {object} DLcontextTypes
  */
-// const DLcontextTypes = {
-//   store: PropTypes.object.isRequired,
-// };
 const DLmapStateToProps = (state, { location, ...props }) => {
   const { query } = location;
   const {
@@ -51,6 +52,8 @@ const DLmapStateToProps = (state, { location, ...props }) => {
   if (location.hash === '#notification') {
     viewId = null;
   }
+
+  console.log('PROPS: ', viewId, master.viewId, query.viewId)
 
   // console.log('master: ', master, sort, page)
 
@@ -77,6 +80,26 @@ const DLmapStateToProps = (state, { location, ...props }) => {
     // const defaultSort={query.sort}
     // defaultPage={parseInt(query.page)}
     // viewId: location.hash === '#notification' ? this.state.viewId : null,
+
+  // TODO: Handle default values
+    //TODO: Handle sorting/pagination from redux
+    // if (nextDefaultSort !== defaultSort && nextDefaultSort !== sort) {
+    //   stateChanges.sort = nextDefaultSort;
+    // }
+
+    // if (nextDefaultPage !== defaultPage && nextDefaultPage !== page) {
+    //   stateChanges.page = nextDefaultPage || 1;
+    // }
+
+    // if (nextDefaultViewId !== viewId) {
+    //   // TODO: Handle selection
+    //   removeSelectedTableItems({ viewId: viewId, windowType });
+
+    //   stateChanges.viewId = nextDefaultViewId;
+    //   stateChanges.refreshSelection = true;
+    // }
+
+
 
 
     // selected: getSelectionDirect(selections, windowType, viewId),
