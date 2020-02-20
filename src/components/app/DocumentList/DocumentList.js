@@ -3,13 +3,11 @@ import cx from 'classnames';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-// import { getRowsData } from '../../../utils/documentListHelper';
 import {
   NO_VIEW,
   PANEL_WIDTHS,
   GEO_PANEL_STATES,
   redirectToNewDocument,
-  doesSelectionExist,
   filtersToMap,
   DLpropTypes,
 } from '../../../utils/documentListHelper';
@@ -53,20 +51,9 @@ export default class DocumentList extends Component {
   };
 
   /**
-   * @method adjustWidth
-   * @summary ToDo: Describe the method.
+   * @method collapseGeoPanels
+   * @summary Show/hide map and results of geolocation search.
    */
-  adjustWidth = () => {
-    const widthIdx =
-      this.state.toggleWidth + 1 === PANEL_WIDTHS.length
-        ? 0
-        : this.state.toggleWidth + 1;
-
-    this.setState({
-      toggleWidth: widthIdx,
-    });
-  };
-
   collapseGeoPanels = () => {
     const { onToggleState, panelsState } = this.props;
     const stateIdx = GEO_PANEL_STATES.indexOf(panelsState);
@@ -87,31 +74,6 @@ export default class DocumentList extends Component {
   };
 
   /**
-   * @method resetInitialFilters
-   * @summary ToDo: Describe the method.
-   */
-  resetInitialFilters = (filterId, parameterName) => {
-    let { initialValuesNulled } = this.state;
-    let filterParams = initialValuesNulled.get(filterId);
-
-    if (!filterParams && parameterName) {
-      filterParams = Set([parameterName]);
-    } else if (filterParams && parameterName) {
-      filterParams = filterParams.add(parameterName);
-    }
-
-    if (!parameterName) {
-      initialValuesNulled = initialValuesNulled.delete(filterId);
-    } else {
-      initialValuesNulled = initialValuesNulled.set(filterId, filterParams);
-    }
-
-    this.setState({
-      initialValuesNulled,
-    });
-  };
-
-  /**
    * @method setTableRowEdited
    * @summary ToDo: Describe the method.
    */
@@ -126,7 +88,8 @@ export default class DocumentList extends Component {
 
   /**
    * @method adjustWidth
-   * @summary ToDo: Describe the method.
+   * @summary Sets the width of the panel to be of % of the available space.
+   * Options available in PANEL_WIDTHS constant. Useful for mobile views.
    */
   adjustWidth = () => {
     const widthIdx =
@@ -159,7 +122,6 @@ export default class DocumentList extends Component {
       inModal,
       updateParentSelectedIds,
       modal,
-      dispatch,
       parentWindowType,
       reduxData,
       layout,
@@ -169,6 +131,7 @@ export default class DocumentList extends Component {
       onGetSelected,
       onFetchLayoutAndData,
       onChangePage,
+      onRedirectToDocument,
       filtersActive,
       isShowIncluded,
       hasShowIncluded,
@@ -178,16 +141,13 @@ export default class DocumentList extends Component {
       triggerSpinner,
       viewId,
       onFilterChange,
-
+      onResetInitialFilters,
       supportAttribute,
+      hasIncluded,
+      selectionValid,
+      onRedirectToNewDocument,
     } = this.props;
-    const {
-      rowData,
-      size,
-      staticFilters,
-      orderBy,
-      queryLimitHit,
-    } = reduxData;
+    const { rowData, size, staticFilters, orderBy, queryLimitHit } = reduxData;
     const { rowEdited, clickOutsideLock, toggleWidth } = this.state;
 
     let { selected, childSelected, parentSelected } = onGetSelected();
@@ -199,19 +159,6 @@ export default class DocumentList extends Component {
     if (toggleWidth !== 0) {
       styleObject.flex = PANEL_WIDTHS[toggleWidth];
     }
-
-    const hasIncluded =
-      layout &&
-      layout.includedView &&
-      includedView &&
-      includedView.windowType &&
-      includedView.viewId;
-
-    const selectionValid = doesSelectionExist({
-      rowData,
-      selected,
-      hasIncluded,
-    });
 
     if (!selectionValid) {
       selected = null;
@@ -273,7 +220,7 @@ export default class DocumentList extends Component {
               {layout.supportNewRecord && !isModal && (
                 <button
                   className="btn btn-meta-outline-secondary btn-distance btn-sm hidden-sm-down btn-new-document"
-                  onClick={() => redirectToNewDocument(dispatch, windowType)}
+                  onClick={onRedirectToNewDocument}
                   title={layout.newRecordCaption}
                 >
                   <i className="meta-icon-add" />
@@ -291,7 +238,7 @@ export default class DocumentList extends Component {
                   }}
                   filterData={filtersToMap(layout.filters)}
                   updateDocList={onFilterChange}
-                  resetInitialValues={this.resetInitialFilters}
+                  resetInitialValues={onResetInitialFilters}
                 />
               )}
 
@@ -395,7 +342,7 @@ export default class DocumentList extends Component {
                 rowEdited={rowEdited}
                 onRowEdited={this.setTableRowEdited}
                 keyProperty="id"
-                onDoubleClick={this.redirectToDocument}
+                onDoubleClick={onRedirectToDocument}
                 size={size}
                 pageLength={pageLength}
                 handleChangePage={onChangePage}
@@ -481,4 +428,6 @@ DocumentList.propTypes = {
   onFilterChange: PropTypes.func,
   onRedirectToDocument: PropTypes.func,
   onClearStaticFilters: PropTypes.func,
+  onResetInitialFilters: PropTypes.func,
+  onRedirectToNewDocument: PropTypes.func,
 };
