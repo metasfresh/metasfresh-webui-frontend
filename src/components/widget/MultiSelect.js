@@ -6,7 +6,6 @@ class MultiSelect extends Component {
     super(props);
     this.state = {
       data: this.props.options,
-      filter: '',
       checkedItems: {},
     };
   }
