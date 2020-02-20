@@ -218,18 +218,22 @@ export class RawList extends PureComponent {
       ...setSelectedValue(dropdownList, selected),
     };
 
-    this.setState(changedValues, () => {
-      if (selected.key === null) {
-        onSelect(null);
-      } else {
-        onSelect(selected);
-      }
-      onCloseDropdown();
+    if (Array.isArray(selected)) {
+      onSelect(selected);
+    } else {
+      this.setState(changedValues, () => {
+        if (selected.key === null) {
+          onSelect(null);
+        } else {
+          onSelect(selected);
+        }
+        onCloseDropdown();
 
-      setTimeout(() => {
-        this.focusDropdown();
-      }, 0);
-    });
+        setTimeout(() => {
+          this.focusDropdown();
+        }, 0);
+      });
+    }
   }
 
   /**
@@ -470,12 +474,13 @@ export class RawList extends PureComponent {
 
     const multiSelectDropdown = (
       <MultiSelect
-        placeholder="Select options"
         options={this.state.dropdownList}
         onOpenDropdown={this.props.onOpenDropdown}
         onCloseDropdown={this.props.onCloseDropdown}
         isToggled={this.props.isToggled}
         onFocus={this.props.onFocus}
+        onSelect={this.props.onSelect}
+        selectedItems={this.props.selected}
       />
     );
 

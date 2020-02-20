@@ -15,7 +15,35 @@ class MultiSelect extends Component {
     this.props.onFocus();
   }
 
+  static getDerivedStateFromProps(nextProps) {
+    let selected =
+      nextProps.selectedItems && Array.isArray(nextProps.selectedItems)
+        ? nextProps.selectedItems
+        : nextProps.selectedItems !== null
+        ? nextProps.selectedItems.values
+        : null;
+    if (selected !== null) {
+      let updatedCheckedItems = {};
+      selected.map((item) => {
+        if (item) {
+          updatedCheckedItems[item.key] = {
+            key: item.key,
+            caption: item.caption,
+            value: true,
+          };
+        }
+        return item;
+      });
+      return {
+        checkedItems: updatedCheckedItems,
+      };
+    }
+
+    return null;
+  }
+
   selectItem = (key, caption) => {
+    let selected = null;
     let newCheckedItems = JSON.parse(JSON.stringify(this.state.checkedItems));
     if (typeof this.state.checkedItems[key] === 'undefined') {
       newCheckedItems[key] = { key: key, caption: caption, value: true };
@@ -23,19 +51,20 @@ class MultiSelect extends Component {
       newCheckedItems[key].value = !this.state.checkedItems[key].value;
     }
     this.setState({ checkedItems: newCheckedItems });
-  };
-
-  haveChecked = () => {
-    let resultCheck = false;
-    Object.keys(this.state.checkedItems).map((item) => {
-      if (this.state.checkedItems[item].value) resultCheck = true;
-      return item;
+    selected = Object.keys(newCheckedItems).map((item) => {
+      if (newCheckedItems[item].value === true) {
+        return {
+          key: newCheckedItems[item].key,
+          caption: newCheckedItems[item].caption,
+        };
+      }
     });
-    return resultCheck;
+
+    this.props.onSelect(selected.filter((el) => typeof el !== 'undefined'));
   };
 
   render() {
-    const { data } = this.state;
+    const { data, checkedItems } = this.state;
     const dataSource = data.size > 0 ? data : this.props.options;
 
     return (
@@ -55,6 +84,11 @@ class MultiSelect extends Component {
                     <input
                       type="checkbox"
                       onChange={() => this.selectItem(item.key, item.caption)}
+                      checked={
+                        checkedItems[item.key]
+                          ? checkedItems[item.key].value
+                          : false
+                      }
                     />
                     <span className="input-checkbox-tick" />
                   </label>
@@ -71,6 +105,8 @@ class MultiSelect extends Component {
 MultiSelect.propTypes = {
   options: PropTypes.object,
   onFocus: PropTypes.func,
+  onSelect: PropTypes.func,
+  selectedItems: PropTypes.any,
 };
 
 export default MultiSelect;
