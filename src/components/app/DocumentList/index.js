@@ -144,7 +144,7 @@ class DocumentListContainer extends Component {
           location.hash === '#notification')) ||
       nextRefId !== refId
     ) {
-      // TODO: This should be probably handled by a middleware
+      // TODO: Check if handling reset only via middleware is enough
       resetView();
 
       this.setState(
@@ -180,7 +180,7 @@ class DocumentListContainer extends Component {
   }
 
   // TODO: Set modal description if data changed
-    // No idea who came up with this...
+  // No idea who came up with this...
   // componentDidUpdate(prevProps, prevState) {
   //   const { setModalDescription } = this.props;
   //   const { data } = this.state;
@@ -190,9 +190,6 @@ class DocumentListContainer extends Component {
   //   }
   // }
 
-
-
-  // TODO: Handle websockets...
   /**
    * @method connectWebSocket
    * @summary ToDo: Describe the method.
@@ -203,7 +200,6 @@ class DocumentListContainer extends Component {
       deselectTableItems,
       viewId,
       updateViewData,
-      reduxData,
     } = this.props;
 
     connectWS.call(this, `/view/${viewId}`, msg => {
@@ -212,17 +208,17 @@ class DocumentListContainer extends Component {
       if (changedIds) {
         getViewRowsByIds(windowType, viewId, changedIds.join()).then(
           response => {
+            const { reduxData } = this.props;
             const { pageColumnInfosByFieldName, filtersActive } = this.state;
+            const toRows = reduxData.rowData.get('1');
 
-            // Here we have to just call some action and save the result in the store
-            const toRows = reduxData.rowDataMap.get('1');
+            // merge changed rows with data in the store
             const { rows, removedRows } = mergeRows({
               toRows,
               fromRows: [...response.data],
               columnInfosByFieldName: pageColumnInfosByFieldName,
               changedIds,
             });
-            // const rowsList = List(rows);
 
             if (removedRows.length) {
               deselectTableItems(removedRows, windowType, viewId);
@@ -236,14 +232,6 @@ class DocumentListContainer extends Component {
             }
 
             updateViewData(rows);
-
-            // this.setState({
-            //   data: {
-            //     ...this.state.data,
-            //     result: rowsList,
-            //   },
-            //   // rowDataMap: Map({ 1: rowsList }),
-            // });
           }
         );
       }
@@ -327,23 +315,15 @@ class DocumentListContainer extends Component {
       type,
       viewProfileId,
       setModalTitle,
-      // setNotFound,
       viewId,
       fetchLayout,
       updateRawModal,
     } = this.props;
-    // const { viewId } = this.state;
 
     // TODO: Spin the spinner
     fetchLayout(windowType, type, viewProfileId)
       .then(response => {
-        // console.log('RESPONSE FETCH: ', this.mounted, response)
         if (this.mounted) {
-          //     this.setState(
-          //       {
-          //         layout: response.data,
-          //       },
-          //       () => {
           const { allowedCloseActions } = response;
 
           if (allowedCloseActions) {
@@ -354,24 +334,19 @@ class DocumentListContainer extends Component {
             this.connectWebSocket(viewId);
 
             if (!isNewFilter) {
-              // console.log('fetch 1')
               this.browseView();
             } else {
-              // console.log('fetch 2')
               this.filterView(locationAreaSearch);
             }
           } else {
-            // console.log('fetch 3')
             this.createView();
           }
 
           // TODO: Should we handle this in the action creator ?
           setModalTitle && setModalTitle(response.data.caption);
         }
-        // );
       })
-      .catch(e => {
-        console.log('FETCH ERROR: ', e)
+      .catch(() => {
         // We have to always update that fields to refresh that view!
         // Check the shouldComponentUpdate method
         this.setState({ triggerSpinner: false });
@@ -456,11 +431,10 @@ class DocumentListContainer extends Component {
       setListIncludedView,
       filterView,
     } = this.props;
-    const { /*page, sort, viewId, */ filtersActive } = this.state;
+    const { filtersActive } = this.state;
 
     filterView(windowType, viewId, filtersActive.toIndexedSeq().toArray())
       .then(response => {
-        console.log('filterView response: ', response);
         const viewId = response.viewId;
 
         if (isIncluded) {
@@ -470,10 +444,6 @@ class DocumentListContainer extends Component {
         this.mounted &&
           this.setState(
             {
-              // data: {
-              //   ...response.data,
-              // },
-              // viewId: viewId,
               triggerSpinner: false,
             },
             () => {
@@ -503,11 +473,7 @@ class DocumentListContainer extends Component {
       updateRawModal,
       viewId,
     } = this.props;
-    // console.log('getData: ', page, sortingQuery, this.pageLength)
 
-    // if (setNotFound) {
-    //   setNotFound(false);
-    // }
     indicatorState('pending');
 
     if (updateUri) {
@@ -516,98 +482,86 @@ class DocumentListContainer extends Component {
       sortingQuery && updateUri('sort', sortingQuery);
     }
 
-    return (
-      fetchDocument(
-        windowType,
-        id,
-        page,
-        // TODO: What ?
-        this.pageLength,
-        sortingQuery
-      )
-        .then(response => {
-          const result = response.result; //List(response.result);
-          // result.hashCode();
+    return fetchDocument(
+      windowType,
+      id,
+      page,
+      // TODO: What ?
+      this.pageLength,
+      sortingQuery
+    )
+      .then(response => {
+        const result = response.result;
+        const resultById = {};
+        const selection = getSelectionDirect(selections, windowType, viewId);
+        const forceSelection =
+          (type === 'includedView' || isIncluded) &&
+          response &&
+          result.length > 0 &&
+          (selection.length === 0 ||
+            !doesSelectionExist({
+              data: { result },
+              selected: selection,
+            }));
 
-          console.log('index FETCH DOCUMENT RESPONSE: ', response)
+        result.map(row => {
+          const parsed = parseToDisplay(row.fieldsByName);
+          resultById[`${row.id}`] = parsed;
+          row.fieldsByName = parsed;
+        });
 
-          const resultById = {};
-          const selection = getSelectionDirect(selections, windowType, viewId);
-          const forceSelection =
-            (type === 'includedView' || isIncluded) &&
-            response &&
-            result.length > 0 &&
-            (selection.length === 0 ||
-              // TODO: Selections
-              !doesSelectionExist({
-                data: {
-                  ...response,
-                  // result,
-                  // resultById,
-                },
-                selected: selection,
-              }));
+        const pageColumnInfosByFieldName = response.columnsByFieldName;
 
-          result.map(row => {
-            const parsed = parseToDisplay(row.fieldsByName);
-            resultById[`${row.id}`] = parsed;
-            row.fieldsByName = parsed;
-          });
+        mergeColumnInfosIntoViewRows(
+          pageColumnInfosByFieldName,
+          response.result
+        );
 
-          const pageColumnInfosByFieldName = response.columnsByFieldName;
+        if (this.mounted) {
+          const newState = {
+            pageColumnInfosByFieldName: pageColumnInfosByFieldName,
+            triggerSpinner: false,
+          };
 
-          mergeColumnInfosIntoViewRows(
-            pageColumnInfosByFieldName,
-            response.result
-          );
-
-          if (this.mounted) {
-            const newState = {
-              pageColumnInfosByFieldName: pageColumnInfosByFieldName,
-              triggerSpinner: false,
-            };
-
-            if (response.filters) {
-              newState.filtersActive = filtersToMap(response.filters);
-            }
-
-            if (
-              locationAreaSearch ||
-              (newState.filtersActive &&
-                newState.filtersActive.has(`location-area-search`))
-            ) {
-              this.getLocationData(resultById);
-            }
-
-            this.setState({ ...newState }, () => {
-              if (forceSelection && response && result && result.length > 0) {
-                const selection = [result[0].id];
-
-                selectTableItems({
-                  windowType,
-                  viewId,
-                  ids: selection,
-                });
-              }
-            });
-
-            // process modal specific
-            const { parentViewId, parentWindowId, headerProperties } = response;
-
-            updateRawModal(windowType, {
-              parentViewId,
-              parentWindowId,
-              headerProperties,
-            });
+          if (response.filters) {
+            newState.filtersActive = filtersToMap(response.filters);
           }
 
-          indicatorState('saved');
-        })
-        // TODO: Handle spinner in component ?
-        .catch(() => {
-          this.setState({ triggerSpinner: false });
-        })
-    );
+          if (
+            locationAreaSearch ||
+            (newState.filtersActive &&
+              newState.filtersActive.has(`location-area-search`))
+          ) {
+            this.getLocationData(resultById);
+          }
+
+          this.setState({ ...newState }, () => {
+            if (forceSelection && response && result && result.length > 0) {
+              const selection = [result[0].id];
+
+              selectTableItems({
+                windowType,
+                viewId,
+                ids: selection,
+              });
+            }
+          });
+
+          // process modal specific
+          const { parentViewId, parentWindowId, headerProperties } = response;
+
+          updateRawModal(windowType, {
+            parentViewId,
+            parentWindowId,
+            headerProperties,
+          });
+        }
+
+        indicatorState('saved');
+      })
+      .catch(() => {
+        this.setState({ triggerSpinner: false });
+      });
   };
 
   // TODO: Handle location search
@@ -640,13 +594,12 @@ class DocumentListContainer extends Component {
       //     locationData,
       //   },
       // };
-
       if (mapConfig && mapConfig.provider) {
         // for mobile show map
         // for desktop show half-n-half
-        newState.panelsState = GEO_PANEL_STATES[1];
-      }
 
+        this.setState({ panelsState: GEO_PANEL_STATES[1]  });
+      }
       // this.setState(newState);
     });
   };
@@ -690,9 +643,6 @@ class DocumentListContainer extends Component {
    */
   sortData = (asc, field, startPage) => {
     const { viewId, page } = this.props;
-    // const { viewId, page } = this.state;
-
-    console.log('index sortData')
 
     this.setState(
       {
@@ -757,7 +707,7 @@ class DocumentListContainer extends Component {
 
   /**
    * @method redirectToDocument
-   * @summary ToDo: Describe the method.
+   * @summary ToDo: Redirect to document details
    */
   redirectToDocument = id => {
     const {
@@ -782,6 +732,16 @@ class DocumentListContainer extends Component {
       setSorting(sort, windowType);
       setListId(reduxData.viewId, windowType);
     }
+  };
+
+  /**
+   * @method redirectToDocument
+   * @summary Redirect to a new document
+   */
+  redirectToNewDocument = () => {
+    const { push, windowType } = this.props;
+
+    push(`/window/${windowType}/new`);
   };
 
   /**
@@ -826,12 +786,10 @@ class DocumentListContainer extends Component {
       parentWindowType,
       parentDefaultViewId,
       reduxData: { viewId },
-      // selected,
     } = this.props;
 
     return {
       selected: getSelectionDirect(selections, windowType, viewId),
-      // selected,
       childSelected:
         includedView && includedView.windowType
           ? getSelectionDirect(
@@ -847,10 +805,32 @@ class DocumentListContainer extends Component {
   };
 
   render() {
+    const {
+      includedView,
+      layout,
+      reduxData: { rowData },
+    } = this.props;
+    let { selected } = this.getSelected();
+
+    const hasIncluded =
+      layout &&
+      layout.includedView &&
+      includedView &&
+      includedView.windowType &&
+      includedView.viewId;
+
+    const selectionValid = doesSelectionExist({
+      rowData,
+      selected,
+      hasIncluded,
+    });
+
     return (
       <DocumentList
         {...this.props}
         {...this.state}
+        hasIncluded={hasIncluded}
+        selectionValid={selectionValid}
         onToggleState={this.toggleState}
         pageLength={this.pageLength}
         onGetSelected={this.getSelected}
@@ -860,7 +840,9 @@ class DocumentListContainer extends Component {
         onChangePage={this.handleChangePage}
         onFilterChange={this.handleFilterChange}
         onRedirectToDocument={this.redirectToDocument}
+        onRedirectToNewDocument={this.onRedirectToNewDocument}
         onClearStaticFilters={this.clearStaticFilters}
+        onResetInitialFilters={this.resetInitialFilters}
       />
     );
   }
