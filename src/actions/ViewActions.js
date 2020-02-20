@@ -22,6 +22,7 @@ export const FILTER_VIEW_SUCCESS = 'FILTER_VIEW_SUCCESS';
 export const FILTER_VIEW_ERROR = 'FILTER_VIEW_ERROR';
 export const UPDATE_VIEW_DATA = 'UPDATE_VIEW_DATA';
 export const FETCH_LOCATION_CONFIG_SUCCESS = 'FETCH_LOCATION_CONFIG_SUCCESS';
+export const FETCH_LOCATION_CONFIG_ERROR = 'FETCH_LOCATION_CONFIG_ERROR';
 
 export function resetView() {
   return {
@@ -126,6 +127,13 @@ function fetchLocationConfigSuccess(data) {
   };
 }
 
+function fetchLocationConfigError(error) {
+  return {
+    type: FETCH_LOCATION_CONFIG_ERROR,
+    error,
+  };
+}
+
 // THUNK ACTIONS
 
 export function fetchDocument(windowId, viewId, page, pageLength, orderBy) {
@@ -226,6 +234,8 @@ export function fetchLocationConfig() {
         dispatch(fetchLocationConfigSuccess(response.data));
       })
       .catch((error) => {
+        dispatch(fetchLocationConfigError(error));
+
         return Promise.resolve(error);
       });
   };

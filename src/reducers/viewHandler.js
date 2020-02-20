@@ -1,8 +1,4 @@
-// import update from 'immutability-helper';
-import { Map, List /*Set*/ } from 'immutable';
-// import _ from 'lodash';
-// import { createSelector } from 'reselect';
-// import uuid from 'uuid/v4';
+import { Map } from 'immutable';
 
 import {
   FETCH_DOCUMENT_PENDING,
@@ -18,11 +14,8 @@ import {
   FILTER_VIEW_SUCCESS,
   FILTER_VIEW_ERROR,
   UPDATE_VIEW_DATA,
-
   FETCH_LOCATION_CONFIG_SUCCESS,
   FETCH_LOCATION_CONFIG_ERROR,
-  // SET_NOT_FOUND,
-  // RESET_NOT_FOUND,
   RESET_VIEW,
 } from '../actions/ViewActions';
 
@@ -34,10 +27,9 @@ const initialState = {
     error: null,
     notfound: false,
   },
-  // data: List(),
   // rowData is an immutable Map with tabId's as keys, and Lists as values.
   // List's elements are plain objects for now
-  rowDataMap: Map(),
+  rowData: Map(),
   docId: undefined,
   type: null,
   viewId: null,
@@ -75,6 +67,7 @@ export default function viewHandler(state = initialState, action) {
         error: null,
       };
     case FETCH_DOCUMENT_SUCCESS: {
+      // TODO: Maybe just use `omit` to remove `result` ?
       const {
         firstRow,
         headerProperties,
@@ -85,11 +78,13 @@ export default function viewHandler(state = initialState, action) {
         viewId,
         windowId,
         orderBy,
+        queryLimit,
+        queryLimitHit,
       } = action.payload;
 
       //WTF prettier?
       //eslint-disable-next-line
-      const page = (firstRow / pageLength) + 1;
+      const page = size > 1 ? (firstRow / pageLength) + 1 : 1;
 
       return {
         ...state,
@@ -102,7 +97,8 @@ export default function viewHandler(state = initialState, action) {
         windowId,
         orderBy,
         page,
-        // data: result,
+        queryLimit,
+        queryLimitHit,
         rowData: Map({ [`${action.payload.tabId || 1}`]: result }),
         pending: false,
       };
@@ -198,14 +194,11 @@ export default function viewHandler(state = initialState, action) {
 
     case UPDATE_VIEW_DATA: {
       const tabId = action.payload.tabId || '1';
-      const updatedRowsData = this.state.rowDataMap.set(
-        tabId,
-        action.payload.rows
-      );
+      const updatedRowsData = state.rowData.set(tabId, action.payload.rows);
 
       return {
         ...state,
-        rowDataMap: updatedRowsData,
+        rowData: updatedRowsData,
       };
     }
 
@@ -221,11 +214,12 @@ export default function viewHandler(state = initialState, action) {
 
       return state;
     }
-    // case SET_NOT_FOUND:
-    //   return {
-    //     ...state,
-    //     notfound: true,
-    //   };
+    case FETCH_LOCATION_CONFIG_ERROR:
+      return {
+        ...state,
+        error: action.error,
+      };
+
     case RESET_VIEW:
       return {
         ...initialState,
