@@ -6,9 +6,9 @@ import currentDevice from 'current-device';
 
 import { getItemsByProperty, nullToEmptyStrings } from './index';
 import {
-  getSelection,
+  // getSelection,
   getSelectionInstant,
-  getSelectionDirect,
+  // getSelectionDirect,
 } from '../reducers/windowHandler';
 import { TIME_REGEX_TEST } from '../constants/Constants';
 
@@ -53,11 +53,9 @@ const DLmapStateToProps = (state, { location, ...props }) => {
     viewId = null;
   }
 
-  console.log('PROPS: ', viewId, master.viewId, query.viewId)
-
-  // console.log('master: ', master, sort, page)
-
   // TODO: Do we still need that ?
+  // TODO: Handle default values
+  //TODO: Handle sorting/pagination from redux
     // defaultViewId: query.viewId,
     // defaultSort: query.sort,
     // defaultPage: parseInt(query.page),
@@ -77,19 +75,10 @@ const DLmapStateToProps = (state, { location, ...props }) => {
     // if (nextDefaultPage !== defaultPage && nextDefaultPage !== page) {
     //   stateChanges.page = nextDefaultPage || 1;
     // }
+
     // const defaultSort={query.sort}
     // defaultPage={parseInt(query.page)}
     // viewId: location.hash === '#notification' ? this.state.viewId : null,
-
-  // TODO: Handle default values
-    //TODO: Handle sorting/pagination from redux
-    // if (nextDefaultSort !== defaultSort && nextDefaultSort !== sort) {
-    //   stateChanges.sort = nextDefaultSort;
-    // }
-
-    // if (nextDefaultPage !== defaultPage && nextDefaultPage !== page) {
-    //   stateChanges.page = nextDefaultPage || 1;
-    // }
 
     // if (nextDefaultViewId !== viewId) {
     //   // TODO: Handle selection
@@ -98,11 +87,6 @@ const DLmapStateToProps = (state, { location, ...props }) => {
     //   stateChanges.viewId = nextDefaultViewId;
     //   stateChanges.refreshSelection = true;
     // }
-
-
-
-
-    // selected: getSelectionDirect(selections, windowType, viewId),
 
   return {
     page,
@@ -117,7 +101,6 @@ const DLmapStateToProps = (state, { location, ...props }) => {
     refId: query.refId,
     refTabId: query.refTabId,
 
-    // TODO: This should use redux as data source
     selections: state.windowHandler.selections,
     selected: getSelectionInstant(
       state,
@@ -126,18 +109,22 @@ const DLmapStateToProps = (state, { location, ...props }) => {
     ),
     childSelected:
       props.includedView && props.includedView.windowType
-        ? getSelection({
+        ? getSelectionInstant(
             state,
-            windowType: props.includedView.windowType,
-            viewId: props.includedView.viewId,
-          })
+            // windowType: props.includedView.windowType,
+            // viewId: props.includedView.viewId,
+            { ...props, windowId: props.includedView.windowType, viewId: props.includedView.viewId },
+            state.windowHandler.selectionsHash
+          )
         : NO_SELECTION,
     parentSelected: props.parentWindowType
-      ? getSelection({
+      ? getSelectionInstant(
           state,
-          windowType: props.parentWindowType,
-          viewId: props.parentDefaultViewId,
-        })
+          // windowType: props.parentWindowType,
+          // viewId: props.parentDefaultViewId,
+          { ...props, windowId: props.parentWindowType, viewId: props.parentDefaultViewId },
+          state.windowHandler.selectionsHash
+        )
       : NO_SELECTION,
     modal: state.windowHandler.modal,
   };
@@ -197,10 +184,6 @@ const doesSelectionExist = function({
   );
 };
 
-const redirectToNewDocument = (dispatch, windowType) => {
-  dispatch(push(`/window/${windowType}/new`));
-};
-
 const getSortingQuery = (asc, field) => (asc ? '+' : '-') + field;
 
 export {
@@ -211,7 +194,6 @@ export {
   PANEL_WIDTHS,
   GEO_PANEL_STATES,
   getSortingQuery,
-  redirectToNewDocument,
   filtersToMap,
   doesSelectionExist,
 };
