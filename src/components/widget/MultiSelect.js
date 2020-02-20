@@ -16,12 +16,12 @@ class MultiSelect extends Component {
   }
 
   static getDerivedStateFromProps(nextProps) {
+    let valuesPart =
+      nextProps.selectedItems !== null ? nextProps.selectedItems.values : null;
     let selected =
       nextProps.selectedItems && Array.isArray(nextProps.selectedItems)
         ? nextProps.selectedItems
-        : nextProps.selectedItems !== null
-        ? nextProps.selectedItems.values
-        : null;
+        : valuesPart;
     if (selected !== null) {
       let updatedCheckedItems = {};
       selected.map((item) => {
@@ -45,8 +45,9 @@ class MultiSelect extends Component {
   selectItem = (key, caption) => {
     let selected = null;
     let newCheckedItems = JSON.parse(JSON.stringify(this.state.checkedItems));
+
     if (typeof this.state.checkedItems[key] === 'undefined') {
-      newCheckedItems[key] = { key: key, caption: caption, value: true };
+      newCheckedItems[key] = { key, caption, value: true };
     } else {
       newCheckedItems[key].value = !this.state.checkedItems[key].value;
     }
