@@ -103,7 +103,7 @@ class MultiSelect extends Component {
 }
 
 MultiSelect.propTypes = {
-  options: PropTypes.object,
+  options: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
   onFocus: PropTypes.func,
   onSelect: PropTypes.func,
   selectedItems: PropTypes.any,
