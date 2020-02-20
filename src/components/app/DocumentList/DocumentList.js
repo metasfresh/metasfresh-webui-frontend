@@ -111,7 +111,9 @@ export default class DocumentList extends Component {
       parentDefaultViewId,
       inBackground,
       fetchQuickActionsOnInit,
+      // TODO: Check if we need two separate flags
       isModal,
+      inModal,
       processStatus,
       readonly,
       includedView,
@@ -119,7 +121,6 @@ export default class DocumentList extends Component {
       disablePaginationShortcuts,
       disconnectFromState,
       autofocus,
-      inModal,
       updateParentSelectedIds,
       modal,
       parentWindowType,

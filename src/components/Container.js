@@ -185,10 +185,10 @@ const Container = (props) => {
                   <DocumentList
                     type="includedView"
                     windowType={includedView.windowType}
-                    defaultViewId={includedView.viewId}
                     viewProfileId={includedView.viewProfileId}
-                    parentWindowType={rawModal.windowId}
+                    defaultViewId={includedView.viewId}
                     parentDefaultViewId={rawModal.viewId}
+                    parentWindowType={rawModal.windowId}
                     fetchQuickActionsOnInit
                     isModal
                     isIncluded

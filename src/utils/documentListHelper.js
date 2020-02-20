@@ -45,21 +45,19 @@ const DLmapStateToProps = (state, { location, ...props }) => {
   const {
     viewHandler: { master },
   } = state;
+
+  // TODO: Do we have to handle defaultPage/defaultSort from `SideList` ?
   const sort = master.sort ? master.sort : query.sort;
-  const page = master.page ? master.page : query.page;
+  const page = master.page ? master.page : parseInt(query.page);
   let viewId = master.viewId ? master.viewId : query.viewId;
+
+  if (props.defaultViewId) {
+    viewId = props.defaultViewId;
+  }
 
   if (location.hash === '#notification') {
     viewId = null;
   }
-
-  // TODO: Do we still need that ?
-  // TODO: Handle default values
-  //TODO: Handle sorting/pagination from redux
-    // defaultViewId: query.viewId,
-    // defaultSort: query.sort,
-    // defaultPage: parseInt(query.page),
-
 
     // if (nextDefaultViewId !== viewId) {
     //   dispatch(removeSelectedTableItems({ viewId: viewId, windowType }));
@@ -76,17 +74,7 @@ const DLmapStateToProps = (state, { location, ...props }) => {
     //   stateChanges.page = nextDefaultPage || 1;
     // }
 
-    // const defaultSort={query.sort}
-    // defaultPage={parseInt(query.page)}
-    // viewId: location.hash === '#notification' ? this.state.viewId : null,
-
-    // if (nextDefaultViewId !== viewId) {
-    //   // TODO: Handle selection
-    //   removeSelectedTableItems({ viewId: viewId, windowType });
-
-    //   stateChanges.viewId = nextDefaultViewId;
-    //   stateChanges.refreshSelection = true;
-    // }
+    console.log('documentListHelper: ', props.windowType, viewId, props.isModal, props.isIncluded)
 
   return {
     page,
@@ -94,13 +82,9 @@ const DLmapStateToProps = (state, { location, ...props }) => {
     viewId,
     reduxData: master,
     layout: master.layout,
-    // defaultViewId: query.viewId,
-    // defaultSort: query.sort,
-    // defaultPage: parseInt(query.page),
     refType: query.refType,
     refId: query.refId,
     refTabId: query.refTabId,
-
     selections: state.windowHandler.selections,
     selected: getSelectionInstant(
       state,
@@ -111,18 +95,22 @@ const DLmapStateToProps = (state, { location, ...props }) => {
       props.includedView && props.includedView.windowType
         ? getSelectionInstant(
             state,
-            // windowType: props.includedView.windowType,
-            // viewId: props.includedView.viewId,
-            { ...props, windowId: props.includedView.windowType, viewId: props.includedView.viewId },
+            {
+              ...props,
+              windowId: props.includedView.windowType,
+              viewId: props.includedView.viewId,
+            },
             state.windowHandler.selectionsHash
           )
         : NO_SELECTION,
     parentSelected: props.parentWindowType
       ? getSelectionInstant(
           state,
-          // windowType: props.parentWindowType,
-          // viewId: props.parentDefaultViewId,
-          { ...props, windowId: props.parentWindowType, viewId: props.parentDefaultViewId },
+          {
+            ...props,
+            windowId: props.parentWindowType,
+            viewId: props.parentDefaultViewId,
+          },
           state.windowHandler.selectionsHash
         )
       : NO_SELECTION,

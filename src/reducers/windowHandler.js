@@ -62,6 +62,8 @@ import {
 
 export const initialState = {
   connectionError: false,
+
+  // this should be moved to a separate `modalHandler`
   modal: {
     visible: false,
     type: '',
@@ -90,6 +92,8 @@ export const initialState = {
     visible: false,
     data: null,
   },
+
+  // this should be moved to a separate `modalHandler`
   rawModal: {
     visible: false,
     windowType: null,
@@ -100,6 +104,8 @@ export const initialState = {
     type: '',
     id: null,
   },
+
+  // this only feeds data to details view now
   master: {
     layout: {
       activeTab: null,
@@ -120,6 +126,7 @@ export const initialState = {
       error: false,
     },
   },
+
   quickActions: {},
   indicator: 'saved',
   allowShortcut: true,
