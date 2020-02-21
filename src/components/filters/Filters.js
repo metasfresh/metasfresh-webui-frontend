@@ -538,15 +538,17 @@ class Filters extends PureComponent {
       allowOutsideClick,
       modalVisible,
     } = this.props;
-    const { frequentFilters, notFrequentFilters } = this.sortFilters(
-      filterData
-    );
+
     const {
       notValidFields,
       widgetShown,
       activeFilter,
       activeFiltersCaptions,
     } = this.state;
+
+    const allFilters = this.annotateFilters(
+      filterData.toIndexedSeq().toArray()
+    );
 
     return (
       <div
@@ -557,47 +559,55 @@ class Filters extends PureComponent {
           {`${counterpart.translate('window.filters.caption')}: `}
         </span>
         <div className="filter-wrapper">
-          {!!frequentFilters.length && (
-            <FiltersFrequent
-              {...{
-                activeFiltersCaptions,
-                windowType,
-                notValidFields,
-                viewId,
-                widgetShown,
-                allowOutsideClick,
-                modalVisible,
-              }}
-              data={frequentFilters}
-              handleShow={this.handleShow}
-              applyFilters={this.applyFilters}
-              clearFilters={this.clearFilters}
-              active={activeFilter}
-              dropdownToggled={this.dropdownToggled}
-              filtersWrapper={this.filtersWrapper}
-            />
-          )}
-          {!!notFrequentFilters.length && (
-            <FiltersNotFrequent
-              {...{
-                activeFiltersCaptions,
-                windowType,
-                notValidFields,
-                viewId,
-                widgetShown,
-                resetInitialValues,
-                allowOutsideClick,
-                modalVisible,
-              }}
-              data={notFrequentFilters}
-              handleShow={this.handleShow}
-              applyFilters={this.applyFilters}
-              clearFilters={this.clearFilters}
-              active={activeFilter}
-              dropdownToggled={this.dropdownToggled}
-              filtersWrapper={this.filtersWrapper}
-            />
-          )}
+          {allFilters.map((item) => {
+            if (item.includedFilters) {
+              return (
+                <FiltersNotFrequent
+                  key={item.caption}
+                  {...{
+                    activeFiltersCaptions,
+                    windowType,
+                    notValidFields,
+                    viewId,
+                    widgetShown,
+                    resetInitialValues,
+                    allowOutsideClick,
+                    modalVisible,
+                  }}
+                  data={item.includedFilters}
+                  handleShow={this.handleShow}
+                  applyFilters={this.applyFilters}
+                  clearFilters={this.clearFilters}
+                  active={activeFilter}
+                  dropdownToggled={this.dropdownToggled}
+                  filtersWrapper={this.filtersWrapper}
+                />
+              );
+            }
+            if (!item.includedFilters) {
+              return (
+                <FiltersFrequent
+                  {...{
+                    activeFiltersCaptions,
+                    windowType,
+                    notValidFields,
+                    viewId,
+                    widgetShown,
+                    allowOutsideClick,
+                    modalVisible,
+                  }}
+                  data={[item]}
+                  handleShow={this.handleShow}
+                  applyFilters={this.applyFilters}
+                  clearFilters={this.clearFilters}
+                  active={activeFilter}
+                  dropdownToggled={this.dropdownToggled}
+                  filtersWrapper={this.filtersWrapper}
+                  key={item.filterId}
+                />
+              );
+            }
+          })}
         </div>
       </div>
     );
