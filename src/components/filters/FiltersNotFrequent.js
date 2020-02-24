@@ -92,10 +92,13 @@ class FiltersNotFrequent extends PureComponent {
     const { isOpenDropdown, openFilterId } = this.state;
     const openFilter = getItemsByProperty(data, 'filterId', openFilterId)[0];
     const activeFilters = data.filter((filter) => filter.isActive);
-    const activeFilter = activeFilters.length === 1 && activeFilters[0];
+    const activeFilter = activeFilters.length && activeFilters[0];
 
     const captions =
-      (activeFilter && activeFiltersCaptions[activeFilter.filterId]) || [];
+      (activeFilter &&
+        activeFiltersCaptions &&
+        activeFiltersCaptions[activeFilter.filterId]) ||
+      [];
     let panelCaption = activeFilter.isActive ? activeFilter.caption : '';
     let buttonCaption = activeFilter.isActive ? activeFilter.caption : 'Filter';
 

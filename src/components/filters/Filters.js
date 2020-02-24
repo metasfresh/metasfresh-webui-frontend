@@ -578,6 +578,16 @@ class Filters extends PureComponent {
         <div className="filter-wrapper">
           {allFilters.map((item) => {
             if (item.includedFilters) {
+              let dropdownFilters = item.includedFilters;
+              dropdownFilters.map((el) => {
+                el.isActive = false;
+                if (this.state.activeFilter !== null) {
+                  el.isActive = this.state.activeFilter.filter(
+                    (e) => e.filterId === el.filterId.length
+                  );
+                }
+                return el;
+              });
               return (
                 <FiltersNotFrequent
                   key={item.caption}
@@ -591,7 +601,7 @@ class Filters extends PureComponent {
                     allowOutsideClick,
                     modalVisible,
                   }}
-                  data={item.includedFilters}
+                  data={dropdownFilters}
                   handleShow={this.handleShow}
                   applyFilters={this.applyFilters}
                   clearFilters={this.clearFilters}
