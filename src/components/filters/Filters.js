@@ -2,7 +2,7 @@ import counterpart from 'counterpart';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { Map } from 'immutable';
+import { Map as IMap } from 'immutable';
 import _ from 'lodash';
 
 import { DATE_FIELDS } from '../../constants/Constants';
@@ -91,7 +91,24 @@ class Filters extends PureComponent {
   parseActiveFilters = () => {
     let { filtersActive, filterData, initialValuesNulled } = this.props;
     let activeFilters = _.cloneDeep(filtersActive);
-    let filtersData = Map(filterData);
+    let combinedFilters = [];
+    for (const [key] of filterData.entries()) {
+      let item = filterData.get(key);
+      if (typeof item.includedFilters !== 'undefined') {
+        item.includedFilters.map((el) => {
+          combinedFilters.push(el);
+          return el;
+        });
+      } else {
+        combinedFilters.push(item);
+      }
+    }
+    // make new Map with the items from combined filters
+    let mappedFiltersData = new Map();
+    combinedFilters.forEach((item) => {
+      mappedFiltersData.set(item.filterId, item);
+    });
+    let filtersData = IMap(mappedFiltersData);
     const flatFiltersMap = {};
     const activeFiltersCaptions = {};
 
@@ -110,7 +127,7 @@ class Filters extends PureComponent {
           };
 
           if (defaultValue && (!activeFilters || !activeFilters.size)) {
-            activeFilters = Map({
+            activeFilters = IMap({
               [`${filterId}`]: {
                 filterId,
                 parameters: [],
@@ -391,7 +408,7 @@ class Filters extends PureComponent {
     const { updateDocList } = this.props;
     let { filtersActive } = this.props;
     const { flatFiltersMap } = this.state;
-    let activeFilters = Map(filtersActive);
+    let activeFilters = IMap(filtersActive);
 
     activeFilters = activeFilters.filter(
       (item, id) => id !== filterToAdd.filterId
@@ -447,7 +464,7 @@ class Filters extends PureComponent {
   clearFilters = (filterToClear, propertyName) => {
     const { updateDocList } = this.props;
     let { filtersActive } = this.props;
-    let activeFilters = Map(filtersActive);
+    let activeFilters = IMap(filtersActive);
 
     if (filtersActive.size) {
       activeFilters = activeFilters.filter((item, id) => {
