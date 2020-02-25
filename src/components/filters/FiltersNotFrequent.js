@@ -143,7 +143,7 @@ class FiltersNotFrequent extends PureComponent {
 
         {isOpenDropdown && (
           <div className="filters-overlay">
-            {!openFilterId && !activeFilter ? (
+            {!openFilterId ? (
               <ul className="filter-menu">
                 {data.map((item, index) => (
                   <li
