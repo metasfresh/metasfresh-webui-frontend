@@ -167,7 +167,11 @@ class FiltersNotFrequent extends PureComponent {
                   clearFilters,
                 }}
                 captionValue={activeFilter.captionValue}
-                data={activeFilter.isActive ? activeFilter : openFilter}
+                data={
+                  activeFilter.isActive && !Array.isArray(activeFilter.isActive)
+                    ? activeFilter
+                    : openFilter
+                }
                 closeFilterMenu={() => this.toggleDropdown(false)}
                 returnBackToDropdown={() => this.toggleFilter(null)}
                 notValidFields={notValidFields}
