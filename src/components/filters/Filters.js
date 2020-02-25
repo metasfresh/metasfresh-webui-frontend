@@ -2,7 +2,7 @@ import counterpart from 'counterpart';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { Map as IMap } from 'immutable';
+import { Map as iMap } from 'immutable';
 import _ from 'lodash';
 
 import { DATE_FIELDS } from '../../constants/Constants';
@@ -108,7 +108,7 @@ class Filters extends PureComponent {
     combinedFilters.forEach((item) => {
       mappedFiltersData.set(item.filterId, item);
     });
-    let filtersData = IMap(mappedFiltersData);
+    let filtersData = iMap(mappedFiltersData);
     const flatFiltersMap = {};
     const activeFiltersCaptions = {};
 
@@ -127,7 +127,7 @@ class Filters extends PureComponent {
           };
 
           if (defaultValue && (!activeFilters || !activeFilters.size)) {
-            activeFilters = IMap({
+            activeFilters = iMap({
               [`${filterId}`]: {
                 filterId,
                 parameters: [],
@@ -408,7 +408,7 @@ class Filters extends PureComponent {
     const { updateDocList } = this.props;
     let { filtersActive } = this.props;
     const { flatFiltersMap } = this.state;
-    let activeFilters = IMap(filtersActive);
+    let activeFilters = iMap(filtersActive);
 
     activeFilters = activeFilters.filter(
       (item, id) => id !== filterToAdd.filterId
@@ -464,7 +464,7 @@ class Filters extends PureComponent {
   clearFilters = (filterToClear, propertyName) => {
     const { updateDocList } = this.props;
     let { filtersActive } = this.props;
-    let activeFilters = IMap(filtersActive);
+    let activeFilters = iMap(filtersActive);
 
     if (filtersActive.size) {
       activeFilters = activeFilters.filter((item, id) => {
