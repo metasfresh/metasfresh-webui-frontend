@@ -281,7 +281,7 @@ class ActionButton extends Component {
               })
             }
             onSubmitClick={() =>
-              this.processStatus(list.find((elem) => elem.key === 'VO'), true)
+              this.processStatus(list.find((elem) => elem.hasOwnProperty('validationInformation')), true)
             }
           />
         )}
