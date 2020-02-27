@@ -20,6 +20,7 @@ class ActionButton extends Component {
       list: [],
       selected: 0,
       promptOpen: false,
+      promptTitle: 'Confirm',
       promptText: 'Are you sure?',
       promptYes: 'Ok',
       promptNo: 'Cancel',
@@ -139,6 +140,7 @@ class ActionButton extends Component {
     if (status.hasOwnProperty('validationInformation')) {
       this.setState({
         promptOpen: true,
+        promptTitle: status.validationInformation.title,
         promptText: status.validationInformation.question,
         promptYes: status.validationInformation.answerYes,
         promptNo: status.validationInformation.answerNo,
@@ -243,7 +245,14 @@ class ActionButton extends Component {
    */
   render() {
     const { data, modalVisible } = this.props;
-    const { list, promptOpen, promptText, promptNo, promptYes } = this.state;
+    const {
+      list,
+      promptOpen,
+      promptTitle,
+      promptText,
+      promptNo,
+      promptYes,
+    } = this.state;
     const abrev = data.status.value && data.status.value.key;
     const status = this.getStatusContext(abrev);
     let value;
@@ -263,7 +272,7 @@ class ActionButton extends Component {
       >
         {promptOpen && (
           <Prompt
-            title=""
+            title={promptTitle}
             text={promptText}
             buttons={{ submit: promptYes, cancel: promptNo }}
             onCancelClick={() =>
