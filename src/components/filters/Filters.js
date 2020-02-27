@@ -2,6 +2,7 @@ import counterpart from 'counterpart';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
+// -- using iMap from immutable
 import { Map as iMap } from 'immutable';
 import _ from 'lodash';
 
@@ -91,6 +92,7 @@ class Filters extends PureComponent {
   parseActiveFilters = () => {
     let { filtersActive, filterData, initialValuesNulled } = this.props;
     let activeFilters = _.cloneDeep(filtersActive);
+    // combine the filters into combinedFilters array
     let combinedFilters = [];
     for (const [key] of filterData.entries()) {
       let item = filterData.get(key);
@@ -103,11 +105,12 @@ class Filters extends PureComponent {
         combinedFilters.push(item);
       }
     }
-    // make new Map with the items from combined filters
+    // make new ES6 Map with the items from combined filters
     let mappedFiltersData = new Map();
     combinedFilters.forEach((item) => {
       mappedFiltersData.set(item.filterId, item);
     });
+    // put the resulted combined map of filters into the iMap and preserve existing functionality
     let filtersData = iMap(mappedFiltersData);
     const flatFiltersMap = {};
     const activeFiltersCaptions = {};
@@ -577,9 +580,11 @@ class Filters extends PureComponent {
         </span>
         <div className="filter-wrapper">
           {allFilters.map((item) => {
+            // iterate among the existing filters
             if (item.includedFilters) {
               let dropdownFilters = item.includedFilters;
               dropdownFilters.map((el) => {
+                // set proper active state
                 el.isActive = false;
                 if (this.state.activeFilter !== null) {
                   el.isActive = this.state.activeFilter.filter(
@@ -588,6 +593,10 @@ class Filters extends PureComponent {
                 }
                 return el;
               });
+              // we render the FiltersNotFrequent for normal filters
+              // and for those entries that do have includedFilters (we have subfilters)
+              // we are rendering FiltersFrequent layout. Note: this is adaptation over previous
+              // funtionality that used the 'frequent' flag (was ditched in favour of this one).
               return (
                 <FiltersNotFrequent
                   key={item.caption}
