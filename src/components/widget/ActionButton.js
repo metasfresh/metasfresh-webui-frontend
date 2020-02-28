@@ -19,7 +19,7 @@ class ActionButton extends Component {
     this.state = {
       list: [],
       selected: 0,
-      promptOpen: false,
+      promptOpen: {},
       promptTitle: 'Confirm',
       promptText: 'Are you sure?',
       promptYes: 'Ok',
@@ -137,15 +137,19 @@ class ActionButton extends Component {
    * @todo Write the documentation
    */
   handleChangeStatus = (status) => {
+    const promptOpenClone = Object.assign({}, this.state.promptOpen);
     if (status.hasOwnProperty('validationInformation')) {
+      promptOpenClone[status.key] = true;
       this.setState({
-        promptOpen: true,
+        promptOpen: promptOpenClone,
         promptTitle: status.validationInformation.title,
         promptText: status.validationInformation.question,
         promptYes: status.validationInformation.answerYes,
         promptNo: status.validationInformation.answerNo,
       });
     } else {
+      promptOpenClone[status.key] = false;
+      this.setState({ promptOpen: false });
       this.processStatus(status, false);
     }
   };
@@ -260,6 +264,14 @@ class ActionButton extends Component {
     if (abrev) {
       value = data.status.value.caption;
     }
+    let showPrompt = false;
+    let activePrompt = null;
+    list.forEach((listItem) => {
+      if (promptOpen[listItem.key]) {
+        showPrompt = true;
+        activePrompt = listItem.key;
+      }
+    });
 
     return (
       <div
@@ -270,7 +282,7 @@ class ActionButton extends Component {
         onBlur={this.handleDropdownBlur}
         onFocus={this.handleDropdownFocus}
       >
-        {promptOpen && (
+        {showPrompt && (
           <Prompt
             title={promptTitle}
             text={promptText}
@@ -281,7 +293,14 @@ class ActionButton extends Component {
               })
             }
             onSubmitClick={() =>
-              this.processStatus(list.find((elem) => elem.hasOwnProperty('validationInformation')), true)
+              this.processStatus(
+                list.find(
+                  (elem) =>
+                    elem.hasOwnProperty('validationInformation') &&
+                    elem.key === activePrompt
+                ),
+                true
+              )
             }
           />
         )}
