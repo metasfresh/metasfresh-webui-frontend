@@ -19,11 +19,12 @@ class ActionButton extends Component {
     this.state = {
       list: [],
       selected: 0,
-      promptOpen: {},
-      promptTitle: 'Confirm',
-      promptText: 'Are you sure?',
-      promptYes: 'Ok',
-      promptNo: 'Cancel',
+      prompt: {
+        isOpen: {},
+        title: 'Confirm',
+        text: 'Are you sure?',
+        yes: 'Cancel',
+      },
     };
   }
 
@@ -137,19 +138,22 @@ class ActionButton extends Component {
    * @todo Write the documentation
    */
   handleChangeStatus = (status) => {
-    const promptOpenClone = Object.assign({}, this.state.promptOpen);
+    const prompt = { ...this.state.prompt };
+    const promptOpenClone = { ...prompt.isOpen };
     if (status.hasOwnProperty('validationInformation')) {
       promptOpenClone[status.key] = true;
       this.setState({
-        promptOpen: promptOpenClone,
-        promptTitle: status.validationInformation.title,
-        promptText: status.validationInformation.question,
-        promptYes: status.validationInformation.answerYes,
-        promptNo: status.validationInformation.answerNo,
+        prompt: {
+          isOpen: promptOpenClone,
+          title: status.validationInformation.title,
+          text: status.validationInformation.question,
+          yes: status.validationInformation.answerYes,
+          no: status.validationInformation.answerNo,
+        },
       });
     } else {
       promptOpenClone[status.key] = false;
-      this.setState({ promptOpen: false });
+      this.setState({ prompt: { ...prompt, isOpen: false } });
       this.processStatus(status, false);
     }
   };
@@ -238,7 +242,7 @@ class ActionButton extends Component {
       });
     }
     if (option) {
-      this.setState({ promptOpen: false });
+      this.setState({ prompt: { ...this.state.prompt, isOpen: false } });
     }
   };
 
@@ -249,14 +253,7 @@ class ActionButton extends Component {
    */
   render() {
     const { data, modalVisible } = this.props;
-    const {
-      list,
-      promptOpen,
-      promptTitle,
-      promptText,
-      promptNo,
-      promptYes,
-    } = this.state;
+    const { list, prompt } = this.state;
     const abrev = data.status.value && data.status.value.key;
     const status = this.getStatusContext(abrev);
     let value;
@@ -267,7 +264,7 @@ class ActionButton extends Component {
     let showPrompt = false;
     let activePrompt = null;
     list.forEach((listItem) => {
-      if (promptOpen[listItem.key]) {
+      if (prompt.isOpen[listItem.key]) {
         showPrompt = true;
         activePrompt = listItem.key;
       }
@@ -284,11 +281,11 @@ class ActionButton extends Component {
       >
         {showPrompt && (
           <Prompt
-            title={promptTitle}
-            text={promptText}
-            buttons={{ submit: promptYes, cancel: promptNo }}
+            title={prompt.title}
+            text={prompt.text}
+            buttons={{ submit: prompt.yes, cancel: prompt.no }}
             onCancelClick={() =>
-              this.setState({ promptOpen: false }, () => {
+              this.setState({ prompt: { ...prompt, isOpen: false } }, () => {
                 this.statusDropdown.blur();
               })
             }
