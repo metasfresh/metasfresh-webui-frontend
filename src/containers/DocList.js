@@ -162,12 +162,14 @@ class DocList extends Component {
             type="grid"
             updateUri={this.updateUriCallback}
             windowType={windowType}
-            defaultViewId={query.viewId}
-            defaultSort={query.sort}
-            defaultPage={parseInt(query.page)}
-            refType={query.refType}
-            refId={query.refId}
-            refTabId={query.refTabId}
+            
+            _defaultViewId={query.viewId}
+            _defaultSort={query.sort}
+            _defaultPage={parseInt(query.page)}
+            _refType={query.refType}
+            _refId={query.refId}
+            _refTabId={query.refTabId}
+
             refRowIds={refRowIds}
             includedView={includedView}
             inBackground={rawModal.visible}
@@ -217,7 +219,7 @@ class DocList extends Component {
  * @prop {string} pathname
  * @prop {object} pluginModal
  * @prop {string} processStatus
- * @prop {object} query
+ * @prop {object} query - routing query
  * @prop {object} rawModal
  * @prop {object} windowType
  */

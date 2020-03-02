@@ -8,6 +8,10 @@ import { getItemsByProperty, nullToEmptyStrings } from './index';
 import { getSelection, getSelectionInstant } from '../reducers/windowHandler';
 import { TIME_REGEX_TEST } from '../constants/Constants';
 
+/**
+ * @typedef {object} Props Component props
+ * @prop {object} DLpropTypes
+ */
 const DLpropTypes = {
   // from parent
   windowType: PropTypes.string.isRequired,
@@ -23,32 +27,81 @@ const DLpropTypes = {
   parentSelected: PropTypes.array.isRequired,
   selected: PropTypes.array.isRequired,
   isModal: PropTypes.bool,
+
+  // from @react-router
+  location: PropTypes.object.isRequired,
 };
 
-const DLmapStateToProps = (state, props) => ({
-  selections: state.windowHandler.selections,
-  selected: getSelectionInstant(
-    state,
-    { ...props, windowId: props.windowType, viewId: props.defaultViewId },
-    state.windowHandler.selectionsHash
-  ),
-  childSelected:
-    props.includedView && props.includedView.windowType
+/**
+ * @typedef {object} Props Component context
+ * @prop {object} DLcontextTypes
+ */
+// const DLcontextTypes = {
+//   store: PropTypes.object.isRequired,
+// };
+const DLmapStateToProps = (state, { master, location, ...props }) => {
+  const { query } = location;
+  // const { dataHandler } = master;
+  // _defaultViewId={query.viewId}
+  // _defaultSort={query.sort}
+  // _defaultPage={parseInt(query.page)}
+  // _refType={query.refType}
+  // _refId={query.refId}
+  // _refTabId={query.refTabId}
+  const sort = master.sort ? master.sort : query.sort;
+  const page = 1;
+  const viewId = query.viewId ? query.viewId : master.viewId;
+
+    // if (nextDefaultViewId !== viewId) {
+    //   dispatch(removeSelectedTableItems({ viewId: viewId, windowType }));
+
+    //   stateChanges.viewId = nextDefaultViewId;
+    //   stateChanges.refreshSelection = true;
+    // }
+
+    // if (nextDefaultSort !== defaultSort && nextDefaultSort !== reduxData.sort) {
+    //   stateChanges.sort = nextDefaultSort;
+    // }
+
+    // if (nextDefaultPage !== defaultPage && nextDefaultPage !== page) {
+    //   stateChanges.page = nextDefaultPage || 1;
+    // }
+
+            // const defaultSort={query.sort}
+            // defaultPage={parseInt(query.page)}
+
+            // viewId: location.hash === '#notification' ? this.state.viewId : null,
+
+
+  return {
+    reduxData: master,
+    page,
+    sort,
+    viewId,
+    selections: state.windowHandler.selections,
+    selected: getSelectionInstant(
+      state,
+      { ...props, windowId: props.windowType, viewId: props.defaultViewId },
+      state.windowHandler.selectionsHash
+    ),
+    childSelected:
+      props.includedView && props.includedView.windowType
+        ? getSelection({
+            state,
+            windowType: props.includedView.windowType,
+            viewId: props.includedView.viewId,
+          })
+        : NO_SELECTION,
+    parentSelected: props.parentWindowType
       ? getSelection({
           state,
-          windowType: props.includedView.windowType,
-          viewId: props.includedView.viewId,
+          windowType: props.parentWindowType,
+          viewId: props.parentDefaultViewId,
         })
       : NO_SELECTION,
-  parentSelected: props.parentWindowType
-    ? getSelection({
-        state,
-        windowType: props.parentWindowType,
-        viewId: props.parentDefaultViewId,
-      })
-    : NO_SELECTION,
-  modal: state.windowHandler.modal,
-});
+    modal: state.windowHandler.modal,
+  };
+};
 
 const NO_SELECTION = [];
 const NO_VIEW = {};
