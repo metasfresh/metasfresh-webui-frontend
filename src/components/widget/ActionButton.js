@@ -30,8 +30,8 @@ class ActionButton extends Component {
 
   /**
    * @method componentDidMount
-   * @summary ToDo: Describe the method
-   * @todo Write the documentation
+   * @summary Lifecycle method
+   *          Fetches the status list once the component is mounted
    */
   componentDidMount() {
     this.fetchStatusList();
@@ -134,7 +134,7 @@ class ActionButton extends Component {
   /**
    * @method handleChangeStatus
    * @summary ToDo: Describe the method
-   * @param {*} status
+   * @param {object} status
    * @todo Write the documentation
    */
   handleChangeStatus = (status) => {
@@ -152,7 +152,6 @@ class ActionButton extends Component {
         },
       });
     } else {
-      promptOpenClone[status.key] = false;
       this.setState({ prompt: { ...prompt, isOpen: false } });
       this.processStatus(status, false);
     }
@@ -198,9 +197,8 @@ class ActionButton extends Component {
 
   /**
    * @method renderStatusList
-   * @summary ToDo: Describe the method
-   * @param {*} list
-   * @todo Write the documentation
+   * @summary Renders the status list by looping through the list array passed as parameter
+   * @param {array} list
    */
   renderStatusList = (list) => {
     const { selected } = this.state;
@@ -223,6 +221,13 @@ class ActionButton extends Component {
     });
   };
 
+  /**
+   * @method processStatus
+   * @summary Processes the actual status. Depending of the boolean value of option it will show or
+   *          hide the prompt for the user
+   * @param {object} status
+   * @param {boolean} option
+   */
   processStatus = (status, option) => {
     const {
       onChange,
@@ -248,8 +253,7 @@ class ActionButton extends Component {
 
   /**
    * @method render
-   * @summary ToDo: Describe the method
-   * @todo Write the documentation
+   * @summary Main render function for the ActionButton
    */
   render() {
     const { data, modalVisible } = this.props;
@@ -339,7 +343,7 @@ ActionButton.propTypes = {
   modalVisible: PropTypes.bool.isRequired,
   fetchTopActions: PropTypes.func.isRequired,
   data: PropTypes.any,
-  onChange: PropTypes.any,
+  onChange: PropTypes.instanceOf(Function),
   dropdownOpenCallback: PropTypes.any,
   windowType: PropTypes.any,
   fields: PropTypes.any,
