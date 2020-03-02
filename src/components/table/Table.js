@@ -1313,16 +1313,14 @@ class Table extends Component {
                 queryLimitHit,
                 disablePaginationShortcuts,
               }}
-              handleChangePage={(pages) => {
-                this.deselectAllProducts();
-                handleChangePage(pages);
-              }}
+              onChangePage={handleChangePage}
               selected={selected || [undefined]}
               pageLength={pageLength}
               rowLength={rows ? rows.length : 0}
               handleSelectAll={this.selectAll}
               handleSelectRange={this.selectRangeProduct}
               deselect={this.deselectAllProducts}
+              onDeselectAll={this.deselectAllProducts}
             />
           </div>
         )}
