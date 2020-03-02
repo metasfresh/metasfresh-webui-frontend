@@ -1,5 +1,3 @@
-// import counterpart from 'counterpart';
-// import cx from 'classnames';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
@@ -9,15 +7,11 @@ import currentDevice from 'current-device';
 import { get } from 'lodash';
 
 import {
-  // getViewLayout,
   locationSearchRequest,
   locationConfigRequest,
-  // createViewRequest,
   deleteStaticFilter,
-  // filterViewRequest,
   getViewRowsByIds,
 } from '../../../api';
-
 import {
   fetchDocument,
   fetchLayout,
@@ -44,18 +38,13 @@ import {
   DLpropTypes,
   DLmapStateToProps,
   NO_SELECTION,
-  // NO_VIEW,
-  // PANEL_WIDTHS,
   GEO_PANEL_STATES,
   getSortingQuery,
-  // redirectToNewDocument,
   doesSelectionExist,
   filtersToMap,
   mergeColumnInfosIntoViewRows,
   mergeRows,
   parseToDisplay,
-
-  // TODO: Figure out where this was used
   getRowsData,
 } from '../../../utils/documentListHelper';
 
@@ -65,35 +54,22 @@ class DocumentListContainer extends Component {
   constructor(props) {
     super(props);
 
-    // const { defaultViewId, defaultPage /*, defaultSort*/ } = props;
-
     // TODO: Why it's not in the state?
     this.pageLength =
       currentDevice.type === 'mobile' || currentDevice.type === 'tablet'
         ? 9999
         : 20;
-    // this.supportAttribute = false;
 
     this.state = {
-      // data: null, // view result (result, firstRow, pageLength etc)
-      // layout: null,
       pageColumnInfosByFieldName: null,
-      // toggleWidth: 0,
       panelsState: GEO_PANEL_STATES[0],
       mapConfig: null,
-      // viewId: defaultViewId,
-      // page: defaultPage || 1,
-      // sort: defaultSort,
       filtersActive: Map(),
       initialValuesNulled: Map(),
-      // clickOutsideLock: false,
       isShowIncluded: false,
       hasShowIncluded: false,
       triggerSpinner: true,
-
-      // in some scenarios we don't want to reload table data
-      // after edit, as it triggers request, collapses rows and looses selection
-      rowEdited: false,
+      supportAttribute: false,
     };
 
     this.fetchLayoutAndData();
@@ -121,35 +97,25 @@ class DocumentListContainer extends Component {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     const {
-      // defaultPage: nextDefaultPage,
-      // defaultSort: nextDefaultSort,
-      // defaultViewId: nextDefaultViewId,
       viewId: nextViewId,
       includedView: nextIncludedView,
       isIncluded: nextIsIncluded,
       refId: nextRefId,
       windowType: nextWindowType,
     } = nextProps;
-
     const {
-      // defaultPage,
-      // defaultSort,
-      // defaultViewId,
       includedView,
       isIncluded,
       refId,
       windowType,
-      // reduxData,
-      // removeSelectedTableItems,
       closeListIncludedView,
 
-      // TODO: pagination & sorting
+      // TODO: sorting
       // sort,
-      // page,
       viewId,
     } = this.props;
-    // const { viewId } = reduxData;
-    const { /*page, /*sort, viewId, */ staticFilterCleared } = this.state;
+    const { staticFilterCleared } = this.state;
+
     const included =
       includedView && includedView.windowType && includedView.viewId;
     const nextIncluded =
@@ -159,7 +125,7 @@ class DocumentListContainer extends Component {
     const location = document.location;
 
     // TODO: What should we do with this ??
-    // this.loadSupportAttributeFlag(nextProps);
+    this.loadSupportAttributeFlag(nextProps);
 
     /*
      * If we browse list of docs, changing type of Document
@@ -183,15 +149,11 @@ class DocumentListContainer extends Component {
     ) {
       this.setState(
         {
-          // data: null,
-          // rowDataMap: Map({ 1: List() }),
-          // layout: null,
           filtersActive: Map(),
           initialValuesNulled: Map(),
-          // viewId: location.hash === '#notification' ? viewId : null,
           staticFilterCleared: false,
           triggerSpinner: true,
-          panelsState: 0,
+          panelsState: GEO_PANEL_STATES[0],
         },
         () => {
           if (included) {
@@ -204,23 +166,6 @@ class DocumentListContainer extends Component {
     }
 
     const stateChanges = {};
-  // TODO: Handle default values
-    //TODO: Handle sorting/pagination from redux
-    // if (nextDefaultSort !== defaultSort && nextDefaultSort !== sort) {
-    //   stateChanges.sort = nextDefaultSort;
-    // }
-
-    // if (nextDefaultPage !== defaultPage && nextDefaultPage !== page) {
-    //   stateChanges.page = nextDefaultPage || 1;
-    // }
-
-    // if (nextDefaultViewId !== viewId) {
-    //   // TODO: Handle selection
-    //   removeSelectedTableItems({ viewId: viewId, windowType });
-
-    //   stateChanges.viewId = nextDefaultViewId;
-    //   stateChanges.refreshSelection = true;
-    // }
 
     if (included && !nextIncluded) {
       stateChanges.isShowIncluded = false;
@@ -233,10 +178,6 @@ class DocumentListContainer extends Component {
       });
     }
   }
-
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   return !!nextState.layout && !!nextState.data;
-  // }
 
   // TODO: Set modal description if data changed
     // No idea who came up with this...
@@ -305,7 +246,6 @@ class DocumentListContainer extends Component {
 
       if (fullyChanged == true) {
         const { selectTableItems, windowType, selections, viewId } = this.props;
-        // const { viewId } = this.state;
         const selection = getSelectionDirect(selections, windowType, viewId);
 
         // Reload Attributes after QuickAction is done
@@ -336,37 +276,34 @@ class DocumentListContainer extends Component {
    * @method loadSupportAttributeFlag
    * @summary Load supportAttribute of the selected row from the table.
    */
-  // loadSupportAttributeFlag = ({ selected }) => {
-  //   const { reduxData } = this.props;
-  //   const { data } = this.state;
-  //   if (!data) {
-  //     return;
-  //   }
-  //   const rows = getRowsData(reduxData.data);
+  loadSupportAttributeFlag = ({ selected }) => {
+    const { reduxData } = this.props;
 
-  //   if (selected.length === 1) {
-  //     const selectedRow = rows.find(row => row.id === selected[0]);
+    if (!reduxData.data) {
+      return;
+    }
+    const rows = getRowsData(reduxData.data);
 
-  //     this.supportAttribute = selectedRow && selectedRow.supportAttributes;
-  //     this.setState({
-  //       supportAttribute: selectedRow && selectedRow.supportAttributes,
-  //     });
-  //   } else {
-  //     this.supportAttribute = false;
-  //     this.setState({
-  //       supportAttribute: false,
-  //     });
-  //   }
-  // };
+    if (selected.length === 1) {
+      const selectedRow = rows.find(row => row.id === selected[0]);
 
-  // TODO: I think this should be handled too
+      this.setState({
+        supportAttribute: selectedRow && selectedRow.supportAttributes,
+      });
+    } else {
+      this.setState({
+        supportAttribute: false,
+      });
+    }
+  };
+
+  // TODO: I think this should be stored in redux too
   /**
    * @method clearStaticFilters
    * @summary ToDo: Describe the method.
    */
   clearStaticFilters = filterId => {
-    const { push, windowType } = this.props;
-    const { viewId } = this.state;
+    const { push, windowType, viewId } = this.props;
 
     deleteStaticFilter(windowType, viewId, filterId).then(response => {
       this.setState({ staticFilterCleared: true }, () =>
@@ -386,7 +323,7 @@ class DocumentListContainer extends Component {
       type,
       viewProfileId,
       setModalTitle,
-      setNotFound,
+      // setNotFound,
       viewId,
       fetchLayout,
       updateRawModal,
@@ -433,15 +370,7 @@ class DocumentListContainer extends Component {
         console.log('FETCH ERROR: ', e)
         // We have to always update that fields to refresh that view!
         // Check the shouldComponentUpdate method
-        this.setState(
-          {
-            //       layout: 'notfound',
-            triggerSpinner: false,
-          }
-          //     () => {
-          //       setNotFound && setNotFound(true);
-          //     }
-        );
+        this.setState({ triggerSpinner: false });
       });
   };
 
@@ -496,10 +425,6 @@ class DocumentListContainer extends Component {
         this.mounted &&
           this.setState(
             {
-              //   data: {
-              //     ...response.data,
-              //   },
-              //   viewId: response.data.viewId,
               triggerSpinner: false,
             },
             () => {
@@ -566,7 +491,6 @@ class DocumentListContainer extends Component {
       windowType,
       selections,
       updateUri,
-      setNotFound,
       type,
       isIncluded,
       fetchDocument,
@@ -575,13 +499,11 @@ class DocumentListContainer extends Component {
       updateRawModal,
       viewId,
     } = this.props;
-    // const { viewId } = this.state;
+    // console.log('getData: ', page, sortingQuery, this.pageLength)
 
-    console.log('B: ', page, sortingQuery, this.pageLength)
-
-    if (setNotFound) {
-      setNotFound(false);
-    }
+    // if (setNotFound) {
+    //   setNotFound(false);
+    // }
     indicatorState('pending');
 
     if (updateUri) {
@@ -730,10 +652,7 @@ class DocumentListContainer extends Component {
    */
   handleChangePage = index => {
     const { reduxData } = this.props;
-    // const { data } = this.state;
     let currentPage = reduxData.page;
-
-    console.log('index handleChangePage: ', index)
 
     switch (index) {
       case 'up':
@@ -750,7 +669,6 @@ class DocumentListContainer extends Component {
 
     this.setState(
       {
-        // page: currentPage,
         triggerSpinner: true,
       },
       () => {
@@ -787,11 +705,10 @@ class DocumentListContainer extends Component {
   handleFilterChange = activeFilters => {
     const locationSearchFilter = activeFilters.has(`location-area-search`);
 
-    // TODO: handle page change, filters should be kept in redux
+    // TODO: filters should be kept in the redux state
     this.setState(
       {
         filtersActive: activeFilters,
-        // page: 1,
         triggerSpinner: true,
       },
       () => {
@@ -827,19 +744,6 @@ class DocumentListContainer extends Component {
 
   // END OF MANAGING SORT, PAGINATION, FILTERS -------------------------------
 
-  /**
-   * @method setTableRowEdited
-   * @summary ToDo: Describe the method.
-   */
-  setTableRowEdited = val => {
-    this.setState(
-      {
-        rowEdited: val,
-      },
-      () => this.updateQuickActions()
-    );
-  };
-
   toggleState = state => {
     this.setState({ panelsState: state });
   };
@@ -858,7 +762,6 @@ class DocumentListContainer extends Component {
       page,
       sort,
     } = this.props;
-    // const { sort, page } = this.state;
 
     if (isModal) {
       return;
@@ -937,7 +840,6 @@ class DocumentListContainer extends Component {
   };
 
   render() {
-    // let { selected, childSelected, parentSelected } = this.getSelected();
     return (
       <DocumentList
         {...this.props}

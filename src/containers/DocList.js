@@ -19,10 +19,10 @@ import Overlay from '../components/app/Overlay';
  * @extends Component
  */
 class DocList extends Component {
+  // TODO: Maybe this should be stored in redux ?
   state = {
     modalTitle: '',
     modalDescription: '',
-    notfound: false,
   };
 
   /**
@@ -85,14 +85,6 @@ class DocList extends Component {
   };
 
   /**
-   * @method setNotFound
-   * @summary ToDo: Describe the method.
-   */
-  setNotFound = (isNotFound) => {
-    this.setState({ notfound: isNotFound });
-  };
-
-  /**
    * @method handleUpdateParentSelectedIds
    * @summary ToDo: Describe the method.
    */
@@ -117,7 +109,7 @@ class DocList extends Component {
       processStatus,
       includedView,
     } = this.props;
-    const { modalTitle, notfound, modalDescription } = this.state;
+    const { modalTitle, modalDescription } = this.state;
     let refRowIds = [];
 
     if (query && query.refRowIds) {
@@ -137,7 +129,6 @@ class DocList extends Component {
         breadcrumb={breadcrumb}
         windowType={windowType}
         query={query}
-        notfound={notfound}
         indicator={indicator}
         modalTitle={modalTitle}
         processStatus={processStatus}
@@ -169,8 +160,6 @@ class DocList extends Component {
             fetchQuickActionsOnInit
             processStatus={processStatus}
             disablePaginationShortcuts={modal.visible || rawModal.visible}
-            setNotFound={this.setNotFound}
-            notfound={notfound}
           />
 
           {includedView &&

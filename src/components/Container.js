@@ -289,7 +289,7 @@ Container.propTypes = {
   modalDescription: PropTypes.any,
   modalTitle: PropTypes.any,
   noMargin: PropTypes.any,
-  notfound: PropTypes.any,
+  notfound: PropTypes.bool,
   pluginModal: PropTypes.object,
   pluginComponents: PropTypes.any,
   processStatus: PropTypes.any,
@@ -310,6 +310,7 @@ Container.propTypes = {
  * @param {object} state
  */
 const mapStateToProps = (state) => ({
+  notfound: state.viewHandler.master.notfound,
   connectionError: state.windowHandler.connectionError || false,
   pluginComponents: state.pluginsHandler.components,
 });

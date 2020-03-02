@@ -1,54 +1,17 @@
 import counterpart from 'counterpart';
 import cx from 'classnames';
 import React, { Component } from 'react';
-// import { connect } from 'react-redux';
-// import { push } from 'react-router-redux';
-// import { Map, List, Set } from 'immutable';
-// import currentDevice from 'current-device';
-// import { get } from 'lodash';
+import PropTypes from 'prop-types';
 
-// import {
-//   getViewLayout,
-//   locationSearchRequest,
-//   locationConfigRequest,
-//   createViewRequest,
-//   deleteStaticFilter,
-//   filterViewRequest,
-//   getViewRowsByIds,
-// } from '../../api';
-
-// import { fetchDocument } from '../../actions/DataFetching';
-
-// import {
-//   closeListIncludedView,
-//   setListId,
-//   setListIncludedView,
-//   setPagination,
-//   setSorting,
-// } from '../../actions/ListActions';
-// import {
-//   updateRawModal,
-//   indicatorState,
-//   selectTableItems,
-//   deselectTableItems,
-//   removeSelectedTableItems,
-// } from '../../actions/WindowActions';
-// import { connectWS, disconnectWS } from '../../utils/websockets';
-import { getRowsData } from '../../../utils/documentListHelper';
-// import { getSelectionDirect } from '../../reducers/windowHandler';
+// import { getRowsData } from '../../../utils/documentListHelper';
 import {
-  // DLpropTypes,
-  // DLmapStateToProps,
-  // NO_SELECTION,
   NO_VIEW,
   PANEL_WIDTHS,
   GEO_PANEL_STATES,
-  // getSortingQuery,
   redirectToNewDocument,
   doesSelectionExist,
   filtersToMap,
-  // mergeColumnInfosIntoViewRows,
-  // mergeRows,
+  DLpropTypes,
 } from '../../../utils/documentListHelper';
 import Spinner from '../../app/SpinnerOverlay';
 import BlankPage from '../../BlankPage';
@@ -72,10 +35,11 @@ export default class DocumentList extends Component {
     this.state = {
       clickOutsideLock: false,
       toggleWidth: 0,
-      // toggleState: GEO_PANEL_STATES[0],
-    };
 
-    this.supportAttribute = false;
+      // in some scenarios we don't want to reload table data
+      // after edit, as it triggers request, collapses rows and looses selection
+      rowEdited: false,
+    };
   }
 
   /**
@@ -109,10 +73,6 @@ export default class DocumentList extends Component {
     const newStateIdx =
       stateIdx + 1 === GEO_PANEL_STATES.length ? 0 : stateIdx + 1;
 
-    // TODO: Pass function from the container to set this
-    // this.setState({
-    //   toggleState: GEO_PANEL_STATES[newStateIdx],
-    // });
     onToggleState(GEO_PANEL_STATES[newStateIdx]);
   };
 
@@ -123,33 +83,6 @@ export default class DocumentList extends Component {
   updateQuickActions = childSelection => {
     if (this.quickActionsComponent) {
       this.quickActionsComponent.updateActions(childSelection);
-    }
-  };
-
-  /**
-   * @method loadSupportAttributeFlag
-   * @summary Load supportAttribute of the selected row from the table.
-   */
-  loadSupportAttributeFlag = ({ selected }) => {
-    const { reduxData } = this.props;
-    // const { data } = this.state;
-    if (!reduxData.data) {
-      return;
-    }
-    const rows = getRowsData(reduxData.data);
-
-    if (selected.length === 1) {
-      const selectedRow = rows.find(row => row.id === selected[0]);
-
-      this.supportAttribute = selectedRow && selectedRow.supportAttributes;
-      this.setState({
-        supportAttribute: selectedRow && selectedRow.supportAttributes,
-      });
-    } else {
-      this.supportAttribute = false;
-      this.setState({
-        supportAttribute: false,
-      });
     }
   };
 
@@ -221,7 +154,6 @@ export default class DocumentList extends Component {
       includedView,
       isIncluded,
       disablePaginationShortcuts,
-      notfound,
       disconnectFromState,
       autofocus,
       inModal,
@@ -233,51 +165,31 @@ export default class DocumentList extends Component {
       layout,
       page,
       pageLength,
-      sort,
       panelsState,
       onGetSelected,
       onFetchLayoutAndData,
       onChangePage,
-
       filtersActive,
       isShowIncluded,
       hasShowIncluded,
       refreshSelection,
       mapConfig,
       initialValuesNulled,
-
+      triggerSpinner,
       viewId,
       onFilterChange,
+
+      supportAttribute,
     } = this.props;
     const {
-      // page,
-      rowDataMap,
-      // viewId,
+      rowData,
       size,
       staticFilters,
       orderBy,
       queryLimitHit,
     } = reduxData;
+    const { rowEdited, clickOutsideLock, toggleWidth } = this.state;
 
-    const {
-      // layout,
-      // data,
-      // viewId,
-      // page,
-      // rowDataMap,
-      
-      // filtersActive,
-      // isShowIncluded,
-      // hasShowIncluded,
-      // refreshSelection, 
-      // mapConfig,
-      // initialValuesNulled,
-
-      supportAttribute,
-      rowEdited,
-      clickOutsideLock,
-      toggleWidth,
-    } = this.state;
     let { selected, childSelected, parentSelected } = onGetSelected();
     const modalType = modal ? modal.modalType : null;
     const stopShortcutPropagation =
@@ -296,8 +208,7 @@ export default class DocumentList extends Component {
       includedView.viewId;
 
     const selectionValid = doesSelectionExist({
-      // data,
-      reduxData,
+      rowData,
       selected,
       hasIncluded,
     });
@@ -309,14 +220,11 @@ export default class DocumentList extends Component {
     const blurWhenOpen =
       layout && layout.includedView && layout.includedView.blurWhenOpen;
 
-    // TODO: handle notfound properly both in store and here (DocList too?)
-    if (notfound || layout === 'notfound' || reduxData.notfound === 'notfound') {
+    if (layout.notfound || reduxData.notfound) {
       return (
         <BlankPage what={counterpart.translate('view.error.windowName')} />
       );
     }
-
-    // console.log('RowDataMap: ', rowDataMap)
 
     const showQuickActions = true;
     const showModalResizeBtn =
@@ -387,7 +295,7 @@ export default class DocumentList extends Component {
                 />
               )}
 
-              {reduxData.data && staticFilters && (
+              {rowData && staticFilters && (
                 <FiltersStatic
                   {...{ windowType, viewId }}
                   data={staticFilters}
@@ -419,7 +327,7 @@ export default class DocumentList extends Component {
               </div>
             )}
 
-            {reduxData.data && showQuickActions && (
+            {rowData && showQuickActions && (
               <QuickActions
                 className="header-element align-items-center"
                 processStatus={processStatus}
@@ -464,17 +372,17 @@ export default class DocumentList extends Component {
           parent={this}
           delay={300}
           iconSize={50}
-          displayCondition={!!(layout && this.state.triggerSpinner)}
-          hideCondition={!!(reduxData.data && !this.state.triggerSpinner)}
+          displayCondition={!!(layout && triggerSpinner)}
+          hideCondition={!!(rowData && !triggerSpinner)}
         />
 
-        {layout && reduxData.data && (
+        {layout && rowData && (
           <div className="document-list-body">
             <div className="row table-row">
               <Table
                 entity="documentView"
                 ref={c => (this.table = c)}
-                rowData={rowDataMap}
+                rowData={rowData}
                 cols={layout.elements}
                 collapsible={layout.collapsible}
                 expandedDepth={layout.expandedDepth}
@@ -509,7 +417,6 @@ export default class DocumentList extends Component {
                 }
                 blurOnIncludedView={blurWhenOpen}
                 focusOnFieldName={layout.focusOnFieldName}
-
                 toggleState={panelsState}
                 {...{
                   isIncluded,
@@ -554,3 +461,24 @@ export default class DocumentList extends Component {
     );
   }
 }
+
+DocumentList.propTypes = {
+  ...DLpropTypes,
+  mapConfig: PropTypes.object,
+  panelsState: PropTypes.string,
+  pageLength: PropTypes.number,
+  filtersActive: PropTypes.any,
+  initialValuesNulled: PropTypes.any,
+  isShowIncluded: PropTypes.bool,
+  hasShowIncluded: PropTypes.bool,
+  triggerSpinner: PropTypes.bool,
+  onToggleState: PropTypes.func,
+  onGetSelected: PropTypes.func,
+  onShowIncludedViewOnSelect: PropTypes.func,
+  onSortData: PropTypes.func,
+  onFetchLayoutAndData: PropTypes.func,
+  onChangePage: PropTypes.func,
+  onFilterChange: PropTypes.func,
+  onRedirectToDocument: PropTypes.func,
+  onClearStaticFilters: PropTypes.func,
+};

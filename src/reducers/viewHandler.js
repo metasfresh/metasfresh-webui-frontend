@@ -17,6 +17,8 @@ import {
   FILTER_VIEW,
   FILTER_VIEW_SUCCESS,
   FILTER_VIEW_ERROR,
+  // SET_NOT_FOUND,
+  // RESET_NOT_FOUND,
 } from '../actions/ViewActions';
 
 const initialState = {
@@ -25,8 +27,9 @@ const initialState = {
     data: [],
     pending: false,
     error: null,
+    notfound: false,
   },
-  data: [],
+  data: List(),
   // rowData is an immutable Map with tabId's as keys, and Lists as values.
   // List's elements are plain objects for now
   rowDataMap: Map(),
@@ -61,6 +64,7 @@ export default function viewHandler(state = initialState, action) {
     case FETCH_DOCUMENT_PENDING:
       return {
         ...state,
+        notfound: false,
         pending: true,
         error: null,
       };
@@ -92,8 +96,8 @@ export default function viewHandler(state = initialState, action) {
         windowId,
         orderBy,
         page,
-        data: result,
-        rowDataMap: Map({ 1: result }),
+        // data: result,
+        rowData: Map({ [`${action.payload.tabId || 1}`]: result }),
         pending: false,
       };
     }
@@ -111,6 +115,7 @@ export default function viewHandler(state = initialState, action) {
         ...state,
         layout: {
           ...state.layout,
+          notfound: false,
           pending: true,
         },
       };
@@ -130,6 +135,7 @@ export default function viewHandler(state = initialState, action) {
         ...state,
         layout: {
           ...state.layout,
+          notfound: true,
           pending: false,
           error: action.error,
         },
@@ -159,6 +165,7 @@ export default function viewHandler(state = initialState, action) {
     case FILTER_VIEW:
       return {
         ...state,
+        notfound: false,
         pending: true,
         error: null,
       };
@@ -173,7 +180,6 @@ export default function viewHandler(state = initialState, action) {
         // TODO: Should we always set it to 1 ?
         page: 1,
         pending: false,
-        notfound: false,
       };
     }
     case FILTER_VIEW_ERROR:
@@ -183,6 +189,17 @@ export default function viewHandler(state = initialState, action) {
         notfound: true,
         error: action.error,
       };
+
+    // case SET_NOT_FOUND:
+    //   return {
+    //     ...state,
+    //     notfound: true,
+    //   };
+    // case RESET_NOT_FOUND:
+    //   return {
+    //     ...state,
+    //     notfound: false,
+    //   }
     default:
       return state;
   }
