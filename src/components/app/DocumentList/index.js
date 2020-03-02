@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router';
 import { push } from 'react-router-redux';
 import { Map, List, Set } from 'immutable';
 import currentDevice from 'current-device';
@@ -51,6 +50,7 @@ import {
 } from '../../../utils/documentListHelper';
 
 import DocumentList from './DocumentList';
+import withRouterAndRef from '../hoc/WithRouterAndRef';
 
 class DocumentListContainer extends Component {
   constructor(props) {
@@ -202,15 +202,15 @@ class DocumentListContainer extends Component {
       updateViewData,
     } = this.props;
 
-    connectWS.call(this, `/view/${viewId}`, msg => {
+    connectWS.call(this, `/view/${viewId}`, (msg) => {
       const { fullyChanged, changedIds } = msg;
 
       if (changedIds) {
         getViewRowsByIds(windowType, viewId, changedIds.join()).then(
-          response => {
+          (response) => {
             const { reduxData } = this.props;
             const { pageColumnInfosByFieldName, filtersActive } = this.state;
-            const toRows = reduxData.rowData.get(1);//(windowType);
+            const toRows = reduxData.rowData.get('1');
 
             // merge changed rows with data in the store
             const { rows, removedRows } = mergeRows({
@@ -256,9 +256,9 @@ class DocumentListContainer extends Component {
 
   /**
    * @method updateQuickActions
-   * @summary ToDo: Describe the method.
+   * @summary Trigger the QuickActions component to fetch quick actions for the new selection
    */
-  updateQuickActions = childSelection => {
+  updateQuickActions = (childSelection) => {
     if (this.quickActionsComponent) {
       this.quickActionsComponent.updateActions(childSelection);
     }
@@ -269,15 +269,17 @@ class DocumentListContainer extends Component {
    * @summary Load supportAttribute of the selected row from the table.
    */
   loadSupportAttributeFlag = ({ selected }) => {
-    const { reduxData: { rowData }, windowType } = this.props;
+    const {
+      reduxData: { rowData },
+    } = this.props;
 
     if (!rowData) {
       return;
     }
-    const rows = getRowsData(rowData.get(1));//(windowType));
+    const rows = getRowsData(rowData.get('1'));
 
     if (selected.length === 1) {
-      const selectedRow = rows.find(row => row.id === selected[0]);
+      const selectedRow = rows.find((row) => row.id === selected[0]);
 
       this.setState({
         supportAttribute: selectedRow && selectedRow.supportAttributes,
@@ -294,10 +296,10 @@ class DocumentListContainer extends Component {
    * @method clearStaticFilters
    * @summary ToDo: Describe the method.
    */
-  clearStaticFilters = filterId => {
+  clearStaticFilters = (filterId) => {
     const { push, windowType, viewId } = this.props;
 
-    deleteStaticFilter(windowType, viewId, filterId).then(response => {
+    deleteStaticFilter(windowType, viewId, filterId).then((response) => {
       this.setState({ staticFilterCleared: true }, () =>
         push(`/window/${windowType}?viewId=${response.data.viewId}`)
       );
@@ -320,9 +322,10 @@ class DocumentListContainer extends Component {
       updateRawModal,
     } = this.props;
 
-    // TODO: Spin the spinner
+    this.setState({ triggerSpinner: true });
+
     fetchLayout(windowType, type, viewProfileId)
-      .then(response => {
+      .then((response) => {
         if (this.mounted) {
           const { allowedCloseActions } = response;
 
@@ -347,8 +350,6 @@ class DocumentListContainer extends Component {
         }
       })
       .catch(() => {
-        // We have to always update that fields to refresh that view!
-        // Check the shouldComponentUpdate method
         this.setState({ triggerSpinner: false });
       });
   };
@@ -364,7 +365,7 @@ class DocumentListContainer extends Component {
 
     // in case of redirect from a notification, first call will have viewId empty
     if (viewId) {
-      this.getData(viewId, page, sort, locationSearchFilter).catch(err => {
+      this.getData(viewId, page, sort, locationSearchFilter).catch((err) => {
         if (err.response && err.response.status === 404) {
           this.createView();
         }
@@ -390,7 +391,8 @@ class DocumentListContainer extends Component {
     } = this.props;
     const { filtersActive } = this.state;
 
-    // TODO: spin the spinner
+    this.setState({ triggerSpinner: true });
+
     createView(
       windowType,
       type,
@@ -421,7 +423,7 @@ class DocumentListContainer extends Component {
    * @method filterView
    * @summary apply filters and re-fetch layout, data. Then rebuild the page
    */
-  filterView = locationAreaSearch => {
+  filterView = (locationAreaSearch) => {
     const {
       windowType,
       isIncluded,
@@ -434,7 +436,7 @@ class DocumentListContainer extends Component {
     const { filtersActive } = this.state;
 
     filterView(windowType, viewId, filtersActive.toIndexedSeq().toArray())
-      .then(response => {
+      .then((response) => {
         const viewId = response.viewId;
 
         if (isIncluded) {
@@ -486,11 +488,10 @@ class DocumentListContainer extends Component {
       windowType,
       id,
       page,
-      // TODO: What ?
       this.pageLength,
       sortingQuery
     )
-      .then(response => {
+      .then((response) => {
         const result = response.result;
         const resultById = {};
         const selection = getSelectionDirect(selections, windowType, viewId);
@@ -504,7 +505,7 @@ class DocumentListContainer extends Component {
               selected: selection,
             }));
 
-        result.map(row => {
+        result.map((row) => {
           const parsed = parseToDisplay(row.fieldsByName);
           resultById[`${row.id}`] = parsed;
           row.fieldsByName = parsed;
@@ -565,7 +566,7 @@ class DocumentListContainer extends Component {
   };
 
   // TODO: Handle location search
-  getLocationData = resultById => {
+  getLocationData = (resultById) => {
     const {
       windowType,
       viewId,
@@ -573,7 +574,7 @@ class DocumentListContainer extends Component {
     } = this.props;
 
     locationSearchRequest({ windowId: windowType, viewId }).then(({ data }) => {
-      const locationData = data.locations.map(location => {
+      const locationData = data.locations.map((location) => {
         const name = get(
           resultById,
           [location.rowId, 'C_BPartner_ID', 'value', 'caption'],
@@ -598,7 +599,7 @@ class DocumentListContainer extends Component {
         // for mobile show map
         // for desktop show half-n-half
 
-        this.setState({ panelsState: GEO_PANEL_STATES[1]  });
+        this.setState({ panelsState: GEO_PANEL_STATES[1] });
       }
       // this.setState(newState);
     });
@@ -610,7 +611,7 @@ class DocumentListContainer extends Component {
    * @method handleChangePage
    * @summary ToDo: Describe the method.
    */
-  handleChangePage = index => {
+  handleChangePage = (index) => {
     const { reduxData } = this.props;
     let currentPage = reduxData.page;
 
@@ -659,7 +660,7 @@ class DocumentListContainer extends Component {
    * @method handleFilterChange
    * @summary ToDo: Describe the method.
    */
-  handleFilterChange = activeFilters => {
+  handleFilterChange = (activeFilters) => {
     const locationSearchFilter = activeFilters.has(`location-area-search`);
 
     // TODO: filters should be kept in the redux state
@@ -701,15 +702,15 @@ class DocumentListContainer extends Component {
 
   // END OF MANAGING SORT, PAGINATION, FILTERS -------------------------------
 
-  toggleState = state => {
+  toggleState = (state) => {
     this.setState({ panelsState: state });
   };
 
   /**
    * @method redirectToDocument
-   * @summary ToDo: Redirect to document details
+   * @summary Redirect to document details
    */
-  redirectToDocument = id => {
+  redirectToDocument = (id) => {
     const {
       isModal,
       windowType,
@@ -773,7 +774,6 @@ class DocumentListContainer extends Component {
     }
   };
 
-  // TODO: Cleanup the selections mess
   /**
    * @method getSelected
    * @summary ToDo: Describe the method.
@@ -806,7 +806,6 @@ class DocumentListContainer extends Component {
 
   render() {
     const {
-      windowType,
       includedView,
       layout,
       reduxData: { rowData },
@@ -821,7 +820,7 @@ class DocumentListContainer extends Component {
       includedView.viewId;
 
     const selectionValid = doesSelectionExist({
-      data: rowData.get(1),//(windowType),
+      data: rowData.get('1'),
       selected,
       hasIncluded,
     });
@@ -855,7 +854,7 @@ class DocumentListContainer extends Component {
  */
 DocumentListContainer.propTypes = { ...DLpropTypes };
 
-export default withRouter(
+export default withRouterAndRef(
   connect(
     DLmapStateToProps,
     {
