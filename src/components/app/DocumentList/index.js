@@ -500,7 +500,7 @@ class DocumentListContainer extends Component {
           result.length > 0 &&
           (selection.length === 0 ||
             !doesSelectionExist({
-              data: { result },
+              data: result,
               selected: selection,
             }));
 
@@ -820,7 +820,7 @@ class DocumentListContainer extends Component {
       includedView.viewId;
 
     const selectionValid = doesSelectionExist({
-      rowData,
+      data: rowData.get('1'),
       selected,
       hasIncluded,
     });

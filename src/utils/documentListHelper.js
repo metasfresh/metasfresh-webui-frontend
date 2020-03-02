@@ -169,15 +169,14 @@ const doesSelectionExist = function({
   let rows = [];
 
   data &&
-    data.result &&
-    data.result.map((item) => {
+    data.length &&
+    data.map((item) => {
       rows = rows.concat(mapIncluded(item));
     });
 
   return (
     data &&
-    data.size &&
-    data.result &&
+    data.length &&
     selected &&
     selected[0] &&
     getItemsByProperty(rows, 'id', selected[0]).length
