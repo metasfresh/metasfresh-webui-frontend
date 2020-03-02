@@ -77,7 +77,7 @@ class DocumentListContainer extends Component {
   }
 
   UNSAFE_componentWillMount() {
-    this.props.fetchLocationConfig();
+    this.props.fetchLocationConfig(this.props.windowType);
   }
 
   componentDidMount = () => {
@@ -88,7 +88,7 @@ class DocumentListContainer extends Component {
     this.mounted = false;
     disconnectWS.call(this);
 
-    this.props.resetView();
+    this.props.resetView(this.props.windowType);
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -182,7 +182,7 @@ class DocumentListContainer extends Component {
   // TODO: Set modal description if data changed
   // No idea who came up with this...
   // componentDidUpdate(prevProps, prevState) {
-  //   const { setModalDescription } = this.props;
+    // const { setModalDescription } = this.props;
   //   const { data } = this.state;
 
   //   if (prevState.data !== data && setModalDescription) {
@@ -210,7 +210,7 @@ class DocumentListContainer extends Component {
           response => {
             const { reduxData } = this.props;
             const { pageColumnInfosByFieldName, filtersActive } = this.state;
-            const toRows = reduxData.rowData.get('1');
+            const toRows = reduxData.rowData.get(1);//(windowType);
 
             // merge changed rows with data in the store
             const { rows, removedRows } = mergeRows({
@@ -231,7 +231,7 @@ class DocumentListContainer extends Component {
               this.updateQuickActions();
             }
 
-            updateViewData(rows);
+            updateViewData(rows, windowType);
           }
         );
       }
@@ -269,12 +269,12 @@ class DocumentListContainer extends Component {
    * @summary Load supportAttribute of the selected row from the table.
    */
   loadSupportAttributeFlag = ({ selected }) => {
-    const { reduxData } = this.props;
+    const { reduxData: { rowData }, windowType } = this.props;
 
-    if (!reduxData.rowDataMap) {
+    if (!rowData) {
       return;
     }
-    const rows = getRowsData(reduxData.rowDataMap.get('1'));
+    const rows = getRowsData(rowData.get(1));//(windowType));
 
     if (selected.length === 1) {
       const selectedRow = rows.find(row => row.id === selected[0]);
@@ -806,6 +806,7 @@ class DocumentListContainer extends Component {
 
   render() {
     const {
+      windowType,
       includedView,
       layout,
       reduxData: { rowData },
@@ -820,7 +821,7 @@ class DocumentListContainer extends Component {
       includedView.viewId;
 
     const selectionValid = doesSelectionExist({
-      data: rowData.get('1'),
+      data: rowData.get(1),//(windowType),
       selected,
       hasIncluded,
     });

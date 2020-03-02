@@ -24,113 +24,119 @@ export const UPDATE_VIEW_DATA = 'UPDATE_VIEW_DATA';
 export const FETCH_LOCATION_CONFIG_SUCCESS = 'FETCH_LOCATION_CONFIG_SUCCESS';
 export const FETCH_LOCATION_CONFIG_ERROR = 'FETCH_LOCATION_CONFIG_ERROR';
 
-export function resetView() {
+export function resetView(id) {
   return {
     type: RESET_VIEW,
+    payload: { id },
   };
 }
 
-function fetchDocumentPending() {
+function fetchDocumentPending(id) {
   return {
     type: FETCH_DOCUMENT_PENDING,
+    payload: { id },
   };
 }
 
-function fetchDocumentSuccess(data) {
+function fetchDocumentSuccess(id, data) {
   return {
     type: FETCH_DOCUMENT_SUCCESS,
-    payload: data,
+    payload: { id, data },
   };
 }
 
-function fetchDocumentError(error) {
+function fetchDocumentError(id, error) {
   return {
     type: FETCH_DOCUMENT_ERROR,
-    error,
+    payload: { id, error },
   };
 }
 
-function fetchLayoutPending() {
+function fetchLayoutPending(id) {
   return {
     type: FETCH_LAYOUT_PENDING,
+    payload: { id },
   };
 }
 
-function fetchLayoutSuccess(layout) {
+function fetchLayoutSuccess(id, layout) {
   return {
     type: FETCH_LAYOUT_SUCCESS,
-    payload: layout,
+    payload: { id, layout },
   };
 }
 
-function fetchLayoutError(error) {
+function fetchLayoutError(id, error) {
   return {
     type: FETCH_LAYOUT_ERROR,
-    error,
+    payload: { id, error },
   };
 }
 
-function createViewPending() {
+function createViewPending(id) {
   return {
     type: CREATE_VIEW,
+    payload: { id },
   };
 }
 
-function createViewSuccess(data) {
+function createViewSuccess(id, data) {
   return {
     type: CREATE_VIEW_SUCCESS,
-    payload: { viewId: data.viewId },
+    payload: { id, viewId: data.viewId },
   };
 }
 
-function createViewError(error) {
+function createViewError(id, error) {
   return {
     type: CREATE_VIEW_ERROR,
-    error,
+    payload: { id, error },
   };
 }
 
-function filterViewPending() {
+function filterViewPending(id) {
   return {
     type: FILTER_VIEW_PENDING,
+    payload: { id },
   };
 }
 
-function filterViewSuccess(data) {
+function filterViewSuccess(id, data) {
   return {
     type: FILTER_VIEW_SUCCESS,
-    payload: { ...data },
+    payload: { id, data },
   };
 }
 
-function filterViewError(error) {
+function filterViewError(id, error) {
   return {
     type: FILTER_VIEW_ERROR,
-    error,
+    payload: { id, error },
   };
 }
 
-export function updateViewData(rows, tabId) {
+export function updateViewData(id, rows, tabId) {
   return {
     type: UPDATE_VIEW_DATA,
     payload: {
+      id,
       rows,
       tabId,
     },
   };
 }
 
-function fetchLocationConfigSuccess(data) {
+function fetchLocationConfigSuccess(id, data) {
   return {
     type: FETCH_LOCATION_CONFIG_SUCCESS,
-    payload: { data },
+    payload: { id, data },
   };
 }
 
-function fetchLocationConfigError(error) {
+function fetchLocationConfigError(id, error) {
   return {
     type: FETCH_LOCATION_CONFIG_ERROR,
-    error,
+    payload: { id, error },
   };
 }
 
@@ -138,16 +144,18 @@ function fetchLocationConfigError(error) {
 
 export function fetchDocument(windowId, viewId, page, pageLength, orderBy) {
   return (dispatch) => {
-    dispatch(fetchDocumentPending());
+    dispatch(fetchDocumentPending(windowId));
 
     return browseViewRequest({ windowId, viewId, page, pageLength, orderBy })
       .then((response) => {
-        dispatch(fetchDocumentSuccess(response.data));
+        dispatch(
+          fetchDocumentSuccess(windowId, response.data)
+        );
 
         return Promise.resolve(response.data);
       })
       .catch((error) => {
-        dispatch(fetchDocumentError(error));
+        dispatch(fetchDocumentError(windowId, error));
 
         //show error message ?
         return Promise.resolve(error);
@@ -165,7 +173,7 @@ export function createView(
   refRowIds
 ) {
   return (dispatch) => {
-    dispatch(createViewPending());
+    dispatch(createViewPending(windowId));
 
     return createViewRequest({
       windowId,
@@ -177,7 +185,7 @@ export function createView(
       refRowIds,
     })
       .then((response) => {
-        dispatch(createViewSuccess(response.data));
+        dispatch(createViewSuccess(windowId, response.data));
 
         return Promise.resolve(response.data);
       })
@@ -192,16 +200,16 @@ export function createView(
 
 export function fetchLayout(windowId, viewType, viewProfileId = null) {
   return (dispatch) => {
-    dispatch(fetchLayoutPending());
+    dispatch(fetchLayoutPending(windowId));
 
     return getViewLayout(windowId, viewType, viewProfileId)
       .then((response) => {
-        dispatch(fetchLayoutSuccess(response.data));
+        dispatch(fetchLayoutSuccess(windowId, response.data));
 
         return Promise.resolve(response.data);
       })
       .catch(error => {
-        dispatch(fetchLayoutError(error));
+        dispatch(fetchLayoutError(windowId, error));
 
         return Promise.resolve(error);
       });
@@ -210,31 +218,31 @@ export function fetchLayout(windowId, viewType, viewProfileId = null) {
 
 export function filterView(windowId, viewId, filters) {
   return (dispatch) => {
-    dispatch(filterViewPending());
+    dispatch(filterViewPending(windowId));
 
     // TODO: This should send object, like with other requests
     return filterViewRequest(windowId, viewId, filters)
       .then((response) => {
-        dispatch(filterViewSuccess(response.data));
+        dispatch(filterViewSuccess(windowId, response.data));
 
         return Promise.resolve(response.data);
       })
       .catch((error) => {
-        dispatch(filterViewError(error));
+        dispatch(filterViewError(windowId, error));
 
         return Promise.resolve(error);
       });
   };
 }
 
-export function fetchLocationConfig() {
+export function fetchLocationConfig(windowId) {
   return (dispatch) => {
     return locationConfigRequest()
       .then((response) => {
-        dispatch(fetchLocationConfigSuccess(response.data));
+        dispatch(fetchLocationConfigSuccess(windowId, response.data));
       })
       .catch((error) => {
-        dispatch(fetchLocationConfigError(error));
+        dispatch(fetchLocationConfigError(windowId, error));
 
         return Promise.resolve(error);
       });

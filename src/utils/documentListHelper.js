@@ -10,6 +10,7 @@ import {
   getSelectionInstant,
   // getSelectionDirect,
 } from '../reducers/windowHandler';
+import { viewState } from '../reducers/viewHandler';
 import { TIME_REGEX_TEST } from '../constants/Constants';
 
 /**
@@ -42,9 +43,14 @@ const DLpropTypes = {
  */
 const DLmapStateToProps = (state, { location, ...props }) => {
   const { query } = location;
-  const {
-    viewHandler: { master },
-  } = state;
+  // const {
+  //   viewHandler: { master },
+  // } = state;
+  let master = state.viewHandler.views[props.windowType];
+
+  if (!master) {
+    master = viewState;
+  }
 
   // TODO: Do we have to handle defaultPage/defaultSort from `SideList` ?
   const sort = master.sort ? master.sort : query.sort;

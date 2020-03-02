@@ -7,7 +7,6 @@ import {
   NO_VIEW,
   PANEL_WIDTHS,
   GEO_PANEL_STATES,
-  redirectToNewDocument,
   filtersToMap,
   DLpropTypes,
 } from '../../../utils/documentListHelper';
@@ -334,7 +333,7 @@ export default class DocumentList extends Component {
                 cols={layout.elements}
                 collapsible={layout.collapsible}
                 expandedDepth={layout.expandedDepth}
-                tabId={1}
+                tabId={1/*windowType*/}
                 windowId={windowType}
                 emptyText={layout.emptyResultText}
                 emptyHint={layout.emptyResultHint}

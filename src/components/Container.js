@@ -2,6 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
+import { viewState } from '../reducers/viewHandler';
+
 import DocumentList from './app/DocumentList';
 import ErrorScreen from './app/ErrorScreen';
 import Modal from './app/Modal';
@@ -309,10 +311,18 @@ Container.propTypes = {
  * @summary ToDo: Describe the method.
  * @param {object} state
  */
-const mapStateToProps = (state) => ({
-  notfound: state.viewHandler.master.notfound,
-  connectionError: state.windowHandler.connectionError || false,
-  pluginComponents: state.pluginsHandler.components,
-});
+const mapStateToProps = (state, { windowType }) => {
+  let master = state.viewHandler.views[windowType];
+
+  if (!master || !windowType) {
+    master = viewState;
+  }
+
+  return {
+    notfound: master.notfound,
+    connectionError: state.windowHandler.connectionError || false,
+    pluginComponents: state.pluginsHandler.components,
+  };
+};
 
 export default connect(mapStateToProps)(Container);
