@@ -43,7 +43,7 @@ export default class DocumentList extends Component {
    * @method setClickOutsideLock
    * @summary ToDo: Describe the method.
    */
-  setClickOutsideLock = value => {
+  setClickOutsideLock = (value) => {
     this.setState({
       clickOutsideLock: !!value,
     });
@@ -66,7 +66,7 @@ export default class DocumentList extends Component {
    * @method updateQuickActions
    * @summary ToDo: Describe the method.
    */
-  updateQuickActions = childSelection => {
+  updateQuickActions = (childSelection) => {
     if (this.quickActionsComponent) {
       this.quickActionsComponent.updateActions(childSelection);
     }
@@ -76,7 +76,7 @@ export default class DocumentList extends Component {
    * @method setTableRowEdited
    * @summary ToDo: Describe the method.
    */
-  setTableRowEdited = val => {
+  setTableRowEdited = (val) => {
     this.setState(
       {
         rowEdited: val,
@@ -278,7 +278,7 @@ export default class DocumentList extends Component {
               <QuickActions
                 className="header-element align-items-center"
                 processStatus={processStatus}
-                ref={c => {
+                ref={(c) => {
                   this.quickActionsComponent = c;
                 }}
                 selected={selected}

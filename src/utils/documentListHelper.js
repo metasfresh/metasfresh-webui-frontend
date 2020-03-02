@@ -1,15 +1,10 @@
 import PropTypes from 'prop-types';
-import { push } from 'react-router-redux';
 import { Map } from 'immutable';
 import Moment from 'moment-timezone';
 import currentDevice from 'current-device';
 
 import { getItemsByProperty, nullToEmptyStrings } from './index';
-import {
-  // getSelection,
-  getSelectionInstant,
-  // getSelectionDirect,
-} from '../reducers/windowHandler';
+import { getSelectionInstant } from '../reducers/windowHandler';
 import { viewState } from '../reducers/viewHandler';
 import { TIME_REGEX_TEST } from '../constants/Constants';
 
@@ -43,9 +38,6 @@ const DLpropTypes = {
  */
 const DLmapStateToProps = (state, { location, ...props }) => {
   const { query } = location;
-  // const {
-  //   viewHandler: { master },
-  // } = state;
   let master = state.viewHandler.views[props.windowType];
 
   if (!master) {
@@ -65,22 +57,13 @@ const DLmapStateToProps = (state, { location, ...props }) => {
     viewId = null;
   }
 
-    // if (nextDefaultViewId !== viewId) {
-    //   dispatch(removeSelectedTableItems({ viewId: viewId, windowType }));
+  // if (nextDefaultSort !== defaultSort && nextDefaultSort !== reduxData.sort) {
+  //   stateChanges.sort = nextDefaultSort;
+  // }
 
-    //   stateChanges.viewId = nextDefaultViewId;
-    //   stateChanges.refreshSelection = true;
-    // }
-
-    // if (nextDefaultSort !== defaultSort && nextDefaultSort !== reduxData.sort) {
-    //   stateChanges.sort = nextDefaultSort;
-    // }
-
-    // if (nextDefaultPage !== defaultPage && nextDefaultPage !== page) {
-    //   stateChanges.page = nextDefaultPage || 1;
-    // }
-
-    console.log('documentListHelper: ', props.windowType, viewId, props.isModal, props.isIncluded)
+  // if (nextDefaultPage !== defaultPage && nextDefaultPage !== page) {
+  //   stateChanges.page = nextDefaultPage || 1;
+  // }
 
   return {
     page,

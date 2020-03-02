@@ -17,7 +17,6 @@ import Tooltips from '../tooltips/Tooltips.js';
 import QuickActionsDropdown from './QuickActionsDropdown';
 
 const initialState = {
-  actions: [],
   isDropdownOpen: false,
   btnTooltip: false,
   listTooltip: false,
