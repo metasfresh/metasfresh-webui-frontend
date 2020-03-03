@@ -43,10 +43,10 @@ export function connectWS(topic, onMessageCallback) {
     let reconnectCounter = 0;
     this.sockClient = new Client({
       brokerURL: config.WS_URL,
-      debug(str) {
-        // console.log('debug: ', str);
+      debug(strMessage) {
+        // console.log('debug: ', strMessage);
         // -- detect reconnect and increment the reconnect counter
-        if (str.includes('reconnect')) {
+        if (strMessage.includes('reconnect')) {
           reconnectCounter += 1;
         }
         // -- if more than max allowed reconnect times  ->  deactivate
