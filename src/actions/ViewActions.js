@@ -148,9 +148,7 @@ export function fetchDocument(windowId, viewId, page, pageLength, orderBy) {
 
     return browseViewRequest({ windowId, viewId, page, pageLength, orderBy })
       .then((response) => {
-        dispatch(
-          fetchDocumentSuccess(windowId, response.data)
-        );
+        dispatch(fetchDocumentSuccess(windowId, response.data));
 
         return Promise.resolve(response.data);
       })
@@ -208,7 +206,7 @@ export function fetchLayout(windowId, viewType, viewProfileId = null) {
 
         return Promise.resolve(response.data);
       })
-      .catch(error => {
+      .catch((error) => {
         dispatch(fetchLayoutError(windowId, error));
 
         return Promise.resolve(error);

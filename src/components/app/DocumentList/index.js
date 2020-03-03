@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
-import { Map, List, Set } from 'immutable';
+import { Map, Set } from 'immutable';
 import currentDevice from 'current-device';
 import { get } from 'lodash';
 
@@ -50,7 +50,7 @@ import {
 } from '../../../utils/documentListHelper';
 
 import DocumentList from './DocumentList';
-import withRouterAndRef from '../hoc/WithRouterAndRef';
+import withRouterAndRef from '../../hoc/WithRouterAndRef';
 
 class DocumentListContainer extends Component {
   constructor(props) {
@@ -105,9 +105,6 @@ class DocumentListContainer extends Component {
       refId,
       windowType,
       closeListIncludedView,
-
-      // TODO: sorting
-      // sort,
       viewId,
       resetView,
     } = this.props;
@@ -136,10 +133,7 @@ class DocumentListContainer extends Component {
     if (
       staticFilterCleared ||
       nextWindowType !== windowType ||
-      // (nextDefaultViewId === undefined &&
-      //   nextDefaultViewId !== defaultViewId) ||
       (nextWindowType === windowType &&
-        // ((nextDefaultViewId !== defaultViewId &&
         ((nextViewId !== viewId && isIncluded && nextIsIncluded) ||
           location.hash === '#notification')) ||
       nextRefId !== refId
@@ -178,17 +172,6 @@ class DocumentListContainer extends Component {
       });
     }
   }
-
-  // TODO: Set modal description if data changed
-  // No idea who came up with this...
-  // componentDidUpdate(prevProps, prevState) {
-    // const { setModalDescription } = this.props;
-  //   const { data } = this.state;
-
-  //   if (prevState.data !== data && setModalDescription) {
-  //     setModalDescription(data.description);
-  //   }
-  // }
 
   /**
    * @method connectWebSocket
@@ -484,13 +467,7 @@ class DocumentListContainer extends Component {
       sortingQuery && updateUri('sort', sortingQuery);
     }
 
-    return fetchDocument(
-      windowType,
-      id,
-      page,
-      this.pageLength,
-      sortingQuery
-    )
+    return fetchDocument(windowType, id, page, this.pageLength, sortingQuery)
       .then((response) => {
         const result = response.result;
         const resultById = {};
@@ -598,10 +575,8 @@ class DocumentListContainer extends Component {
       if (mapConfig && mapConfig.provider) {
         // for mobile show map
         // for desktop show half-n-half
-
         this.setState({ panelsState: GEO_PANEL_STATES[1] });
       }
-      // this.setState(newState);
     });
   };
 
@@ -643,11 +618,13 @@ class DocumentListContainer extends Component {
    * @summary ToDo: Describe the method.
    */
   sortData = (asc, field, startPage) => {
-    const { viewId, page } = this.props;
+    const { viewId, page, setSorting, windowType } = this.props;
+    const sort = getSortingQuery(asc, field);
+
+    setSorting(sort, windowType);
 
     this.setState(
       {
-        // sort: getSortingQuery(asc, field),
         triggerSpinner: true,
       },
       () => {
