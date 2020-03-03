@@ -44,7 +44,6 @@ const DLmapStateToProps = (state, { location, ...props }) => {
     master = viewState;
   }
 
-  // TODO: Do we have to handle defaultPage/defaultSort from `SideList` ?
   const sort = master.sort ? master.sort : query.sort;
   const page = master.page ? master.page : parseInt(query.page);
   let viewId = master.viewId ? master.viewId : query.viewId;
@@ -56,14 +55,6 @@ const DLmapStateToProps = (state, { location, ...props }) => {
   if (location.hash === '#notification') {
     viewId = null;
   }
-
-  // if (nextDefaultSort !== defaultSort && nextDefaultSort !== reduxData.sort) {
-  //   stateChanges.sort = nextDefaultSort;
-  // }
-
-  // if (nextDefaultPage !== defaultPage && nextDefaultPage !== page) {
-  //   stateChanges.page = nextDefaultPage || 1;
-  // }
 
   return {
     page,

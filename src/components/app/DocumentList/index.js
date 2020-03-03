@@ -17,6 +17,7 @@ import {
   fetchLocationConfig,
   filterView,
   resetView,
+  deleteView,
   updateViewData,
 } from '../../../actions/ViewActions';
 import {
@@ -88,7 +89,7 @@ class DocumentListContainer extends Component {
     this.mounted = false;
     disconnectWS.call(this);
 
-    this.props.resetView(this.props.windowType);
+    this.props.deleteView(this.props.windowType);
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -303,6 +304,7 @@ class DocumentListContainer extends Component {
       viewId,
       fetchLayout,
       updateRawModal,
+      setModalDescription,
     } = this.props;
 
     this.setState({ triggerSpinner: true });
@@ -328,8 +330,10 @@ class DocumentListContainer extends Component {
             this.createView();
           }
 
-          // TODO: Should we handle this in the action creator ?
           setModalTitle && setModalTitle(response.data.caption);
+          if (response.data.description && setModalDescription) {
+            setModalDescription(response.data.description);
+          }
         }
       })
       .catch(() => {
@@ -371,6 +375,7 @@ class DocumentListContainer extends Component {
       page,
       sort,
       createView,
+      setModalDescription,
     } = this.props;
     const { filtersActive } = this.state;
 
@@ -385,7 +390,11 @@ class DocumentListContainer extends Component {
       refTabId,
       refRowIds
     )
-      .then(({ viewId }) => {
+      .then(({ viewId, data }) => {
+        if (data.description && setModalDescription) {
+          setModalDescription(data.description);
+        }
+
         this.mounted &&
           this.setState(
             {
@@ -414,6 +423,7 @@ class DocumentListContainer extends Component {
       sort,
       viewId,
       setListIncludedView,
+      setModalDescription,
       filterView,
     } = this.props;
     const { filtersActive } = this.state;
@@ -421,6 +431,10 @@ class DocumentListContainer extends Component {
     filterView(windowType, viewId, filtersActive.toIndexedSeq().toArray())
       .then((response) => {
         const viewId = response.viewId;
+
+        if (response.data.description && setModalDescription) {
+          setModalDescription(response.data.description);
+        }
 
         if (isIncluded) {
           setListIncludedView({ windowType, viewId });
@@ -831,6 +845,7 @@ export default withRouterAndRef(
     DLmapStateToProps,
     {
       resetView,
+      deleteView,
       fetchDocument,
       fetchLayout,
       createView,
