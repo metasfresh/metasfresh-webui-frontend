@@ -3,30 +3,39 @@ import {
   createViewRequest,
   filterViewRequest,
   getViewLayout,
-  // locationSearchRequest,
   locationConfigRequest,
 } from '../api';
 
-export const RESET_VIEW = 'RESET_VIEW';
-export const FETCH_DOCUMENT_PENDING = 'FETCH_DOCUMENT_PENDING';
-export const FETCH_DOCUMENT_SUCCESS = 'FETCH_DOCUMENT_SUCCESS';
-export const FETCH_DOCUMENT_ERROR = 'FETCH_DOCUMENT_ERROR';
-export const FETCH_LAYOUT_PENDING = 'FETCH_LAYOUT_PENDING';
-export const FETCH_LAYOUT_SUCCESS = 'FETCH_LAYOUT_SUCCESS';
-export const FETCH_LAYOUT_ERROR = 'FETCH_LAYOUT_ERROR';
-export const CREATE_VIEW = 'CREATE_VIEW';
-export const CREATE_VIEW_SUCCESS = 'CREATE_VIEW_SUCCESS';
-export const CREATE_VIEW_ERROR = 'CREATE_VIEW_ERROR';
-export const FILTER_VIEW_PENDING = 'FILTER_VIEW_PENDING';
-export const FILTER_VIEW_SUCCESS = 'FILTER_VIEW_SUCCESS';
-export const FILTER_VIEW_ERROR = 'FILTER_VIEW_ERROR';
-export const UPDATE_VIEW_DATA = 'UPDATE_VIEW_DATA';
-export const FETCH_LOCATION_CONFIG_SUCCESS = 'FETCH_LOCATION_CONFIG_SUCCESS';
-export const FETCH_LOCATION_CONFIG_ERROR = 'FETCH_LOCATION_CONFIG_ERROR';
+import {
+  FETCH_DOCUMENT_PENDING,
+  FETCH_DOCUMENT_SUCCESS,
+  FETCH_DOCUMENT_ERROR,
+  FETCH_LAYOUT_PENDING,
+  FETCH_LAYOUT_SUCCESS,
+  FETCH_LAYOUT_ERROR,
+  CREATE_VIEW,
+  CREATE_VIEW_SUCCESS,
+  CREATE_VIEW_ERROR,
+  FILTER_VIEW_PENDING,
+  FILTER_VIEW_SUCCESS,
+  FILTER_VIEW_ERROR,
+  UPDATE_VIEW_DATA,
+  FETCH_LOCATION_CONFIG_SUCCESS,
+  FETCH_LOCATION_CONFIG_ERROR,
+  RESET_VIEW,
+  DELETE_VIEW,
+} from '../actions/ViewActions';
 
 export function resetView(id) {
   return {
     type: RESET_VIEW,
+    payload: { id },
+  };
+}
+
+export function deleteView(id) {
+  return {
+    type: DELETE_VIEW,
     payload: { id },
   };
 }
@@ -246,44 +255,3 @@ export function fetchLocationConfig(windowId) {
       });
   };
 }
-
-// export function initDataSuccess({
-//   data,
-//   docId,
-//   includedTabsInfo,
-//   saveStatus,
-//   scope,
-//   standardActions,
-//   validStatus,
-//   websocket,
-// }) {
-//   return {
-//     data,
-//     docId,
-//     includedTabsInfo,
-//     saveStatus,
-//     scope,
-//     standardActions,
-//     type: INIT_DATA_SUCCESS,
-//     validStatus,
-//     websocket,
-//   };
-// }
-// export function fetchLayout(windowId, viewId, page, pageLength, orderBy) {
-//   return dispatch => {
-//     dispatch(fetchDocumentPending());
-
-//     return getLayout(windowId, viewId, page, pageLength, orderBy)
-//       .then(response => {
-//         dispatch(fetchLayoutSuccess(response.data));
-
-//         return Promise.resolve(response.data);
-//       })
-//       .catch(error => {
-//         dispatch(fetchLayoutError(error));
-
-//         //show error message ?
-//         return Promise.resolve(error);
-//       });
-//   };
-// }

@@ -155,10 +155,10 @@ export function updateRawModal(windowType, data) {
   };
 }
 
-  /**
-   * @method setModalDescription
-   * @summary ToDo: Describe the method.
-   */
+/**
+ * @method setRawModalTitle
+ * @summary Action creator that sets the title on the rawModal
+ */
 export function setRawModalTitle(title, windowType) {
   return {
     type: SET_RAW_MODAL_TITLE,
@@ -166,10 +166,10 @@ export function setRawModalTitle(title, windowType) {
   };
 }
 
-  /**
-   * @method setModalDescription
-   * @summary ToDo: Describe the method.
-   */
+/**
+ * @method setRawModalDescription
+ * @summary Action creator that sets the description on the rawModal
+ */
 export function setRawModalDescription(description, windowType) {
   return {
     type: SET_RAW_MODAL_DESCRIPTION,

@@ -11,14 +11,15 @@ import {
   CREATE_VIEW,
   CREATE_VIEW_SUCCESS,
   CREATE_VIEW_ERROR,
-  FILTER_VIEW,
+  FILTER_VIEW_PENDING,
   FILTER_VIEW_SUCCESS,
   FILTER_VIEW_ERROR,
   UPDATE_VIEW_DATA,
   FETCH_LOCATION_CONFIG_SUCCESS,
   FETCH_LOCATION_CONFIG_ERROR,
   RESET_VIEW,
-} from '../actions/ViewActions';
+  DELETE_VIEW,
+} from '../constants/ActionTypes';
 
 export const viewState = {
   layout: {
@@ -255,7 +256,7 @@ export default function viewHandler(state = initialState, action) {
         },
       };
     }
-    case FILTER_VIEW: {
+    case FILTER_VIEW_PENDING: {
       const { id } = action.payload;
       const view = getView(id, state);
 
@@ -365,6 +366,13 @@ export default function viewHandler(state = initialState, action) {
       };
     }
 
+    case DELETE_VIEW: {
+      const id = action.payload.id;
+
+      delete state.views[id];
+
+      return state;
+    }
     case RESET_VIEW: {
       const id = action.payload.id;
 
