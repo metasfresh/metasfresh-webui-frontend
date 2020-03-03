@@ -41,6 +41,8 @@ import {
   REMOVE_TABLE_ITEMS_SELECTION,
   SELECT_TABLE_ITEMS,
   SET_LATEST_NEW_DOCUMENT,
+  SET_RAW_MODAL_DESCRIPTION,
+  SET_RAW_MODAL_TITLE,
   SORT_TAB,
   TOGGLE_OVERLAY,
   UNSELECT_TAB,
@@ -98,6 +100,8 @@ export const initialState = {
     visible: false,
     windowType: null,
     viewId: null,
+    title: '',
+    description: '',
   },
   pluginModal: {
     visible: false,
@@ -205,13 +209,21 @@ export default function windowHandler(state = initialState, action) {
           childViewSelectedIds: action.childViewSelectedIds,
         },
       };
-    case OPEN_PLUGIN_MODAL:
+    case UPDATE_MODAL:
       return {
         ...state,
-        pluginModal: {
-          visible: true,
-          type: action.payload.type,
-          id: action.payload.id,
+        modal: {
+          ...state.modal,
+          rowId: action.rowId,
+          dataId: action.dataId,
+        },
+      };
+    case CLOSE_MODAL:
+      return {
+        ...state,
+        modal: {
+          ...state.modal,
+          ...initialState.modal,
         },
       };
     case OPEN_RAW_MODAL:
@@ -223,15 +235,6 @@ export default function windowHandler(state = initialState, action) {
           windowId: action.windowId,
           viewId: action.viewId,
           profileId: action.profileId,
-        },
-      };
-    case UPDATE_MODAL:
-      return {
-        ...state,
-        modal: {
-          ...state.modal,
-          rowId: action.rowId,
-          dataId: action.dataId,
         },
       };
     case UPDATE_RAW_MODAL: {
@@ -249,6 +252,22 @@ export default function windowHandler(state = initialState, action) {
         return state;
       }
     }
+    case SET_RAW_MODAL_TITLE:
+      return {
+        ...state,
+        rawModal: {
+          ...state.rawModal,
+          title: action.payload.title,
+        },
+      };
+    case SET_RAW_MODAL_DESCRIPTION:
+      return {
+        ...state,
+        rawModal: {
+          ...state.rawModal,
+          description: action.payload.description,
+        },
+      };
     case CLOSE_RAW_MODAL:
       return {
         ...state,
@@ -260,24 +279,13 @@ export default function windowHandler(state = initialState, action) {
           profileId: null,
         },
       };
-
-    case CLOSE_PROCESS_MODAL:
-      if (state.modal.modalType === 'process') {
-        return {
-          ...state,
-          modal: {
-            ...state.modal,
-            ...initialState.modal,
-          },
-        };
-      }
-      return state;
-    case CLOSE_MODAL:
+    case OPEN_PLUGIN_MODAL:
       return {
         ...state,
-        modal: {
-          ...state.modal,
-          ...initialState.modal,
+        pluginModal: {
+          visible: true,
+          type: action.payload.type,
+          id: action.payload.id,
         },
       };
     case CLOSE_PLUGIN_MODAL:
@@ -289,6 +297,17 @@ export default function windowHandler(state = initialState, action) {
           id: null,
         },
       };
+    case CLOSE_PROCESS_MODAL:
+      if (state.modal.modalType === 'process') {
+        return {
+          ...state,
+          modal: {
+            ...state.modal,
+            ...initialState.modal,
+          },
+        };
+      }
+      return state;
     case TOGGLE_OVERLAY:
       return {
         ...state,

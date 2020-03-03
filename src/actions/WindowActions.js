@@ -41,6 +41,8 @@ import {
   REMOVE_TABLE_ITEMS_SELECTION,
   SELECT_TABLE_ITEMS,
   SET_LATEST_NEW_DOCUMENT,
+  SET_RAW_MODAL_DESCRIPTION,
+  SET_RAW_MODAL_TITLE,
   SHOW_SPINNER,
   SORT_TAB,
   TOGGLE_OVERLAY,
@@ -150,6 +152,28 @@ export function updateRawModal(windowType, data) {
     type: UPDATE_RAW_MODAL,
     windowId: windowType,
     data: { ...data },
+  };
+}
+
+  /**
+   * @method setModalDescription
+   * @summary ToDo: Describe the method.
+   */
+export function setRawModalTitle(title, windowType) {
+  return {
+    type: SET_RAW_MODAL_TITLE,
+    payload: { windowType, title },
+  };
+}
+
+  /**
+   * @method setModalDescription
+   * @summary ToDo: Describe the method.
+   */
+export function setRawModalDescription(description, windowType) {
+  return {
+    type: SET_RAW_MODAL_DESCRIPTION,
+    payload: { windowType, description },
   };
 }
 

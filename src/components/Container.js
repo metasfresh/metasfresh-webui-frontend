@@ -3,6 +3,10 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { viewState } from '../reducers/viewHandler';
+import {
+  setRawModalTitle,
+  setRawModalDescription,
+} from '../actions/WindowActions';
 
 import DocumentList from './app/DocumentList';
 import ErrorScreen from './app/ErrorScreen';
@@ -47,17 +51,15 @@ const Container = (props) => {
     modal,
     pluginModal,
     indicator,
-    modalTitle,
-    setModalTitle,
     includedView,
     closeModalCallback,
-    setModalDescription,
-    modalDescription,
     editmode,
     handleEditModeToggle,
     activeTab,
     masterDocumentList,
     pluginComponents,
+    setRawModalTitle,
+    setRawModalDescription,
   } = props;
   const pluginModalVisible = pluginModal.visible;
   let PluginModalComponent = null;
@@ -149,8 +151,8 @@ const Container = (props) => {
 
         {rawModal.visible && (
           <RawModal
-            modalTitle={modalTitle}
-            modalDescription={modalDescription}
+            modalTitle={rawModal.title}
+            modalDescription={rawModal.description}
             allowedCloseActions={rawModal.allowedCloseActions}
             windowType={rawModal.windowId}
             viewId={rawModal.viewId}
@@ -162,8 +164,8 @@ const Container = (props) => {
                 windowType={rawModal.windowId}
                 defaultViewId={rawModal.viewId}
                 viewProfileId={rawModal.profileId}
-                setModalTitle={setModalTitle}
-                setModalDescription={setModalDescription}
+                setModalTitle={setRawModalTitle}
+                setModalDescription={setRawModalDescription}
                 fetchQuickActionsOnInit={
                   !(
                     includedView &&
@@ -171,7 +173,7 @@ const Container = (props) => {
                     includedView.viewId
                   )
                 }
-                modalDescription={modalDescription}
+                modalDescription={rawModal.description}
                 isModal
                 processStatus={processStatus}
                 includedView={includedView}
@@ -325,4 +327,7 @@ const mapStateToProps = (state, { windowType }) => {
   };
 };
 
-export default connect(mapStateToProps)(Container);
+export default connect(
+  mapStateToProps,
+  { setRawModalTitle, setRawModalDescription }
+)(Container);

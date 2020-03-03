@@ -19,16 +19,6 @@ import Overlay from '../components/app/Overlay';
  * @extends Component
  */
 class DocList extends Component {
-  // TODO: Maybe this should be stored in redux ?
-  state = {
-    modalTitle: '',
-    modalDescription: '',
-  };
-
-  /**
-   * @method componentDidMount
-   * @summary ToDo: Describe the method.
-   */
   componentDidMount = () => {
     const { dispatch, windowType, latestNewDocument, query } = this.props;
 
@@ -46,10 +36,6 @@ class DocList extends Component {
     }
   };
 
-  /**
-   * @method componentDidUpdate
-   * @summary ToDo: Describe the method.
-   */
   componentDidUpdate = (prevProps) => {
     const { dispatch, windowType } = this.props;
 
@@ -69,22 +55,6 @@ class DocList extends Component {
   };
 
   /**
-   * @method setModalTitle
-   * @summary ToDo: Describe the method.
-   */
-  setModalTitle = (title) => {
-    this.setState({ modalTitle: title });
-  };
-
-  /**
-   * @method setModalDescription
-   * @summary ToDo: Describe the method.
-   */
-  setModalDescription = (desc) => {
-    this.setState({ modalDescription: desc });
-  };
-
-  /**
    * @method handleUpdateParentSelectedIds
    * @summary ToDo: Describe the method.
    */
@@ -92,10 +62,6 @@ class DocList extends Component {
     this.masterDocumentList.updateQuickActions(childSelection);
   };
 
-  /**
-   * @method render
-   * @summary ToDo: Describe the method.
-   */
   render() {
     const {
       windowType,
@@ -109,7 +75,6 @@ class DocList extends Component {
       processStatus,
       includedView,
     } = this.props;
-    const { modalTitle, modalDescription } = this.state;
     let refRowIds = [];
 
     if (query && query.refRowIds) {
@@ -130,12 +95,8 @@ class DocList extends Component {
         windowType={windowType}
         query={query}
         indicator={indicator}
-        modalTitle={modalTitle}
         processStatus={processStatus}
         includedView={includedView}
-        setModalTitle={this.setModalTitle}
-        setModalDescription={this.setModalDescription}
-        modalDescription={modalDescription}
         showIndicator={!modal.visible && !rawModal.visible}
         masterDocumentList={this.masterDocumentList}
       >

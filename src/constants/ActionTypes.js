@@ -334,6 +334,18 @@ export const UPDATE_RAW_MODAL = 'UPDATE_RAW_MODAL';
 
 /**
  * @constant
+ * @type {string}
+ */
+export const SET_RAW_MODAL_TITLE = 'SET_RAW_MODAL_TITLE';
+
+/**
+ * @constant
+ * @type {string}
+ */
+export const SET_RAW_MODAL_DESCRIPTION = 'SET_RAW_MODAL_DESCRIPTION';
+
+/**
+ * @constant
  * @type {string} ToDo: Description for the constant.
  */
 export const CLOSE_RAW_MODAL = 'CLOSE_RAW_MODAL';
