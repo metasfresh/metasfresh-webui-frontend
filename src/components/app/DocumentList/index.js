@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
-import { Map, Set } from 'immutable';
+import { Map as iMap, Set as iSet } from 'immutable';
 import currentDevice from 'current-device';
 import { get } from 'lodash';
 
@@ -66,8 +66,8 @@ class DocumentListContainer extends Component {
     this.state = {
       pageColumnInfosByFieldName: null,
       panelsState: GEO_PANEL_STATES[0],
-      filtersActive: Map(),
-      initialValuesNulled: Map(),
+      filtersActive: iMap(),
+      initialValuesNulled: iMap(),
       isShowIncluded: false,
       hasShowIncluded: false,
       triggerSpinner: true,
@@ -119,7 +119,6 @@ class DocumentListContainer extends Component {
       nextIncludedView.viewId;
     const location = document.location;
 
-    // TODO: What should we do with this ??
     this.loadSupportAttributeFlag(nextProps);
 
     /*
@@ -140,12 +139,12 @@ class DocumentListContainer extends Component {
       nextRefId !== refId
     ) {
       // TODO: Check if handling reset only via middleware is enough
-      resetView();
+      resetView(windowType);
 
       this.setState(
         {
-          filtersActive: Map(),
-          initialValuesNulled: Map(),
+          filtersActive: iMap(),
+          initialValuesNulled: iMap(),
           staticFilterCleared: false,
           triggerSpinner: true,
           panelsState: GEO_PANEL_STATES[0],
@@ -220,7 +219,7 @@ class DocumentListContainer extends Component {
         );
       }
 
-      if (fullyChanged == true) {
+      if (fullyChanged === true) {
         const { selectTableItems, windowType, selections, viewId } = this.props;
         const selection = getSelectionDirect(selections, windowType, viewId);
 
@@ -307,7 +306,7 @@ class DocumentListContainer extends Component {
       setModalDescription,
     } = this.props;
 
-    this.setState({ triggerSpinner: true });
+    this.mounted && this.setState({ triggerSpinner: true });
 
     fetchLayout(windowType, type, viewProfileId)
       .then((response) => {
@@ -331,13 +330,17 @@ class DocumentListContainer extends Component {
           }
 
           setModalTitle && setModalTitle(response.data.caption);
-          if (response.data.description && setModalDescription) {
+          if (
+            response.data &&
+            response.data.description &&
+            setModalDescription
+          ) {
             setModalDescription(response.data.description);
           }
         }
       })
       .catch(() => {
-        this.setState({ triggerSpinner: false });
+        this.mounted && this.setState({ triggerSpinner: false });
       });
   };
 
@@ -391,7 +394,7 @@ class DocumentListContainer extends Component {
       refRowIds
     )
       .then(({ viewId, data }) => {
-        if (data.description && setModalDescription) {
+        if (data && data.description && setModalDescription) {
           setModalDescription(data.description);
         }
 
@@ -432,7 +435,7 @@ class DocumentListContainer extends Component {
       .then((response) => {
         const viewId = response.viewId;
 
-        if (response.data.description && setModalDescription) {
+        if (response.data && response.data.description && setModalDescription) {
           setModalDescription(response.data.description);
         }
 
@@ -606,7 +609,7 @@ class DocumentListContainer extends Component {
           : null;
         break;
       case 'down':
-        currentPage != 1 ? currentPage-- : null;
+        currentPage !== 1 ? currentPage-- : null;
         break;
       default:
         currentPage = index;
@@ -667,7 +670,7 @@ class DocumentListContainer extends Component {
     let filterParams = initialValuesNulled.get(filterId);
 
     if (!filterParams && parameterName) {
-      filterParams = Set([parameterName]);
+      filterParams = iSet([parameterName]);
     } else if (filterParams && parameterName) {
       filterParams = filterParams.add(parameterName);
     }

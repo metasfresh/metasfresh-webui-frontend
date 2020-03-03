@@ -1,4 +1,4 @@
-import { Map } from 'immutable';
+import { Map as iMap } from 'immutable';
 import { get } from 'lodash';
 
 import {
@@ -30,7 +30,7 @@ export const viewState = {
   },
   // rowData is an immutable Map with tabId's as keys, and Lists as values.
   // List's elements are plain objects for now
-  rowData: Map(),
+  rowData: iMap(),
   docId: undefined,
   type: null,
   viewId: null,
@@ -60,6 +60,10 @@ const getView = (id, state) => {
 };
 
 export default function viewHandler(state = initialState, action) {
+  if ((!action.payload || !action.payload.id) && action.type !== DELETE_VIEW) {
+    return state;
+  }
+
   switch (action.type) {
     // LAYOUT
     case FETCH_LAYOUT_PENDING: {
@@ -175,7 +179,7 @@ export default function viewHandler(state = initialState, action) {
         page,
         queryLimit,
         queryLimitHit,
-        rowData: Map({ [`${action.payload.tabId || 1}`]: result }),
+        rowData: iMap({ [`${action.payload.tabId || 1}`]: result }),
         pending: false,
       };
 
@@ -369,19 +373,32 @@ export default function viewHandler(state = initialState, action) {
     case DELETE_VIEW: {
       const id = action.payload.id;
 
-      delete state.views[id];
+      if (id) {
+        delete state.views[id];
 
-      return state;
+        return state;
+      } else {
+        return {
+          ...state,
+          views: {},
+        };
+      }
     }
     case RESET_VIEW: {
       const id = action.payload.id;
+      const view = getView(id, state);
 
-      return {
-        views: {
-          ...state.views,
-          [`${id}`]: { ...viewState },
-        },
-      };
+      if (view) {
+        return {
+          ...state,
+          views: {
+            ...state.views,
+            [`${id}`]: { ...viewState },
+          },
+        };
+      } else {
+        return state;
+      }
     }
     default:
       return state;

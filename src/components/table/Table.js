@@ -1032,7 +1032,9 @@ class Table extends Component {
       dataHash,
     } = this.state;
 
-    if (!rows || !rows.length) return null;
+    if (!rows || !rows.length || (!cols || !cols.length) || (!rows && !cols)) {
+      return null;
+    }
 
     this.rowRefs = {};
 

@@ -1,4 +1,4 @@
-import { resetView } from '../actions/ViewActions';
+import { deleteView } from '../actions/ViewActions';
 
 /**
  * Navigation middleware that resets the view (or actually the viewHandler state)
@@ -11,7 +11,7 @@ const navigationMiddleware = ({ dispatch }) => (next) => (action) => {
     action.type === '@@router/LOCATION_CHANGE' &&
     action.payload.action === 'PUSH'
   ) {
-    dispatch(resetView());
+    dispatch(deleteView());
   }
 
   return nextAction;
