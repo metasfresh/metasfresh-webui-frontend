@@ -247,13 +247,6 @@ Inbox.propTypes = {
 
 Inbox.defaultProps = {};
 
-/**
- * @method routerInbox
- * @summary ToDo: Describe the method
- * @param {object} state
- * @param {object} props
- * @todo Write the documentation
- */
 const routerInbox = withRouter(
   connect((state, props) => ({
     modalVisible: state.windowHandler.modal.visible,

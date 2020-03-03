@@ -64,7 +64,6 @@ export function patchRequest({
   // HOTFIX: before refactoring all calls explicity set docId to `null`
   // instead of `undefined` so default value 'NEW' was never used!
   docId,
-
   docType,
   entity,
   isAdvanced,

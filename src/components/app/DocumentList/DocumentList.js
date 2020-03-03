@@ -328,12 +328,12 @@ export default class DocumentList extends Component {
             <div className="row table-row">
               <Table
                 entity="documentView"
-                ref={c => (this.table = c)}
+                ref={(c) => (this.table = c)}
                 rowData={rowData}
                 cols={layout.elements}
                 collapsible={layout.collapsible}
                 expandedDepth={layout.expandedDepth}
-                tabId={1/*windowType*/}
+                tabId={1}
                 windowId={windowType}
                 emptyText={layout.emptyResultText}
                 emptyHint={layout.emptyResultHint}

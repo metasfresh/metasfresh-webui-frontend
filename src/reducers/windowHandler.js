@@ -1,5 +1,5 @@
 import update from 'immutability-helper';
-import { Map, List, Set } from 'immutable';
+import { Map as iMap, List as iList, Set as iSet } from 'immutable';
 import { get, forEach, difference } from 'lodash';
 import { createSelector } from 'reselect';
 import uuid from 'uuid/v4';
@@ -65,7 +65,7 @@ import {
 export const initialState = {
   connectionError: false,
 
-  // this should be moved to a separate `modalHandler`
+  // TODO: this should be moved to a separate `modalHandler`
   modal: {
     visible: false,
     type: '',
@@ -75,7 +75,7 @@ export const initialState = {
     viewId: null,
     layout: {},
     data: {},
-    rowData: Map(),
+    rowData: iMap(),
     modalTitle: '',
     modalType: '',
     isAdvanced: false,
@@ -95,7 +95,7 @@ export const initialState = {
     data: null,
   },
 
-  // this should be moved to a separate `modalHandler`
+  // TODO: this should be moved to a separate `modalHandler`
   rawModal: {
     visible: false,
     windowType: null,
@@ -116,9 +116,9 @@ export const initialState = {
     },
     data: [],
 
-    // rowData is an immutable Map with tabId's as keys, and Lists as values.
-    // List's elements are plain objects for now
-    rowData: Map(),
+    // rowData is an immutable Map with tabId's as keys, and iLists as values.
+    // iList's elements are plain objects for now
+    rowData: iMap(),
     saveStatus: {},
     validStatus: {},
     includedTabsInfo: {},
@@ -336,9 +336,9 @@ export default function windowHandler(state = initialState, action) {
           data: action.data,
           docId: action.docId,
           layout: {},
-          rowData: Map(),
+          rowData: iMap(),
           saveStatus: action.saveStatus,
-          standardActions: Set(action.standardActions),
+          standardActions: iSet(action.standardActions),
           validStatus: action.validStatus,
           includedTabsInfo: action.includedTabsInfo,
           websocket: action.websocket,
@@ -361,7 +361,7 @@ export default function windowHandler(state = initialState, action) {
         master: {
           ...state.master,
           data: {},
-          rowData: Map(),
+          rowData: iMap(),
           docId: undefined,
         },
       };
@@ -402,11 +402,11 @@ export default function windowHandler(state = initialState, action) {
       });
     /* eslint-disable no-case-declarations */
     case ADD_ROW_DATA:
-      let addRowData = Map();
+      let addRowData = iMap();
 
       for (const [key, item] of Object.entries(action.data)) {
         const arrayItem = item.length ? item : [];
-        addRowData = addRowData.set(key, List(arrayItem));
+        addRowData = addRowData.set(key, iList(arrayItem));
       }
 
       return {
@@ -477,8 +477,8 @@ export default function windowHandler(state = initialState, action) {
       // added rows
       forEach(changed, (value, key) => rows.push(value));
 
-      let addRowData = Map();
-      addRowData = addRowData.set(tabId, List(rows));
+      let addRowData = iMap();
+      addRowData = addRowData.set(tabId, iList(rows));
 
       return {
         ...state,
@@ -508,9 +508,9 @@ export default function windowHandler(state = initialState, action) {
       if (typeof action.value === 'string') {
         value = action.value;
       } else if (action.property === 'standardActions') {
-        // TODO: Evaluate if standardActions of type Set
+        // TODO: Evaluate if standardActions of type iSet
         // is worth this extra check
-        value = Set(action.value);
+        value = iSet(action.value);
       } else {
         value = Object.assign(
           {},

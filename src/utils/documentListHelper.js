@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { Map } from 'immutable';
+import { Map as iMap } from 'immutable';
 import Moment from 'moment-timezone';
 import currentDevice from 'current-device';
 
@@ -21,7 +21,6 @@ const DLpropTypes = {
   updateParentSelectedIds: PropTypes.func,
 
   // from @connect
-  // dispatch: PropTypes.func.isRequired,
   selections: PropTypes.object.isRequired,
   childSelected: PropTypes.array.isRequired,
   parentSelected: PropTypes.array.isRequired,
@@ -109,7 +108,7 @@ if (currentDevice.type === 'mobile' || currentDevice.type === 'tablet') {
 }
 
 const filtersToMap = function(filtersArray) {
-  let filtersMap = Map();
+  let filtersMap = iMap();
 
   if (filtersArray && filtersArray.length) {
     filtersArray.forEach((filter) => {
