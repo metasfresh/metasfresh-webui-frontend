@@ -334,7 +334,7 @@ export default function viewHandler(state = initialState, action) {
       const { id, data } = action.payload;
       const view = getView(id, state);
 
-      if (data.provider === 'GoogleMaps') {
+      if (data.provider) {
         return {
           ...state,
           views: {
@@ -364,6 +364,7 @@ export default function viewHandler(state = initialState, action) {
         },
       };
     }
+
     case RESET_VIEW: {
       const id = action.payload.id;
 

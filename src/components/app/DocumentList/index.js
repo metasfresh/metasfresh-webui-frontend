@@ -23,8 +23,8 @@ import {
   closeListIncludedView,
   setListId,
   setListIncludedView,
-  setPagination,
-  setSorting,
+  setPagination as setListPagination,
+  setSorting as setListSorting,
 } from '../../../actions/ListActions';
 import {
   updateRawModal,
@@ -542,7 +542,6 @@ class DocumentListContainer extends Component {
       });
   };
 
-  // TODO: Handle location search
   getLocationData = (resultById) => {
     const {
       windowType,
@@ -564,14 +563,10 @@ class DocumentListContainer extends Component {
         };
       });
 
-      console.log('index getLocationData: ', data, locationData);
+      if (locationData.length) {
+        updateViewData(locationData, windowType);
+      }
 
-      // const newState = {
-      //   data: {
-      //     ...this.state.data,
-      //     locationData,
-      //   },
-      // };
       if (mapConfig && mapConfig.provider) {
         // for mobile show map
         // for desktop show half-n-half
@@ -618,10 +613,7 @@ class DocumentListContainer extends Component {
    * @summary ToDo: Describe the method.
    */
   sortData = (asc, field, startPage) => {
-    const { viewId, page, setSorting, windowType } = this.props;
-    const sort = getSortingQuery(asc, field);
-
-    setSorting(sort, windowType);
+    const { viewId, page } = this.props;
 
     this.setState(
       {
@@ -696,6 +688,9 @@ class DocumentListContainer extends Component {
       push,
       page,
       sort,
+      setListSorting,
+      setListPagination,
+      setListId,
     } = this.props;
 
     if (isModal) {
@@ -706,8 +701,8 @@ class DocumentListContainer extends Component {
 
     if (!isSideListShow) {
       // Caching last settings
-      setPagination(page, windowType);
-      setSorting(sort, windowType);
+      setListPagination(page, windowType);
+      setListSorting(sort, windowType);
       setListId(reduxData.viewId, windowType);
     }
   };
@@ -843,8 +838,8 @@ export default withRouterAndRef(
       setListIncludedView,
       indicatorState,
       closeListIncludedView,
-      setPagination,
-      setSorting,
+      setListPagination,
+      setListSorting,
       setListId,
       push,
       updateRawModal,
