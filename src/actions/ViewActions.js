@@ -24,7 +24,7 @@ import {
   FETCH_LOCATION_CONFIG_ERROR,
   RESET_VIEW,
   DELETE_VIEW,
-} from '../actions/ViewActions';
+} from '../constants/ActionTypes';
 
 export function resetView(id) {
   return {
