@@ -169,12 +169,6 @@ export const getSelectionInstant = createSelector(
   (items) => items
 );
 
-// export const getSelection = ({ state, windowId, viewId }) => {
-//   const windowTypeSelections = state.windowHandler.selections[windowId];
-//   const id = viewId || windowId;
-
-//   return (windowTypeSelections && windowTypeSelections[id]) || NO_SELECTION;
-// };
 export const getSelectionDirect = (selections, windowId, viewId) => {
   const windowTypeSelections = selections[windowId];
 

@@ -23,7 +23,6 @@ import {
 export const viewState = {
   layout: {
     activeTab: null,
-    // data: [],
     pending: false,
     error: null,
     notfound: false,
@@ -84,8 +83,6 @@ export default function viewHandler(state = initialState, action) {
     case FETCH_LAYOUT_SUCCESS: {
       const { id, layout } = action.payload;
       const view = getView(id, state);
-
-      console.log('WTF: ', )
 
       return {
         ...state,
@@ -258,65 +255,115 @@ export default function viewHandler(state = initialState, action) {
         },
       };
     }
-    case FILTER_VIEW:
+    case FILTER_VIEW: {
+      const { id } = action.payload;
+      const view = getView(id, state);
+
       return {
         ...state,
-        notfound: false,
-        pending: true,
-        error: null,
+        views: {
+          ...state.views,
+          [`${id}`]: {
+            ...view,
+            notfound: false,
+            pending: true,
+            error: null,
+          },
+        },
       };
+    }
     case FILTER_VIEW_SUCCESS: {
       const {
         id,
         data: { filters, viewId, size },
       } = action.payload;
+      const view = getView(id, state);
 
       return {
         ...state,
-        filters,
-        viewId,
-        size,
-        // TODO: Should we always set it to 1 ?
-        page: 1,
-        pending: false,
+        views: {
+          ...state.views,
+          [`${id}`]: {
+            ...view,
+            filters,
+            viewId,
+            size,
+            // TODO: Should we always set it to 1 ?
+            page: 1,
+            pending: false,
+          },
+        },
       };
     }
-    case FILTER_VIEW_ERROR:
+    case FILTER_VIEW_ERROR: {
+      const { id, error } = action.payload;
+      const view = getView(id, state);
+
       return {
         ...state,
-        pending: false,
-        notfound: true,
-        error: action.error,
+        views: {
+          ...state.views,
+          [`${id}`]: {
+            ...view,
+            pending: false,
+            notfound: true,
+            error,
+          },
+        },
       };
-
+    }
     case UPDATE_VIEW_DATA: {
-      const tabId = action.payload.tabId || 1;
-      const updatedRowsData = state.rowData.set(tabId, action.payload.rows);
+      const { id, rows } = action.payload;
+      const tabId = action.payload.tabId || '1';
+      const view = getView(id, state);
+      const updatedRowsData = view.rowData.set(tabId, rows);
 
       return {
         ...state,
-        rowData: updatedRowsData,
+        views: {
+          ...state.views,
+          [`${id}`]: {
+            ...view,
+            rowData: updatedRowsData,
+          },
+        },
       };
     }
 
     case FETCH_LOCATION_CONFIG_SUCCESS: {
-      const { payload } = action;
+      const { id, data } = action.payload;
+      const view = getView(id, state);
 
-      if (payload.data.provider === 'GoogleMaps') {
+      if (data.provider === 'GoogleMaps') {
         return {
           ...state,
-          mapConfig: payload.data,
+          views: {
+            ...state.views,
+            [`${id}`]: {
+              ...view,
+              mapConfig: data,
+            },
+          },
         };
       }
 
       return state;
     }
-    case FETCH_LOCATION_CONFIG_ERROR:
+    case FETCH_LOCATION_CONFIG_ERROR: {
+      const { id, error } = action.payload;
+      const view = getView(id, state);
+
       return {
         ...state,
-        error: action.error,
+        views: {
+          ...state.views,
+          [`${id}`]: {
+            ...view,
+            error,
+          },
+        },
       };
-
+    }
     case RESET_VIEW: {
       const id = action.payload.id;
 
