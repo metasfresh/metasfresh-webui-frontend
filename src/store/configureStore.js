@@ -12,7 +12,7 @@ export default function configureStore(history) {
     thunk,
     promiseMiddleware,
     navigationMiddleware,
-    routerMiddleware(history)
+    routerMiddleware(history),
   ];
   const store = createStore(
     null,

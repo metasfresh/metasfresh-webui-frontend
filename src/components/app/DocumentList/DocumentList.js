@@ -32,7 +32,6 @@ export default class DocumentList extends Component {
     this.state = {
       clickOutsideLock: false,
       toggleWidth: 0,
-
       // in some scenarios we don't want to reload table data
       // after edit, as it triggers request, collapses rows and looses selection
       rowEdited: false,
