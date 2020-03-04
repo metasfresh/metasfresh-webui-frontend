@@ -303,8 +303,8 @@ Container.propTypes = {
   showIndicator: PropTypes.any,
   showSidelist: PropTypes.any,
   siteName: PropTypes.any,
-  setModalDescription: PropTypes.any,
-  setModalTitle: PropTypes.any,
+  setRawModalDescription: PropTypes.any,
+  setRawModalTitle: PropTypes.any,
   windowType: PropTypes.any,
 };
 

@@ -515,7 +515,7 @@ class DocumentListContainer extends Component {
 
         if (this.mounted) {
           const newState = {
-            pageColumnInfosByFieldName: pageColumnInfosByFieldName,
+            pageColumnInfosByFieldName,
             triggerSpinner: false,
           };
 

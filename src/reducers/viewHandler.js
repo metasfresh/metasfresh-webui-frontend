@@ -31,7 +31,7 @@ export const viewState = {
   // rowData is an immutable Map with tabId's as keys, and Lists as values.
   // List's elements are plain objects for now
   rowData: iMap(),
-  docId: undefined,
+  docId: null,
   type: null,
   viewId: null,
   windowId: null,
@@ -118,7 +118,7 @@ export default function viewHandler(state = initialState, action) {
             layout: {
               ...view.layout,
               notfound: true,
-              error: error,
+              error,
               pending: false,
             },
           },
