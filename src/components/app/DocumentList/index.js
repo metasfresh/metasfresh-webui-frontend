@@ -71,7 +71,6 @@ class DocumentListContainer extends Component {
       initialValuesNulled: iMap(),
       isShowIncluded: false,
       hasShowIncluded: false,
-      triggerSpinner: true,
       supportAttribute: false,
     };
 
@@ -147,7 +146,6 @@ class DocumentListContainer extends Component {
           filtersActive: iMap(),
           initialValuesNulled: iMap(),
           staticFilterCleared: false,
-          triggerSpinner: true,
           panelsState: GEO_PANEL_STATES[0],
         },
         () => {
@@ -307,8 +305,6 @@ class DocumentListContainer extends Component {
       setModalDescription,
     } = this.props;
 
-    this.mounted && this.setState({ triggerSpinner: true });
-
     fetchLayout(windowType, type, viewProfileId)
       .then((response) => {
         if (this.mounted) {
@@ -341,7 +337,7 @@ class DocumentListContainer extends Component {
         }
       })
       .catch(() => {
-        this.mounted && this.setState({ triggerSpinner: false });
+        // TODO: We should somehow indicate errors
       });
   };
 
@@ -383,8 +379,6 @@ class DocumentListContainer extends Component {
     } = this.props;
     const { filtersActive } = this.state;
 
-    this.setState({ triggerSpinner: true });
-
     createView(
       windowType,
       type,
@@ -399,19 +393,13 @@ class DocumentListContainer extends Component {
           setModalDescription(data.description);
         }
 
-        this.mounted &&
-          this.setState(
-            {
-              triggerSpinner: false,
-            },
-            () => {
-              this.connectWebSocket(viewId);
-              this.getData(viewId, page, sort);
-            }
-          );
+        if (this.mounted) {
+          this.connectWebSocket(viewId);
+          this.getData(viewId, page, sort);
+        }
       })
       .catch(() => {
-        this.setState({ triggerSpinner: false });
+        // TODO: We should somehow indicate errors
       });
   };
 
@@ -445,17 +433,10 @@ class DocumentListContainer extends Component {
         }
 
         this.mounted &&
-          this.setState(
-            {
-              triggerSpinner: false,
-            },
-            () => {
-              this.getData(viewId, page, sort, locationAreaSearch);
-            }
-          );
+          this.getData(viewId, page, sort, locationAreaSearch);
       })
       .catch(() => {
-        this.setState({ triggerSpinner: false });
+        // TODO: We should somehow indicate errors
       });
   };
 
@@ -516,7 +497,6 @@ class DocumentListContainer extends Component {
         if (this.mounted) {
           const newState = {
             pageColumnInfosByFieldName,
-            triggerSpinner: false,
           };
 
           if (response.filters) {
@@ -556,7 +536,7 @@ class DocumentListContainer extends Component {
         indicatorState('saved');
       })
       .catch(() => {
-        this.setState({ triggerSpinner: false });
+        // TODO: We should somehow indicate errors
       });
   };
 
@@ -616,14 +596,7 @@ class DocumentListContainer extends Component {
         currentPage = index;
     }
 
-    this.setState(
-      {
-        triggerSpinner: true,
-      },
-      () => {
-        this.getData(reduxData.viewId, currentPage, reduxData.sort);
-      }
-    );
+    this.getData(reduxData.viewId, currentPage, reduxData.sort);
   };
 
   /**
@@ -633,14 +606,7 @@ class DocumentListContainer extends Component {
   sortData = (asc, field, startPage) => {
     const { viewId, page } = this.props;
 
-    this.setState(
-      {
-        triggerSpinner: true,
-      },
-      () => {
-        this.getData(viewId, startPage ? 1 : page, getSortingQuery(asc, field));
-      }
-    );
+    this.getData(viewId, startPage ? 1 : page, getSortingQuery(asc, field));
   };
 
   /**
@@ -654,7 +620,6 @@ class DocumentListContainer extends Component {
     this.setState(
       {
         filtersActive: activeFilters,
-        triggerSpinner: true,
       },
       () => {
         this.fetchLayoutAndData(true, locationSearchFilter);
@@ -798,7 +763,7 @@ class DocumentListContainer extends Component {
     const {
       includedView,
       layout,
-      reduxData: { rowData },
+      reduxData: { rowData, pending },
     } = this.props;
     let { selected } = this.getSelected();
 
@@ -819,6 +784,7 @@ class DocumentListContainer extends Component {
       <DocumentList
         {...this.props}
         {...this.state}
+        triggerSpinner={layout.pending || pending}
         hasIncluded={hasIncluded}
         selectionValid={selectionValid}
         onToggleState={this.toggleState}

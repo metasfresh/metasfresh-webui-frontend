@@ -339,18 +339,14 @@ export default class DocumentList extends Component {
                 emptyHint={layout.emptyResultHint}
                 readonly={true}
                 supportOpenRecord={layout.supportOpenRecord}
-                rowEdited={rowEdited}
                 onRowEdited={this.setTableRowEdited}
                 keyProperty="id"
                 onDoubleClick={onRedirectToDocument}
-                size={size}
-                pageLength={pageLength}
                 handleChangePage={onChangePage}
                 onSelectionChanged={updateParentSelectedIds}
                 mainTable={true}
                 updateDocList={onFetchLayoutAndData}
                 sort={this.sortData}
-                orderBy={orderBy}
                 tabIndex={0}
                 indentSupported={layout.supportTree}
                 disableOnClickOutside={clickOutsideLock}
@@ -365,7 +361,12 @@ export default class DocumentList extends Component {
                 blurOnIncludedView={blurWhenOpen}
                 focusOnFieldName={layout.focusOnFieldName}
                 toggleState={panelsState}
+                spinnerVisible={triggerSpinner}
                 {...{
+                  orderBy,
+                  rowEdited,
+                  size,
+                  pageLength,
                   isIncluded,
                   disconnectFromState,
                   autofocus,
