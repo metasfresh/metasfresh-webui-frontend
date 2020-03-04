@@ -1,4 +1,4 @@
-import { Map as iMap } from 'immutable';
+import { Map as iMap, List as iList } from 'immutable';
 import { get } from 'lodash';
 
 import {
@@ -179,7 +179,7 @@ export default function viewHandler(state = initialState, action) {
         page,
         queryLimit,
         queryLimitHit,
-        rowData: iMap({ [`${action.payload.tabId || 1}`]: result }),
+        rowData: iMap({ [`${action.payload.tabId || 1}`]: iList(result) }),
         pending: false,
       };
 
@@ -321,7 +321,7 @@ export default function viewHandler(state = initialState, action) {
       const { id, rows } = action.payload;
       const tabId = action.payload.tabId || '1';
       const view = getView(id, state);
-      const updatedRowsData = view.rowData.set(tabId, rows);
+      const updatedRowsData = view.rowData.set(tabId, iList(rows));
 
       return {
         ...state,

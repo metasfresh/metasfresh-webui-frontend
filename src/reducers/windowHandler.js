@@ -116,8 +116,8 @@ export const initialState = {
     },
     data: [],
 
-    // rowData is an immutable Map with tabId's as keys, and iLists as values.
-    // iList's elements are plain objects for now
+    // rowData is an immutable Map with tabId's as keys, and Lists as values.
+    // List's elements are plain objects for now
     rowData: iMap(),
     saveStatus: {},
     validStatus: {},

@@ -192,7 +192,7 @@ class DocumentListContainer extends Component {
           (response) => {
             const { reduxData } = this.props;
             const { pageColumnInfosByFieldName, filtersActive } = this.state;
-            const toRows = reduxData.rowData.get('1');
+            const toRows = reduxData.rowData.get('1').toArray();
 
             // merge changed rows with data in the store
             const { rows, removedRows } = mergeRows({
@@ -213,7 +213,7 @@ class DocumentListContainer extends Component {
               this.updateQuickActions();
             }
 
-            updateViewData(rows, windowType);
+            updateViewData(windowType, rows);
           }
         );
       }
@@ -337,7 +337,7 @@ class DocumentListContainer extends Component {
         }
       })
       .catch(() => {
-        // TODO: We should somehow indicate errors
+        // TODO: Should we somehow handle errors here ?
       });
   };
 
@@ -399,7 +399,7 @@ class DocumentListContainer extends Component {
         }
       })
       .catch(() => {
-        // TODO: We should somehow indicate errors
+        // TODO: Should we somehow handle errors here ?
       });
   };
 
@@ -435,7 +435,7 @@ class DocumentListContainer extends Component {
         this.mounted && this.getData(viewId, page, sort, locationAreaSearch);
       })
       .catch(() => {
-        // TODO: We should somehow indicate errors
+        // TODO: Should we somehow handle errors here ?
       });
   };
 
@@ -535,7 +535,7 @@ class DocumentListContainer extends Component {
         indicatorState('saved');
       })
       .catch(() => {
-        // TODO: We should somehow indicate errors
+        // TODO: Should we somehow handle errors here ?
       });
   };
 
@@ -561,7 +561,7 @@ class DocumentListContainer extends Component {
       });
 
       if (locationData.length) {
-        updateViewData(locationData, windowType);
+        updateViewData(windowType, locationData);
       }
 
       if (mapConfig && mapConfig.provider) {
