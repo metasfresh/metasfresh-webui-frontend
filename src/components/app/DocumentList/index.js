@@ -12,6 +12,7 @@ import {
   getViewRowsByIds,
 } from '../../../api';
 import {
+  addViewLocationData,
   createView,
   fetchDocument,
   fetchLayout,
@@ -561,10 +562,10 @@ class DocumentListContainer extends Component {
       });
 
       if (locationData.length) {
-        updateViewData(windowType, locationData);
+        addViewLocationData(windowType, locationData);
       }
 
-      if (mapConfig && mapConfig.provider) {
+      if (mapConfig && mapConfig.provider && locationData.length) {
         // for mobile show map
         // for desktop show half-n-half
         this.setState({ panelsState: GEO_PANEL_STATES[1] });

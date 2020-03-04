@@ -180,8 +180,7 @@ export default class DocumentList extends Component {
       layout &&
       layout.supportGeoLocations &&
       reduxData &&
-      reduxData.locationData &&
-      mapConfig.provider !== 'OpenStreetMap';
+      reduxData.locationData;
 
     return (
       <div

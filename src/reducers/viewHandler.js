@@ -2,6 +2,7 @@ import { Map as iMap, List as iList } from 'immutable';
 import { get } from 'lodash';
 
 import {
+  ADD_VIEW_LOCATION_DATA,
   FETCH_DOCUMENT_PENDING,
   FETCH_DOCUMENT_SUCCESS,
   FETCH_DOCUMENT_ERROR,
@@ -31,6 +32,7 @@ export const viewState = {
   // rowData is an immutable Map with tabId's as keys, and Lists as values.
   // List's elements are plain objects for now
   rowData: iMap(),
+  locationData: null,
   docId: null,
   type: null,
   viewId: null,
@@ -330,6 +332,21 @@ export default function viewHandler(state = initialState, action) {
           [`${id}`]: {
             ...view,
             rowData: updatedRowsData,
+          },
+        },
+      };
+    }
+    case ADD_VIEW_LOCATION_DATA: {
+      const { id, locationData } = action.payload;
+      const view = getView(id, state);
+
+      return {
+        ...state,
+        views: {
+          ...state.views,
+          [`${id}`]: {
+            ...view,
+            locationData,
           },
         },
       };

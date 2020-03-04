@@ -7,6 +7,7 @@ import {
 } from '../api';
 
 import {
+  ADD_VIEW_LOCATION_DATA,
   FETCH_DOCUMENT_PENDING,
   FETCH_DOCUMENT_SUCCESS,
   FETCH_DOCUMENT_ERROR,
@@ -146,6 +147,13 @@ function fetchLocationConfigError(id, error) {
   return {
     type: FETCH_LOCATION_CONFIG_ERROR,
     payload: { id, error },
+  };
+}
+
+export function addLocationData(id, locationData) {
+  return {
+    type: ADD_VIEW_LOCATION_DATA,
+    payload: { id, locationData },
   };
 }
 
