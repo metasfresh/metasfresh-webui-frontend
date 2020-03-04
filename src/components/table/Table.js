@@ -65,6 +65,12 @@ class Table extends Component {
     }
   }
 
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    if (this.state.rows.length && !nextProps.cols) {
+      this.setState({ rows: [] });
+    }
+  }
+
   componentDidUpdate(prevProps, prevState) {
     const {
       dispatch,
@@ -1167,6 +1173,7 @@ class Table extends Component {
       hasIncluded,
       blurOnIncludedView,
       toggleState,
+      spinnerVisible,
     } = this.props;
 
     const {
@@ -1295,7 +1302,7 @@ class Table extends Component {
               <tfoot ref={(c) => (this.tfoot = c)} />
             </table>
 
-            {this.renderEmptyInfo(rowData, tabId)}
+            {!spinnerVisible && this.renderEmptyInfo(rowData, tabId)}
           </div>
 
           {

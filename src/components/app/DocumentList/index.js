@@ -432,8 +432,7 @@ class DocumentListContainer extends Component {
           setListIncludedView({ windowType, viewId });
         }
 
-        this.mounted &&
-          this.getData(viewId, page, sort, locationAreaSearch);
+        this.mounted && this.getData(viewId, page, sort, locationAreaSearch);
       })
       .catch(() => {
         // TODO: We should somehow indicate errors
