@@ -53,7 +53,7 @@ export const viewState = {
   isActive: false,
 };
 
-const initialState = { views: {} };
+export const initialState = { views: {} };
 
 const getView = (id, state) => {
   return get(state, ['views', id], viewState);
