@@ -231,7 +231,7 @@ class Table extends Component {
     const { selected } = this.state;
     let rowsData = [];
 
-    if (indentSupported && rowData.get(`${tabId}`).length) {
+    if (indentSupported && rowData.get(`${tabId}`).size) {
       rowsData = getRowsData(rowData.get(`${tabId}`));
 
       let stateChange = {
@@ -306,8 +306,8 @@ class Table extends Component {
       });
     } else {
       rowsData =
-        rowData.get(`${tabId}`) && rowData.get(`${tabId}`).length
-          ? rowData.get(`${tabId}`)
+        rowData.get(`${tabId}`) && rowData.get(`${tabId}`).size
+          ? rowData.get(`${tabId}`).toArray()
           : [];
 
       this.setState({

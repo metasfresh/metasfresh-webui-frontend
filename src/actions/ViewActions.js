@@ -227,7 +227,6 @@ export function filterView(windowId, viewId, filters) {
   return (dispatch) => {
     dispatch(filterViewPending(windowId));
 
-    // TODO: This should send object, like with other requests
     return filterViewRequest(windowId, viewId, filters)
       .then((response) => {
         dispatch(filterViewSuccess(windowId, response.data));
