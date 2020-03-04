@@ -60,6 +60,7 @@ import {
   UPDATE_ROW_STATUS,
   UPDATE_TAB_ROWS_DATA,
 } from '../constants/ActionTypes';
+import { PROCESS_NAME } from '../constants/Constants';
 
 import {
   getData,
@@ -1018,12 +1019,12 @@ export function updatePropertyValue(
       dispatch(
         updateRowFieldProperty(property, { value }, tabid, rowid, 'master')
       );
-      if (isModal && entity !== 'process') {
+      if (isModal && entity !== PROCESS_NAME) {
         dispatch(updateDataFieldProperty(property, { value }, 'modal'));
       }
     } else {
       dispatch(updateDataFieldProperty(property, { value }, getScope(isModal)));
-      if (isModal && entity !== 'process') {
+      if (isModal && entity !== PROCESS_NAME) {
         //update the master field too if exist
         dispatch(updateDataFieldProperty(property, { value }, 'master'));
       }
@@ -1181,7 +1182,7 @@ export function createProcess({
         let response;
 
         try {
-          response = await getLayout('process', processType);
+          response = await getLayout(PROCESS_NAME, processType);
 
           await dispatch(setProcessSaved());
 
@@ -1235,7 +1236,7 @@ export function handleProcessResponse(response, type, id) {
 
             break;
           case 'openReport':
-            openFile('process', type, id, 'print', action.filename);
+            openFile(PROCESS_NAME, type, id, 'print', action.filename);
 
             break;
           case 'openDocument':

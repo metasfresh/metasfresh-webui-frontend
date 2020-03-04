@@ -3,6 +3,7 @@ import cx from 'classnames';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
+import { PROCESS_NAME } from '../../../constants/Constants';
 import {
   NO_VIEW,
   PANEL_WIDTHS,
@@ -152,7 +153,7 @@ export default class DocumentList extends Component {
     let { selected, childSelected, parentSelected } = onGetSelected();
     const modalType = modal ? modal.modalType : null;
     const stopShortcutPropagation =
-      (isIncluded && !!selected) || (inModal && modalType === 'process');
+      (isIncluded && !!selected) || (inModal && modalType === PROCESS_NAME);
 
     const styleObject = {};
     if (toggleWidth !== 0) {

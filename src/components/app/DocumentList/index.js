@@ -5,6 +5,7 @@ import { Map as iMap, Set as iSet } from 'immutable';
 import currentDevice from 'current-device';
 import { get } from 'lodash';
 
+import { LOCATION_SEARCH_NAME } from '../../../constants/Constants';
 import {
   locationSearchRequest,
   deleteStaticFilter,
@@ -351,7 +352,7 @@ class DocumentListContainer extends Component {
   browseView = () => {
     const { viewId, page, sort } = this.props;
     const { filtersActive } = this.state;
-    const locationSearchFilter = filtersActive.has(`location-area-search`);
+    const locationSearchFilter = filtersActive.has(LOCATION_SEARCH_NAME);
 
     // in case of redirect from a notification, first call will have viewId empty
     if (viewId) {
@@ -525,7 +526,7 @@ class DocumentListContainer extends Component {
           if (
             locationAreaSearch ||
             (newState.filtersActive &&
-              newState.filtersActive.has(`location-area-search`))
+              newState.filtersActive.has(LOCATION_SEARCH_NAME))
           ) {
             this.getLocationData(resultById);
           }
@@ -647,7 +648,7 @@ class DocumentListContainer extends Component {
    * @summary ToDo: Describe the method.
    */
   handleFilterChange = (activeFilters) => {
-    const locationSearchFilter = activeFilters.has(`location-area-search`);
+    const locationSearchFilter = activeFilters.has(LOCATION_SEARCH_NAME);
 
     // TODO: filters should be kept in the redux state
     this.setState(
