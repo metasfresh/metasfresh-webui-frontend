@@ -50,12 +50,20 @@ class FiltersNotFrequent extends PureComponent {
   toggleDropdown = (value) => {
     const { active, data } = this.props;
     const toCheckAgainst = data.map((item) => item.filterId);
-    const foundInActive = active.filter((activeItem) =>
-      toCheckAgainst.includes(activeItem.filterId)
-    );
+    let openFilterIdValue;
+    if (active !== null) {
+      const foundInActive = active.filter((activeItem) =>
+        toCheckAgainst.includes(activeItem.filterId)
+      );
+      openFilterIdValue =
+        foundInActive.length && active ? active[0].filterId : null;
+    } else {
+      openFilterIdValue = null;
+    }
+
     this.setState({
       isOpenDropdown: value,
-      openFilterId: foundInActive.length && active ? active[0].filterId : null,
+      openFilterId: openFilterIdValue,
     });
   };
 
