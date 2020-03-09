@@ -49,8 +49,10 @@ class FiltersNotFrequent extends PureComponent {
    * @todo Write the documentation
    */
   toggleDropdown = (value) => {
+    const { active } = this.props;
     this.setState({
       isOpenDropdown: value,
+      openFilterId: active ? active[0].filterId : null,
     });
   };
 
@@ -99,6 +101,7 @@ class FiltersNotFrequent extends PureComponent {
         activeFiltersCaptions &&
         activeFiltersCaptions[activeFilter.filterId]) ||
       [];
+
     let panelCaption = activeFilter.isActive ? activeFilter.caption : '';
     let buttonCaption = activeFilter.isActive ? activeFilter.caption : 'Filter';
 
