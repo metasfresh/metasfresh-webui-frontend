@@ -70,9 +70,9 @@ class Filters extends PureComponent {
     for (const [key] of filterData.entries()) {
       let item = filterData.get(key);
       if (typeof item.includedFilters !== 'undefined') {
-        item.includedFilters.map((el) => {
-          combinedFilters.push(el);
-          return el;
+        item.includedFilters.map((itemElement) => {
+          combinedFilters.push(itemElement);
+          return itemElement;
         });
       } else {
         combinedFilters.push(item);
