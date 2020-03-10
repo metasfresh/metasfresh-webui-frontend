@@ -70,10 +70,7 @@ class Filters extends PureComponent {
     for (const [key] of filterData.entries()) {
       let item = filterData.get(key);
       if (typeof item.includedFilters !== 'undefined') {
-        item.includedFilters.map((itemElement) => {
-          combinedFilters.push(itemElement);
-          return itemElement;
-        });
+        combinedFilters.push(...item.includedFilters);
       } else {
         combinedFilters.push(item);
       }
@@ -107,7 +104,10 @@ class Filters extends PureComponent {
    *    active filters. If yes, do nothing as it'll always override the
    *    defaultValue
    *  - otherwise add parameter and filter to local active filters and set
-   *    the `defaultVal` to true as apparently there are no values set
+   *    the `defaultVal` to true as apparently there are no values set  
+   *  
+   *    Update: 10 March 2020, removed the logic to set the default 
+   * 
    */
   /**
    * @method parseActiveFilters
@@ -128,8 +128,6 @@ class Filters extends PureComponent {
     // activeFilters with them
     filtersData.forEach((filter, filterId) => {
       if (filter.parameters) {
-        let paramsArray = [];
-
         outerParameters: for (let parameter of filter.parameters) {
           const { defaultValue, parameterName, widgetType } = parameter;
           const nulledFilter = initialValuesNulled.get(filterId);
@@ -137,15 +135,6 @@ class Filters extends PureComponent {
           flatFiltersMap[`${filterId}-${parameterName}`] = {
             widgetType,
           };
-
-          if (defaultValue && (!activeFilters || !activeFilters.size)) {
-            activeFilters = iMap({
-              [`${filterId}`]: {
-                filterId,
-                parameters: [],
-              },
-            });
-          }
 
           const isActive = filtersActive.has(filterId);
 
@@ -176,23 +165,6 @@ class Filters extends PureComponent {
               }
             }
           }
-
-          const singleActiveFilter = activeFilters.get(filterId);
-          paramsArray = singleActiveFilter ? singleActiveFilter.parameters : [];
-
-          activeFilters = activeFilters.set(filterId, {
-            filterId,
-            // this parameter tells us if filter has defaultValues defined
-            defaultVal: true,
-            parameters: [
-              ...paramsArray,
-              {
-                parameterName,
-                value: defaultValue,
-                defaultValue: defaultValue,
-              },
-            ],
-          });
         }
       }
     });
