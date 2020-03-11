@@ -435,7 +435,6 @@ class FiltersItem extends PureComponent {
       closeFilterMenu,
       captionValue,
       openedFilter,
-      panelCaption,
     } = this.props;
     const { filter, isTooltipShow, maxWidth, maxHeight } = this.state;
     const style = {};
@@ -444,6 +443,10 @@ class FiltersItem extends PureComponent {
       style.width = maxWidth;
       style.maxHeight = maxHeight;
     }
+
+    const panelCaption = this.props.panelCaption
+      ? this.props.panelCaption
+      : filter.caption;
 
     return (
       <div>
