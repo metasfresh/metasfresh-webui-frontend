@@ -146,16 +146,20 @@ export default class App extends Component {
       }.bind(this)
     );
 
-    getAvailableLang().then((response) => {
-      const { defaultValue, values } = response.data;
-      const valuesFlatten = values.map((item) => Object.keys(item)[0]);
-      const lang =
-        valuesFlatten.indexOf(navigator.language) > -1
-          ? navigator.language
-          : defaultValue;
+    getAvailableLang()
+      .then((response) => {
+        const { defaultValue, values } = response.data;
+        const valuesFlatten = values.map((item) => Object.keys(item)[0]);
+        const lang =
+          valuesFlatten.indexOf(navigator.language) > -1
+            ? navigator.language
+            : defaultValue;
 
-      languageSuccess(lang);
-    });
+        languageSuccess(lang);
+      })
+      .catch(() => {
+        store.dispatch(noConnection(true));
+      });
 
     counterpart.setMissingEntryGenerator(() => '');
 
