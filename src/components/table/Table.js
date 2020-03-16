@@ -1391,9 +1391,10 @@ const mapStateToProps = (state) => ({
   allowShortcut: state.windowHandler.allowShortcut,
   allowOutsideClick: state.windowHandler.allowOutsideClick,
   modalVisible: state.windowHandler.modal.visible,
-  isGerman: state.appHandler.me.language
-    ? state.appHandler.me.language.key.includes('de')
-    : false,
+  isGerman:
+    state.appHandler.me.language && state.appHandler.me.language.key
+      ? state.appHandler.me.language.key.includes('de')
+      : false,
 });
 
 const clickOutsideConfig = {
