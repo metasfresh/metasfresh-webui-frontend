@@ -13,6 +13,7 @@ import {
   setProcessSaved,
   initHotkeys,
   initKeymap,
+  setLanguages,
 } from '../actions/AppActions';
 import { getAvailableLang } from '../api';
 import { noConnection } from '../actions/WindowActions';
@@ -29,7 +30,7 @@ import keymap from '../shortcuts/keymap';
 import configureStore from '../store/configureStore';
 
 const hotkeys = generateHotkeys({ keymap, blacklist });
-export const store = configureStore(browserHistory);
+const store = configureStore(browserHistory);
 const history = syncHistoryWithStore(browserHistory, store);
 const APP_PLUGINS = PLUGINS ? PLUGINS : [];
 
@@ -146,20 +147,19 @@ export default class App extends Component {
       }.bind(this)
     );
 
-    getAvailableLang()
-      .then((response) => {
-        const { defaultValue, values } = response.data;
-        const valuesFlatten = values.map((item) => Object.keys(item)[0]);
-        const lang =
-          valuesFlatten.indexOf(navigator.language) > -1
-            ? navigator.language
-            : defaultValue;
+    getAvailableLang().then((response) => {
+      const { defaultValue, values } = response.data;
+      const valuesFlatten = values.map((item) => Object.keys(item)[0]);
+      if (!store.getState().appHandler.me.language) {
+        store.dispatch(setLanguages(values));
+      }
+      const lang =
+        valuesFlatten.indexOf(navigator.language) > -1
+          ? navigator.language
+          : defaultValue;
 
-        languageSuccess(lang);
-      })
-      .catch(() => {
-        store.dispatch(noConnection(true));
-      });
+      languageSuccess(lang);
+    });
 
     counterpart.setMissingEntryGenerator(() => '');
 
