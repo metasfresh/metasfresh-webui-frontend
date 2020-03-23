@@ -2,6 +2,7 @@ import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 import { noConnection } from '../actions/WindowActions';
 import { store } from '../containers/App';
+import { getUserSession } from '../api';
 function socketFactory() {
   return new SockJS(config.WS_URL);
 }
@@ -47,7 +48,14 @@ export function connectWS(topic, onMessageCallback) {
         // console.log('debug: ', strMessage);
         // -- detect reconnect and increment the reconnect counter
         if (strMessage.includes('reconnect')) {
-          reconnectCounter += 1;
+          getUserSession()
+            .then(({ data }) => {
+              reconnectCounter =
+                data && !data.loggedIn ? reconnectCounter + 1 : 0;
+            })
+            .catch(() => {
+              reconnectCounter += 1;
+            });
         }
         // -- if more than max allowed reconnect times  ->  deactivate
         if (reconnectCounter > maxReconnectTimesNo) {
