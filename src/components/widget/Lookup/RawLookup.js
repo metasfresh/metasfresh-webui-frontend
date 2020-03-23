@@ -288,8 +288,8 @@ export class RawLookup extends PureComponent {
     } = this.props;
 
     // -- shape placeholder with the clearValueText in case this exists
-    const placeholder = mainProperty[0].clearValueText
-      ? mainProperty[0].clearValueText
+    const placeholder = mainProperty.clearValueText
+      ? mainProperty.clearValueText
       : this.props.placeholder;
     const inputValue = this.inputSearch.value;
     let typeaheadRequest;
@@ -407,7 +407,7 @@ export class RawLookup extends PureComponent {
     if (!filterWidget && !!defaultValue && this.inputSearch) {
       const init = [defaultValue];
       const inputValue = defaultValue.caption;
-      const clearValueText = this.props.mainProperty[0].clearValueText;
+      const clearValueText = this.props.mainProperty.clearValueText;
       const placeholder = clearValueText
         ? clearValueText
         : this.props.placeholder;
