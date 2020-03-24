@@ -410,6 +410,13 @@ export class RawWidget extends Component {
       tabIndex = -1;
     }
 
+    // TODO: this logic should be removed and adapted below after widgetType === 'MultiListValue' is added
+    const isMultiselect =
+      widgetData[0].widgetType === 'List' && widgetData[0].multiListValue
+        ? true
+        : false;
+    // TODO:  ^^^^^^^^^^^^^
+
     const widgetProperties = {
       ref: (c) => (this.rawWidget = c),
       //autocomplete=new-password did not work in chrome for non password fields anymore,
@@ -430,6 +437,10 @@ export class RawWidget extends Component {
       title: widgetValue,
       id,
     };
+
+    let selectedValue = widgetData[0].value
+      ? widgetData[0].value
+      : widgetData[0].defaultValue;
 
     switch (widgetType) {
       case 'Date':
@@ -670,6 +681,42 @@ export class RawWidget extends Component {
             subentity={subentity}
             subentityId={subentityId}
             defaultValue={fields[0].emptyText}
+            selected={selectedValue}
+            properties={fields[0]}
+            readonly={readonly}
+            mandatory={widgetData[0].mandatory}
+            windowType={windowType}
+            rowId={rowId}
+            tabId={tabId}
+            onFocus={this.focus}
+            onBlur={this.handleBlur}
+            onChange={this.handlePatch}
+            align={gridAlign}
+            updated={updated}
+            filterWidget={filterWidget}
+            filterId={filterId}
+            parameterName={fields[0].parameterName}
+            emptyText={fields[0].emptyText}
+            tabIndex={tabIndex}
+            viewId={viewId}
+            autoFocus={autoFocus}
+            validStatus={widgetData[0].validStatus}
+            isMultiselect={isMultiselect}
+          />
+        );
+
+      case 'MultiListValue':
+        return (
+          <List
+            {...{
+              attribute,
+            }}
+            widgetField={widgetField}
+            dataId={dataId}
+            entity={entity}
+            subentity={subentity}
+            subentityId={subentityId}
+            defaultValue={fields[0].emptyText}
             selected={widgetData[0].value || null}
             properties={fields[0]}
             readonly={readonly}
@@ -690,9 +737,9 @@ export class RawWidget extends Component {
             viewId={viewId}
             autoFocus={autoFocus}
             validStatus={widgetData[0].validStatus}
+            isMultiselect={true}
           />
         );
-
       case 'Link':
         return (
           <Link

@@ -2,7 +2,8 @@ import counterpart from 'counterpart';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { Map } from 'immutable';
+// -- using iMap from immutable
+import { Map as iMap } from 'immutable';
 import _ from 'lodash';
 
 import { DATE_FIELDS } from '../../constants/Constants';
@@ -60,6 +61,27 @@ class Filters extends PureComponent {
     this.parseActiveFilters();
   }
 
+  /**
+   * @method arrangeFilters
+   * @summary combines the filters and also removes the other actives ones from same group
+   */
+  arrangeFilters = (filterData) => {
+    let combinedFilters = [];
+    for (const [key] of filterData.entries()) {
+      let item = filterData.get(key);
+      if (typeof item.includedFilters !== 'undefined') {
+        combinedFilters.push(...item.includedFilters);
+      } else {
+        combinedFilters.push(item);
+      }
+    }
+    let mappedFiltersData = new Map();
+    combinedFilters.forEach((item) => {
+      mappedFiltersData.set(item.filterId, item);
+    });
+    return mappedFiltersData;
+  };
+
   // PARSING FILTERS ---------------------------------------------------------
 
   /*
@@ -82,7 +104,10 @@ class Filters extends PureComponent {
    *    active filters. If yes, do nothing as it'll always override the
    *    defaultValue
    *  - otherwise add parameter and filter to local active filters and set
-   *    the `defaultVal` to true as apparently there are no values set
+   *    the `defaultVal` to true as apparently there are no values set  
+   *  
+   *    Update: 10 March 2020, removed the logic to set the default 
+   * 
    */
   /**
    * @method parseActiveFilters
@@ -91,7 +116,11 @@ class Filters extends PureComponent {
   parseActiveFilters = () => {
     let { filtersActive, filterData, initialValuesNulled } = this.props;
     let activeFilters = _.cloneDeep(filtersActive);
-    let filtersData = Map(filterData);
+
+    // make new ES6 Map with the items from combined filters
+    let mappedFiltersData = this.arrangeFilters(filterData);
+    // put the resulted combined map of filters into the iMap and preserve existing functionality
+    let filtersData = iMap(mappedFiltersData);
     const flatFiltersMap = {};
     const activeFiltersCaptions = {};
 
@@ -99,8 +128,6 @@ class Filters extends PureComponent {
     // activeFilters with them
     filtersData.forEach((filter, filterId) => {
       if (filter.parameters) {
-        let paramsArray = [];
-
         outerParameters: for (let parameter of filter.parameters) {
           const { defaultValue, parameterName, widgetType } = parameter;
           const nulledFilter = initialValuesNulled.get(filterId);
@@ -108,15 +135,6 @@ class Filters extends PureComponent {
           flatFiltersMap[`${filterId}-${parameterName}`] = {
             widgetType,
           };
-
-          if (defaultValue && (!activeFilters || !activeFilters.size)) {
-            activeFilters = Map({
-              [`${filterId}`]: {
-                filterId,
-                parameters: [],
-              },
-            });
-          }
 
           const isActive = filtersActive.has(filterId);
 
@@ -147,23 +165,6 @@ class Filters extends PureComponent {
               }
             }
           }
-
-          const singleActiveFilter = activeFilters.get(filterId);
-          paramsArray = singleActiveFilter ? singleActiveFilter.parameters : [];
-
-          activeFilters = activeFilters.set(filterId, {
-            filterId,
-            // this parameter tells us if filter has defaultValues defined
-            defaultVal: true,
-            parameters: [
-              ...paramsArray,
-              {
-                parameterName,
-                value: defaultValue,
-                defaultValue: defaultValue,
-              },
-            ],
-          });
         }
       }
     });
@@ -249,8 +250,13 @@ class Filters extends PureComponent {
         }
       }
 
+      const cleanActiveFilter = this.cleanupActiveFilter(
+        filterData.toIndexedSeq().toArray(),
+        activeFilters.toIndexedSeq().toArray()
+      );
+
       this.setState({
-        activeFilter: activeFilters.toIndexedSeq().toArray(),
+        activeFilter: cleanActiveFilter,
         activeFiltersCaptions,
         flatFiltersMap,
       });
@@ -261,6 +267,45 @@ class Filters extends PureComponent {
         flatFiltersMap,
       });
     }
+  };
+
+  cleanupActiveFilter = (allFilters, activeStateFilters) => {
+    let filtersToRemove = [];
+    activeStateFilters.forEach((activeStateFilter) => {
+      allFilters.forEach((filterItem) => {
+        if (Array.isArray(filterItem.includedFilters)) {
+          let groupFilter = filterItem.includedFilters;
+          let foundMatches = groupFilter.filter(
+            (gFilterItem) => gFilterItem.filterId === activeStateFilter.filterId
+          );
+          if (foundMatches.length > 0) {
+            filtersToRemove = groupFilter.filter(
+              (toRemove) => toRemove.filterId !== activeStateFilter.filterId
+            );
+          }
+        }
+      });
+    });
+    return activeStateFilters.filter(
+      (asFilterItem) =>
+        !this.isBlacklisted(asFilterItem.filterId, filtersToRemove)
+    );
+  };
+
+  /**
+   * @method isBlackListed
+   * @summary Check if the filterId is found among the filters to remove array
+   * @param {string filterId
+   * @param {array} filtersToRemove
+   */
+  isBlacklisted = (filterId, filtersToRemove) => {
+    let resultValue = false;
+    filtersToRemove.forEach((filterItem) => {
+      if (filterItem.filterId === filterId) {
+        resultValue = true;
+      }
+    });
+    return resultValue;
   };
 
   /**
@@ -391,7 +436,7 @@ class Filters extends PureComponent {
     const { updateDocList } = this.props;
     let { filtersActive } = this.props;
     const { flatFiltersMap } = this.state;
-    let activeFilters = Map(filtersActive);
+    let activeFilters = iMap(filtersActive);
 
     activeFilters = activeFilters.filter(
       (item, id) => id !== filterToAdd.filterId
@@ -447,7 +492,7 @@ class Filters extends PureComponent {
   clearFilters = (filterToClear, propertyName) => {
     const { updateDocList } = this.props;
     let { filtersActive } = this.props;
-    let activeFilters = Map(filtersActive);
+    let activeFilters = iMap(filtersActive);
 
     if (filtersActive.size) {
       activeFilters = activeFilters.filter((item, id) => {
@@ -538,15 +583,19 @@ class Filters extends PureComponent {
       allowOutsideClick,
       modalVisible,
     } = this.props;
-    const { frequentFilters, notFrequentFilters } = this.sortFilters(
-      filterData
-    );
+
     const {
       notValidFields,
       widgetShown,
       activeFilter,
       activeFiltersCaptions,
     } = this.state;
+
+    const allFilters = this.annotateFilters(
+      filterData.toIndexedSeq().toArray()
+    );
+    const flatActiveFilterIds =
+      activeFilter !== null ? activeFilter.map((item) => item.filterId) : [];
 
     return (
       <div
@@ -557,47 +606,68 @@ class Filters extends PureComponent {
           {`${counterpart.translate('window.filters.caption')}: `}
         </span>
         <div className="filter-wrapper">
-          {!!frequentFilters.length && (
-            <FiltersFrequent
-              {...{
-                activeFiltersCaptions,
-                windowType,
-                notValidFields,
-                viewId,
-                widgetShown,
-                allowOutsideClick,
-                modalVisible,
-              }}
-              data={frequentFilters}
-              handleShow={this.handleShow}
-              applyFilters={this.applyFilters}
-              clearFilters={this.clearFilters}
-              active={activeFilter}
-              dropdownToggled={this.dropdownToggled}
-              filtersWrapper={this.filtersWrapper}
-            />
-          )}
-          {!!notFrequentFilters.length && (
-            <FiltersNotFrequent
-              {...{
-                activeFiltersCaptions,
-                windowType,
-                notValidFields,
-                viewId,
-                widgetShown,
-                resetInitialValues,
-                allowOutsideClick,
-                modalVisible,
-              }}
-              data={notFrequentFilters}
-              handleShow={this.handleShow}
-              applyFilters={this.applyFilters}
-              clearFilters={this.clearFilters}
-              active={activeFilter}
-              dropdownToggled={this.dropdownToggled}
-              filtersWrapper={this.filtersWrapper}
-            />
-          )}
+          {allFilters.map((item) => {
+            // iterate among the existing filters
+            if (item.includedFilters) {
+              let dropdownFilters = item.includedFilters;
+              dropdownFilters.map((dropdownFilterItem) => {
+                dropdownFilterItem.isActive = flatActiveFilterIds.includes(
+                  dropdownFilterItem.filterId
+                );
+                return dropdownFilterItem;
+              });
+
+              // we render the FiltersNotFrequent for normal filters
+              // and for those entries that do have includedFilters (we have subfilters)
+              // we are rendering FiltersFrequent layout. Note: this is adaptation over previous
+              // funtionality that used the 'frequent' flag (was ditched in favour of this one).
+              return (
+                <FiltersNotFrequent
+                  key={item.caption}
+                  {...{
+                    activeFiltersCaptions,
+                    windowType,
+                    notValidFields,
+                    viewId,
+                    widgetShown,
+                    resetInitialValues,
+                    allowOutsideClick,
+                    modalVisible,
+                  }}
+                  data={dropdownFilters}
+                  handleShow={this.handleShow}
+                  applyFilters={this.applyFilters}
+                  clearFilters={this.clearFilters}
+                  active={activeFilter}
+                  dropdownToggled={this.dropdownToggled}
+                  filtersWrapper={this.filtersWrapper}
+                />
+              );
+            }
+            if (!item.includedFilters) {
+              return (
+                <FiltersFrequent
+                  {...{
+                    activeFiltersCaptions,
+                    windowType,
+                    notValidFields,
+                    viewId,
+                    widgetShown,
+                    allowOutsideClick,
+                    modalVisible,
+                  }}
+                  data={[item]}
+                  handleShow={this.handleShow}
+                  applyFilters={this.applyFilters}
+                  clearFilters={this.clearFilters}
+                  active={activeFilter}
+                  dropdownToggled={this.dropdownToggled}
+                  filtersWrapper={this.filtersWrapper}
+                  key={item.filterId}
+                />
+              );
+            }
+          })}
         </div>
       </div>
     );

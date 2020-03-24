@@ -1,7 +1,7 @@
 
 # Metasfresh Front-end Application
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/1caf080cc9364234ab636ed8ab4343e2)](https://www.codacy.com/app/metasfresh/metasfresh-webui-frontend?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=metasfresh/metasfresh-webui-frontend&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/9b3e33a215a14a51a0d134fdf93993fb)](https://www.codacy.com/gh/metasfresh/metasfresh-webui-frontend?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=metasfresh/metasfresh-webui-frontend&amp;utm_campaign=Badge_Grade)
 [![Join the chat at https://gitter.im/metasfresh/metasfresh-webui-frontend](https://badges.gitter.im/metasfresh/metasfresh-webui-frontend.svg)](https://gitter.im/metasfresh/metasfresh-webui-frontend?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Krihelimeter](http://krihelinator.xyz/badge/metasfresh/metasfresh-webui-frontend)](http://krihelinator.xyz)
 
@@ -64,7 +64,8 @@ Also remember to respect our code-schema rules. All of them are listed in __esli
 > 
 > npm run-script stylelint
 
-(first one is also autofixing when possible)
+(first one is also autofixing when possible) <br />
+Also please follow our [Code of conduct](https://github.com/metasfresh/metasfresh/wiki/Code-of-conduct-for-webui-frontend-contributors)
 
 ### Dictionary
 

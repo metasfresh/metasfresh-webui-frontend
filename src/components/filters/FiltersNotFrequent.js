@@ -44,13 +44,26 @@ class FiltersNotFrequent extends PureComponent {
 
   /**
    * @method toggleDropdown
-   * @summary ToDo: Describe the method
+   * @summary Executed when you clock on a filter and dropdown should show up
    * @param {*} value
    * @todo Write the documentation
    */
   toggleDropdown = (value) => {
+    const { active, data } = this.props;
+    const toCheckAgainst = data.map((item) => item.filterId);
+    let openFilterIdValue;
+    if (active !== null) {
+      const foundInActive = active.filter((activeItem) =>
+        toCheckAgainst.includes(activeItem.filterId)
+      );
+      openFilterIdValue =
+        foundInActive.length && active ? active[0].filterId : null;
+    } else {
+      openFilterIdValue = null;
+    }
     this.setState({
       isOpenDropdown: value,
+      openFilterId: openFilterIdValue,
     });
   };
 
@@ -92,10 +105,13 @@ class FiltersNotFrequent extends PureComponent {
     const { isOpenDropdown, openFilterId } = this.state;
     const openFilter = getItemsByProperty(data, 'filterId', openFilterId)[0];
     const activeFilters = data.filter((filter) => filter.isActive);
-    const activeFilter = activeFilters.length === 1 && activeFilters[0];
+    const activeFilter = activeFilters.length && activeFilters[0];
 
     const captions =
-      (activeFilter && activeFiltersCaptions[activeFilter.filterId]) || [];
+      (activeFilter &&
+        activeFiltersCaptions &&
+        activeFiltersCaptions[activeFilter.filterId]) ||
+      [];
     let panelCaption = activeFilter.isActive ? activeFilter.caption : '';
     let buttonCaption = activeFilter.isActive ? activeFilter.caption : 'Filter';
 
@@ -140,7 +156,7 @@ class FiltersNotFrequent extends PureComponent {
 
         {isOpenDropdown && (
           <div className="filters-overlay">
-            {!openFilterId && !activeFilter ? (
+            {!openFilterId ? (
               <ul className="filter-menu">
                 {data.map((item, index) => (
                   <li
@@ -164,7 +180,11 @@ class FiltersNotFrequent extends PureComponent {
                   clearFilters,
                 }}
                 captionValue={activeFilter.captionValue}
-                data={activeFilter.isActive ? activeFilter : openFilter}
+                data={
+                  activeFilter.isActive && !Array.isArray(activeFilter.isActive)
+                    ? activeFilter
+                    : openFilter
+                }
                 closeFilterMenu={() => this.toggleDropdown(false)}
                 returnBackToDropdown={() => this.toggleFilter(null)}
                 notValidFields={notValidFields}
