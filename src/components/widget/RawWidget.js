@@ -456,7 +456,7 @@ export class RawWidget extends Component {
       onFocus: this.handleFocus,
       tabIndex: tabIndex,
       onChange: (e) => {
-        if (e.keyCode == 13) {
+        if (e.keyCode === 13) {
           handleChange && handleChange(widgetField, e.target.value);
         } else {
           handleChange && this.proxyChange(widgetField, e.target.value);
