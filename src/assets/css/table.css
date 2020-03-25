@@ -158,7 +158,6 @@
 
         .with-widget {
             display: flex;
-            align-items: flex-end;
 
             .widget-tooltip {
                 text-align: right;
