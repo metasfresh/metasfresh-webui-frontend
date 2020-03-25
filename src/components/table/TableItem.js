@@ -338,7 +338,7 @@ class TableItem extends Component {
     activeCell && activeCell.focus();
   };
 
-  handleCellExtend = selected => {
+  handleCellExtend = (selected) => {
     this.setState({
       cellsExtended: selected,
     });
