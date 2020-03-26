@@ -67,7 +67,7 @@ const DLmapStateToProps = (state, { location, ...props }) => {
     selections: state.windowHandler.selections,
     selected: getSelectionInstant(
       state,
-      { ...props, windowId: props.windowType, viewId: props.defaultViewId },
+      { ...props, windowId: props.windowType, viewId, },
       state.windowHandler.selectionsHash
     ),
     childSelected:

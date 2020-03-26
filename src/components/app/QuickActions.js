@@ -93,6 +93,8 @@ export class QuickActions extends Component {
       (nextProps.viewId && nextProps.viewId !== viewId) ||
       (nextProps.windowType && nextProps.windowType !== windowType)
     ) {
+
+
       this.queue.pushTask((res, rej) => {
         this.fetchActions(
           nextProps.windowType,
@@ -218,7 +220,7 @@ export class QuickActions extends Component {
    * @param {*} parentView
    * @param {*} resolve
    * @param {*} reject
-   * @todo Write the documentation
+   * @todo Rewrite this as an action creator
    */
   async fetchActions(
     windowId,
