@@ -774,11 +774,14 @@ class DocumentListContainer extends Component {
       includedView.windowType &&
       includedView.viewId;
 
-    const selectionValid = doesSelectionExist({
-      data: rowData.get('1'),
-      selected,
-      hasIncluded,
-    });
+    let selectionValid = false;
+    if (rowData.has('1')) {
+      selectionValid = doesSelectionExist({
+        data: rowData.get('1').toJS(),
+        selected,
+        hasIncluded,
+      });
+    }
 
     return (
       <DocumentList
