@@ -186,6 +186,7 @@ export default class DocumentList extends Component {
       <div
         className={cx('document-list-wrapper', {
           'document-list-included': isShowIncluded || isIncluded,
+          'document-list-is-included': isIncluded,
           'document-list-has-included': hasShowIncluded || hasIncluded,
         })}
         style={styleObject}
