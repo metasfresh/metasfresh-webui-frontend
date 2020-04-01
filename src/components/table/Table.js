@@ -696,10 +696,11 @@ class Table extends Component {
       openIncludedViewOnSelect,
       showIncludedViewOnSelect,
       keyProperty,
+      updateQuickActions,
     } = this.props;
     const id = item[keyProperty];
     let selectionValue = false;
-
+    
     if (e.button === 0) {
       const { selected } = this.state;
       const selectMore = e.metaKey || e.ctrlKey;
@@ -724,6 +725,7 @@ class Table extends Component {
           this.selectOneProduct(id);
         }
       } else {
+        updateQuickActions && updateQuickActions(id);
         newSelection = [id];
         this.selectOneProduct(id);
       }
