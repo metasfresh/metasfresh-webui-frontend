@@ -700,7 +700,7 @@ class Table extends Component {
     } = this.props;
     const id = item[keyProperty];
     let selectionValue = false;
-    
+
     if (e.button === 0) {
       const { selected } = this.state;
       const selectMore = e.metaKey || e.ctrlKey;
