@@ -63,23 +63,28 @@ class MasterWindowContainer extends Component {
   async onWebsocketEvent(event) {
     const { includedTabsInfo, stale } = event;
 
+    // case: the whole document is staled
     if (stale) {
-      // some tabs data got updated/row was added
-      if (includedTabsInfo) {
-        const rowsRequests = this.getTabRowsRequests(includedTabsInfo);
+      this.fireFullUpdateData();
 
-        // wait for all the rows requests to finish
-        return await Promise.all(rowsRequests).then((res) => {
-          this.mergeDataIntoIncludedTabs(res);
-        });
-      } else {
-        this.fireFullUpdateData();
+      if (includedTabsInfo) {
+        const tabIds = Object.keys(includedTabsInfo);
+        this.refreshActiveTab(tabIds);
       }
     }
+    // case: only some included tab/rows were staled
+    else if (includedTabsInfo) {
+      const rowsRequests = this.getTabRowsRequests(includedTabsInfo);
 
-    if (includedTabsInfo) {
-      const tabIds = Object.keys(includedTabsInfo);
-      this.refreshActiveTab(tabIds);
+      // wait for all the rows requests to finish
+      return await Promise.all(rowsRequests).then((res) => {
+        this.mergeDataIntoIncludedTabs(res);
+      });
+    }
+    // case: got some invalid event?! (shall not happen)
+    else {
+      // eslint-disable-next-line no-console
+      console.warn('got invalid event but ignored: %o', event);
     }
   }
 
