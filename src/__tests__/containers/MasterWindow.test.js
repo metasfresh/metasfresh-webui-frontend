@@ -130,7 +130,7 @@ describe("MasterWindowContainer", () => {
 
       nock(config.API_URL)
         .defaultReplyHeaders({ 'access-control-allow-origin': '*' })
-        .get(`/window/${windowType}/${docId}/${tabId}/?orderBy=+Line`)
+        .get(`/window/${windowType}/${docId}/${tabId}/?orderBy=%2BLine`)
         .reply(200, rowFixtures.row_data1);
 
       nock(config.API_URL)
@@ -233,7 +233,7 @@ describe("MasterWindowContainer", () => {
 
       nock(config.API_URL)
         .defaultReplyHeaders({ 'access-control-allow-origin': '*' })
-        .get(`/window/${windowType}/${docId}/${tabId}/?orderBy=+Line`)
+        .get(`/window/${windowType}/${docId}/${tabId}/?orderBy=%2BLine`)
         .reply(200, rowFixtures.row_data1);
 
       nock(config.API_URL)
