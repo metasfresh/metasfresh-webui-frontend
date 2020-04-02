@@ -147,6 +147,7 @@ export default class DocumentList extends Component {
       selectionValid,
       onRedirectToNewDocument,
       onShowIncludedViewOnSelect,
+      onClearStaticFilters,
     } = this.props;
     const { rowData, size, staticFilters, orderBy, queryLimitHit } = reduxData;
     const { rowEdited, clickOutsideLock, toggleWidth } = this.state;
@@ -247,7 +248,7 @@ export default class DocumentList extends Component {
                 <FiltersStatic
                   {...{ windowType, viewId }}
                   data={staticFilters}
-                  clearFilters={this.clearStaticFilters}
+                  clearFilters={onClearStaticFilters}
                 />
               )}
             </div>
@@ -341,6 +342,7 @@ export default class DocumentList extends Component {
                 readonly={true}
                 supportOpenRecord={layout.supportOpenRecord}
                 onRowEdited={this.setTableRowEdited}
+                updateQuickActions={this.updateQuickActions}
                 keyProperty="id"
                 onDoubleClick={onRedirectToDocument}
                 handleChangePage={onChangePage}
