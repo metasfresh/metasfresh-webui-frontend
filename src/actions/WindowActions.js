@@ -941,7 +941,7 @@ function updateRow(row, scope) {
   };
 }
 
-function mapDataToState(data, isModal, rowId, id, windowType, isAdvanced) {
+function mapDataToState(data, isModal, rowId) {
   return (dispatch) => {
     const dataArray = typeof data.splice === 'function' ? data : [data];
 
