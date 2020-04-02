@@ -13,18 +13,25 @@ export function getData({
   rowId,
   subentity,
   subentityId,
-  fetchAdvancedFields,
   orderBy,
   viewId,
+  fetchAdvancedFields,
+  doNotFetchIncludedTabs,
 }) {
+  let queryParams = getQueryString({
+    advanced: fetchAdvancedFields,
+    noTabs: doNotFetchIncludedTabs,
+    orderBy: orderBy,
+  });
+
   return get(
     `${config.API_URL}/${entity}/${docType}${viewId ? `/${viewId}` : ''}${
       docId ? `/${docId}` : ''
     }${tabId ? `/${tabId}` : ''}${rowId ? `/${rowId}` : ''}${
       subentity ? `/${subentity}` : ''
     }${subentityId ? `/${subentityId}` : ''}/${
-      fetchAdvancedFields ? `?advanced=true` : ''
-    }${orderBy ? `?orderBy=${orderBy}` : ''}`
+      queryParams ? `?${queryParams}` : ''
+    }`
   );
 }
 

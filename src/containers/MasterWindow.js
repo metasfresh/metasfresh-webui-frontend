@@ -65,7 +65,13 @@ class MasterWindowContainer extends Component {
 
     // case: the whole document is staled
     if (stale) {
-      this.fireFullUpdateData();
+      const { params, fireUpdateData } = this.props;
+
+      fireUpdateData({
+        windowId: params.windowType,
+        documentId: params.docId,
+        doNotFetchIncludedTabs: true,
+      });
 
       if (includedTabsInfo) {
         const tabIds = Object.keys(includedTabsInfo);
@@ -86,15 +92,6 @@ class MasterWindowContainer extends Component {
       // eslint-disable-next-line no-console
       console.warn('got invalid event but ignored: %o', event);
     }
-  }
-
-  fireFullUpdateData() {
-    const { params, fireUpdateData } = this.props;
-
-    fireUpdateData({
-      windowId: params.windowType,
-      documentId: params.docId,
-    });
   }
 
   getTabRowsRequests(includedTabsInfo) {
