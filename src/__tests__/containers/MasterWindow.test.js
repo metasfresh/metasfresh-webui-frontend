@@ -190,7 +190,8 @@ describe("MasterWindowContainer", () => {
       const windowType = FIXTURES_PROPS.params.windowType;
       const docId = FIXTURES_PROPS.params.docId;
       const tabId = layoutFixtures.layout1.tabs[0].tabId;
-      const updatedRows = rowFixtures.updatedRow1;
+      const updatedRow = rowFixtures.updatedRow1;
+      const updatedRows = [...rowFixtures.row_data1, ...updatedRow];
       const auth = {
         initNotificationClient: jest.fn(),
         initSessionClient: jest.fn(),
@@ -223,11 +224,6 @@ describe("MasterWindowContainer", () => {
 
       nock(config.API_URL)
         .defaultReplyHeaders({ 'access-control-allow-origin': '*' })
-        .get(`/window/${windowType}/${docId}/${tabId}/${updatedRows[0].rowId}/`)
-        .reply(200, updatedRows);
-
-      nock(config.API_URL)
-        .defaultReplyHeaders({ 'access-control-allow-origin': '*' })
         .get(`/window/${windowType}/${docId}/${tabId}/`)
         .reply(200, rowFixtures.row_data1);
 
@@ -240,6 +236,18 @@ describe("MasterWindowContainer", () => {
         .defaultReplyHeaders({ 'access-control-allow-origin': '*' })
         .get(`/window/${windowType}/${docId}/field/DocAction/dropdown`)
         .reply(200, docActionFixtures.data1);
+
+      // after update
+
+      nock(config.API_URL)
+        .defaultReplyHeaders({ 'access-control-allow-origin': '*' })
+        .get(`/window/${windowType}/${docId}/?noTabs=true`)
+        .reply(200, dataFixtures.data1);
+
+      nock(config.API_URL)
+        .defaultReplyHeaders({ 'access-control-allow-origin': '*' })
+        .get(`/window/${windowType}/${docId}/${tabId}/`)
+        .reply(200, updatedRows);
 
       const wrapper = mount(
         <Provider store={store}>
