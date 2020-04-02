@@ -114,13 +114,13 @@ class MasterWindowContainer extends Component {
 
   getTabRow(tabId, rowId) {
     const { params } = this.props;
-    return getData(
-      'window',
-      params.windowType,
-      params.docId,
-      tabId,
-      rowId
-    ).catch(() => ({ rowId, tabId }));
+    return getData({
+      entity: 'window',
+      docType: params.windowType,
+      docId: params.docId,
+      tabId: tabId,
+      rowId: rowId,
+    }).catch(() => ({ rowId, tabId }));
   }
 
   isActiveTab(tabId) {
