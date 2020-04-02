@@ -869,30 +869,36 @@ export function patch(
   };
 }
 
-export function fireUpdateData(
-  entity,
-  windowType,
-  id,
+export function fireUpdateData({
+  windowId,
+  documentId,
   tabId,
   rowId,
   isModal,
-  isAdvanced
-) {
+  fetchAdvancedFields,
+}) {
   return (dispatch) => {
-    getData(entity, windowType, id, tabId, rowId, null, null, isAdvanced).then(
-      (response) => {
-        dispatch(
-          mapDataToState(
-            response.data,
-            isModal,
-            rowId,
-            id,
-            windowType,
-            isAdvanced
-          )
-        );
-      }
-    );
+    getData(
+      'window',
+      windowId,
+      documentId,
+      tabId,
+      rowId,
+      null,
+      null,
+      fetchAdvancedFields
+    ).then((response) => {
+      dispatch(
+        mapDataToState(
+          response.data,
+          isModal,
+          rowId,
+          documentId,
+          windowId,
+          fetchAdvancedFields
+        )
+      );
+    });
   };
 }
 

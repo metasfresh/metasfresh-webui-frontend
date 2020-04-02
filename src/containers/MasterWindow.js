@@ -91,15 +91,10 @@ class MasterWindowContainer extends Component {
   fireFullUpdateData() {
     const { params, fireUpdateData } = this.props;
 
-    fireUpdateData(
-      'window',
-      params.windowType,
-      params.docId,
-      null,
-      null,
-      null,
-      null
-    );
+    fireUpdateData({
+      windowId: params.windowType,
+      documentId: params.docId,
+    });
   }
 
   getTabRowsRequests(includedTabsInfo) {
