@@ -190,8 +190,7 @@ describe("MasterWindowContainer", () => {
       const windowType = FIXTURES_PROPS.params.windowType;
       const docId = FIXTURES_PROPS.params.docId;
       const tabId = layoutFixtures.layout1.tabs[0].tabId;
-      const updatedRow = rowFixtures.updatedRow1;
-      const updatedRows = [...rowFixtures.row_data1, ...updatedRow];
+      const updatedRows = rowFixtures.updatedRow1;
       const auth = {
         initNotificationClient: jest.fn(),
         initSessionClient: jest.fn(),
@@ -241,13 +240,13 @@ describe("MasterWindowContainer", () => {
 
       nock(config.API_URL)
         .defaultReplyHeaders({ 'access-control-allow-origin': '*' })
-        .get(`/window/${windowType}/${docId}/?noTabs=true`)
-        .reply(200, dataFixtures.data1);
+        .get(`/window/${windowType}/${docId}/${tabId}/${updatedRows[0].rowId}/`)
+        .reply(200, updatedRows);
 
       nock(config.API_URL)
         .defaultReplyHeaders({ 'access-control-allow-origin': '*' })
-        .get(`/window/${windowType}/${docId}/${tabId}/`)
-        .reply(200, updatedRows);
+        .get(`/window/${windowType}/${docId}/?noTabs=true`)
+        .reply(200, dataFixtures.data1);
 
       const wrapper = mount(
         <Provider store={store}>
