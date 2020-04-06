@@ -179,6 +179,19 @@ export const getSelectionDirect = (selections, windowId, viewId) => {
   return (windowTypeSelections && windowTypeSelections[viewId]) || NO_SELECTION;
 };
 
+const masterDataSelector = (windowHandler) => windowHandler.master.data;
+
+export const docStatusSelector = createSelector(
+  masterDataSelector,
+  (masterData) => {
+    return {
+      status: masterData.DocStatus || -1,
+      action: masterData.DocAction || -1,
+      displayed: true,
+    };
+  }
+);
+
 export default function windowHandler(state = initialState, action) {
   switch (action.type) {
     case NO_CONNECTION:
