@@ -100,7 +100,9 @@ class MasterWindowContainer extends Component {
   }
 
   getTabRow(tabId, rows) {
-    const { params: { windowType, docId } } = this.props;
+    const {
+      params: { windowType, docId },
+    } = this.props;
 
     return getRowsData({
       entity: 'window',

@@ -35,13 +35,7 @@ export function getData({
   );
 }
 
-export function getRowsData({
-  entity,
-  docType,
-  docId,
-  tabId,
-  rows,
-}) {
+export function getRowsData({ entity, docType, docId, tabId, rows }) {
   const ids = rows.join(',');
 
   return get(
