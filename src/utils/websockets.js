@@ -94,14 +94,12 @@ export function connectWS(topic, onMessageCallback) {
     this.sockClient.activate();
   };
 
-  if (this.sockTopic !== topic && _.includes(topic, 'view')) {
-    disconnectWS.call(this, connect);
+  const wasConnected = disconnectWS.call(this, connect);
+  if (
+    !wasConnected ||
+    (this.sockTopic !== topic && _.includes(topic, 'view'))
+  ) {
     connect();
-  } else {
-    const wasConnected = disconnectWS.call(this, connect);
-    if (!wasConnected) {
-      connect();
-    }
   }
 }
 
