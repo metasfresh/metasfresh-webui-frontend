@@ -312,8 +312,6 @@ class DocumentListContainer extends Component {
           }
 
           if (viewId) {
-            this.connectWebSocket(viewId);
-
             if (!isNewFilter) {
               this.browseView();
             } else {

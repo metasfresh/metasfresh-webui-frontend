@@ -3,6 +3,7 @@ import { Client } from '@stomp/stompjs';
 import { noConnection } from '../actions/WindowActions';
 import { store } from '../containers/App';
 import { getUserSession } from '../api';
+import _ from 'lodash';
 function socketFactory() {
   return new SockJS(config.WS_URL);
 }
@@ -93,9 +94,14 @@ export function connectWS(topic, onMessageCallback) {
     this.sockClient.activate();
   };
 
-  const wasConnected = disconnectWS.call(this, connect);
-  if (!wasConnected) {
+  if (this.sockTopic !== topic && _.includes(topic, 'view')) {
+    disconnectWS.call(this, connect);
     connect();
+  } else {
+    const wasConnected = disconnectWS.call(this, connect);
+    if (!wasConnected) {
+      connect();
+    }
   }
 }
 
