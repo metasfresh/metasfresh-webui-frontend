@@ -42,7 +42,8 @@
 * - 400 - screen-freeze
 */
 html {
-    overflow: auto !important;
+    overflow-y: scroll !important;
+    overflow-x: auto !important;
 }
 
 body {
