@@ -159,18 +159,20 @@ export function addLocationData(id, locationData) {
 
 // THUNK ACTIONS
 
-export function fetchDocument(windowId, viewId, page, pageLength, orderBy) {
+export function fetchDocument(windowId, viewId, page, pageLength, orderBy, useViewId = false) {
   return (dispatch) => {
-    dispatch(fetchDocumentPending(windowId));
+    const identifier = useViewId ? viewId : windowId;
+
+    dispatch(fetchDocumentPending(identifier));
 
     return browseViewRequest({ windowId, viewId, page, pageLength, orderBy })
       .then((response) => {
-        dispatch(fetchDocumentSuccess(windowId, response.data));
+        dispatch(fetchDocumentSuccess(identifier, response.data));
 
         return Promise.resolve(response.data);
       })
       .catch((error) => {
-        dispatch(fetchDocumentError(windowId, error));
+        dispatch(fetchDocumentError(identifier, error));
 
         //show error message ?
         return Promise.resolve(error);
@@ -178,17 +180,21 @@ export function fetchDocument(windowId, viewId, page, pageLength, orderBy) {
   };
 }
 
-export function createView(
+export function createView({
   windowId,
   viewType,
   filters,
   refDocType,
   refDocId,
   refTabId,
-  refRowIds
-) {
+  refRowIds,
+  // for modals
+  inModalId,
+}) {
   return (dispatch) => {
-    dispatch(createViewPending(windowId));
+    const identifier = inModalId ? inModalId : windowId;
+
+    dispatch(createViewPending(identifier));
 
     return createViewRequest({
       windowId,
@@ -200,12 +206,12 @@ export function createView(
       refRowIds,
     })
       .then((response) => {
-        dispatch(createViewSuccess(windowId, response.data));
+        dispatch(createViewSuccess(identifier, response.data));
 
         return Promise.resolve(response.data);
       })
       .catch((error) => {
-        dispatch(createViewError(error));
+        dispatch(createViewError(identifier, error));
 
         //show error message ?
         return Promise.resolve(error);
@@ -213,26 +219,30 @@ export function createView(
   };
 }
 
-export function fetchLayout(windowId, viewType, viewProfileId = null) {
+export function fetchLayout(windowId, viewType, viewProfileId = null, viewId = null) {
   return (dispatch) => {
-    dispatch(fetchLayoutPending(windowId));
+    const identifier = viewId ? viewId : windowId;
+
+    dispatch(fetchLayoutPending(identifier));
 
     return getViewLayout(windowId, viewType, viewProfileId)
       .then((response) => {
-        dispatch(fetchLayoutSuccess(windowId, response.data));
+        dispatch(fetchLayoutSuccess(identifier, response.data));
 
         return Promise.resolve(response.data);
       })
       .catch((error) => {
-        dispatch(fetchLayoutError(windowId, error));
+        dispatch(fetchLayoutError(identifier, error));
 
         return Promise.resolve(error);
       });
   };
 }
 
-export function filterView(windowId, viewId, filters) {
+export function filterView(windowId, viewId, filters, useViewId = false) {
   return (dispatch) => {
+    const identifier = useViewId ? viewId : windowId;
+
     dispatch(filterViewPending(windowId));
 
     return filterViewRequest(windowId, viewId, filters)
@@ -249,14 +259,16 @@ export function filterView(windowId, viewId, filters) {
   };
 }
 
-export function fetchLocationConfig(windowId) {
+export function fetchLocationConfig(windowId, viewId = null) {
   return (dispatch) => {
+    const identifier = viewId ? viewId : windowId;
+
     return locationConfigRequest()
       .then((response) => {
-        dispatch(fetchLocationConfigSuccess(windowId, response.data));
+        dispatch(fetchLocationConfigSuccess(identifier, response.data));
       })
       .catch((error) => {
-        dispatch(fetchLocationConfigError(windowId, error));
+        dispatch(fetchLocationConfigError(identifier, error));
 
         return Promise.resolve(error);
       });
