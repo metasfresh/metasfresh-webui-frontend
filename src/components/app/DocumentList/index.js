@@ -79,7 +79,9 @@ class DocumentListContainer extends Component {
   }
 
   UNSAFE_componentWillMount() {
-    this.props.fetchLocationConfig(this.props.windowType);
+    const { isModal, windowType, viewId } = this.props;
+
+    this.props.fetchLocationConfig(isModal ? viewId : windowType);
   }
 
   componentDidMount = () => {
@@ -87,10 +89,12 @@ class DocumentListContainer extends Component {
   };
 
   componentWillUnmount() {
+    const { isModal, windowType, viewId } = this.props;
+
     this.mounted = false;
     disconnectWS.call(this);
 
-    this.props.deleteView(this.props.windowType);
+    this.props.deleteView(isModal ? viewId : windowType);
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
