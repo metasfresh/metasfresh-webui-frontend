@@ -203,7 +203,7 @@ class DocumentListContainer extends Component {
               deselectTableItems(removedRows, windowType, viewId);
             } else {
               if (filtersActive.size) {
-                this.filterView();
+                this.filterCurrentView();
               }
 
               // force updating actions
@@ -300,9 +300,10 @@ class DocumentListContainer extends Component {
       fetchLayout,
       updateRawModal,
       setModalDescription,
+      isModal,
     } = this.props;
 
-    fetchLayout(windowType, type, viewProfileId)
+    fetchLayout(windowType, type, viewProfileId, (isModal ? viewId : null))
       .then((response) => {
         if (this.mounted) {
           const { allowedCloseActions } = response;
@@ -315,10 +316,10 @@ class DocumentListContainer extends Component {
             if (!isNewFilter) {
               this.browseView();
             } else {
-              this.filterView(locationAreaSearch);
+              this.filterCurrentView(locationAreaSearch);
             }
           } else {
-            this.createView();
+            this.createNewView();
           }
 
           setModalTitle && setModalTitle(response.data.caption);
@@ -349,17 +350,17 @@ class DocumentListContainer extends Component {
     if (viewId) {
       this.getData(viewId, page, sort, locationSearchFilter).catch((err) => {
         if (err.response && err.response.status === 404) {
-          this.createView();
+          this.createNewView();
         }
       });
     }
   };
 
   /**
-   * @method createView
+   * @method createNewView
    * @summary Create a new view, on visiting the page for the first time
    */
-  createView = () => {
+  createNewView = () => {
     const {
       windowType,
       type,
@@ -371,18 +372,21 @@ class DocumentListContainer extends Component {
       sort,
       createView,
       setModalDescription,
+      isModal,
+      viewId,
     } = this.props;
     const { filtersActive } = this.state;
 
-    createView(
-      windowType,
-      type,
-      filtersActive.toIndexedSeq().toArray(),
-      refType,
-      refId,
+    createView({
+      windowId: windowType,
+      viewType: type,
+      filters: filtersActive.toIndexedSeq().toArray(),
+      refDocType: refType,
+      refDocId: refId,
       refTabId,
-      refRowIds
-    )
+      refRowIds,
+      inModalId: isModal ? viewId : null,
+    })
       .then(({ viewId, data }) => {
         if (data && data.description && setModalDescription) {
           setModalDescription(data.description);
@@ -399,10 +403,10 @@ class DocumentListContainer extends Component {
   };
 
   /**
-   * @method filterView
+   * @method filterCurrentView
    * @summary apply filters and re-fetch layout, data. Then rebuild the page
    */
-  filterView = (locationAreaSearch) => {
+  filterCurrentView = (locationAreaSearch) => {
     const {
       windowType,
       isIncluded,
@@ -412,10 +416,11 @@ class DocumentListContainer extends Component {
       setListIncludedView,
       setModalDescription,
       filterView,
+      isModal,
     } = this.props;
     const { filtersActive } = this.state;
 
-    filterView(windowType, viewId, filtersActive.toIndexedSeq().toArray())
+    filterView(windowType, viewId, filtersActive.toIndexedSeq().toArray(), isModal)
       .then((response) => {
         const viewId = response.viewId;
         this.connectWebSocket(viewId);
@@ -450,6 +455,7 @@ class DocumentListContainer extends Component {
       selectTableItems,
       updateRawModal,
       viewId,
+      isModal,
     } = this.props;
 
     indicatorState('pending');
@@ -460,7 +466,7 @@ class DocumentListContainer extends Component {
       sortingQuery && updateUri('sort', sortingQuery);
     }
 
-    return fetchDocument(windowType, id, page, this.pageLength, sortingQuery)
+    return fetchDocument(windowType, id, page, this.pageLength, sortingQuery, isModal)
       .then((response) => {
         const result = response.result;
         const resultById = {};
