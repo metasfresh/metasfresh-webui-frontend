@@ -290,12 +290,6 @@ Breadcrumb.propTypes = {
   filters: PropTypes.object,
 };
 
-const mapStateToProps = (state) => {
-  const { filters } = state;
-
-  return {
-    filters,
-  };
-};
+const mapStateToProps = ({ filters }) => ({ filters });
 
 export default connect(mapStateToProps)(Breadcrumb);
