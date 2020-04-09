@@ -426,17 +426,19 @@ class DocumentListContainer extends Component {
 
     filterView(windowType, viewId, filtersActive.toIndexedSeq().toArray(), isModal)
       .then((response) => {
-        const viewId = response.viewId;
-        this.connectWebSocket(viewId);
+        const newViewId = response.viewId;
+
+        this.connectWebSocket(newViewId);
+
         if (response.data && response.data.description && setModalDescription) {
           setModalDescription(response.data.description);
         }
 
         if (isIncluded) {
-          setListIncludedView({ windowType, viewId });
+          setListIncludedView({ windowType, viewId: newViewId });
         }
 
-        this.mounted && this.getData(viewId, page, sort, locationAreaSearch);
+        this.mounted && this.getData(newViewId, page, sort, locationAreaSearch);
       })
       .catch(() => {
         // TODO: Should we somehow handle errors here ?
@@ -470,7 +472,14 @@ class DocumentListContainer extends Component {
       sortingQuery && updateUri('sort', sortingQuery);
     }
 
-    return fetchDocument(windowType, id, page, this.pageLength, sortingQuery, isModal)
+    // if we're filtering in a modal we don't want to create another entry in the state,
+    // but update the current (modal) view
+    let modalId = null;
+    if (isModal && id !== viewId) {
+      modalId = viewId;
+    }
+
+    return fetchDocument(windowType, id, page, this.pageLength, sortingQuery, isModal, modalId)
       .then((response) => {
         const result = response.result;
         const resultById = {};

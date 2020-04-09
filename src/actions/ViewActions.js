@@ -159,9 +159,23 @@ export function addLocationData(id, locationData) {
 
 // THUNK ACTIONS
 
-export function fetchDocument(windowId, viewId, page, pageLength, orderBy, useViewId = false) {
+export function fetchDocument(
+  windowId,
+  viewId,
+  page,
+  pageLength,
+  orderBy,
+  // for modals
+  useViewId = false,
+  //for filtering in modals
+  modalId = null
+) {
   return (dispatch) => {
-    const identifier = useViewId ? viewId : windowId;
+    let identifier = useViewId ? viewId : windowId;
+
+    if (useViewId && modalId) {
+      identifier = modalId;
+    }
 
     dispatch(fetchDocumentPending(identifier));
 
@@ -187,8 +201,7 @@ export function createView({
   refDocType,
   refDocId,
   refTabId,
-  refRowIds,
-  // for modals
+  refRowIds, 
   inModalId,
 }) {
   return (dispatch) => {
@@ -243,16 +256,16 @@ export function filterView(windowId, viewId, filters, useViewId = false) {
   return (dispatch) => {
     const identifier = useViewId ? viewId : windowId;
 
-    dispatch(filterViewPending(windowId));
+    dispatch(filterViewPending(identifier));
 
     return filterViewRequest(windowId, viewId, filters)
       .then((response) => {
-        dispatch(filterViewSuccess(windowId, response.data));
+        dispatch(filterViewSuccess(identifier, response.data));
 
         return Promise.resolve(response.data);
       })
       .catch((error) => {
-        dispatch(filterViewError(windowId, error));
+        dispatch(filterViewError(identifier, error));
 
         return Promise.resolve(error);
       });
