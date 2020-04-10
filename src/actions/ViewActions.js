@@ -201,7 +201,7 @@ export function createView({
   refDocType,
   refDocId,
   refTabId,
-  refRowIds, 
+  refRowIds,
   inModalId,
 }) {
   return (dispatch) => {
@@ -232,7 +232,12 @@ export function createView({
   };
 }
 
-export function fetchLayout(windowId, viewType, viewProfileId = null, viewId = null) {
+export function fetchLayout(
+  windowId,
+  viewType,
+  viewProfileId = null,
+  viewId = null
+) {
   return (dispatch) => {
     const identifier = viewId ? viewId : windowId;
 

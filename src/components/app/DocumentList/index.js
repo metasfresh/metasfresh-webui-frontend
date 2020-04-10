@@ -307,7 +307,7 @@ class DocumentListContainer extends Component {
       isModal,
     } = this.props;
 
-    fetchLayout(windowType, type, viewProfileId, (isModal ? viewId : null))
+    fetchLayout(windowType, type, viewProfileId, isModal ? viewId : null)
       .then((response) => {
         if (this.mounted) {
           const { allowedCloseActions } = response;
@@ -424,7 +424,12 @@ class DocumentListContainer extends Component {
     } = this.props;
     const { filtersActive } = this.state;
 
-    filterView(windowType, viewId, filtersActive.toIndexedSeq().toArray(), isModal)
+    filterView(
+      windowType,
+      viewId,
+      filtersActive.toIndexedSeq().toArray(),
+      isModal
+    )
       .then((response) => {
         const newViewId = response.viewId;
 
@@ -479,7 +484,15 @@ class DocumentListContainer extends Component {
       modalId = viewId;
     }
 
-    return fetchDocument(windowType, id, page, this.pageLength, sortingQuery, isModal, modalId)
+    return fetchDocument(
+      windowType,
+      id,
+      page,
+      this.pageLength,
+      sortingQuery,
+      isModal,
+      modalId
+    )
       .then((response) => {
         const result = response.result;
         const resultById = {};
