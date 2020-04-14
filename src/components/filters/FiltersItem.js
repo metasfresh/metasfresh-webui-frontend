@@ -384,9 +384,10 @@ class FiltersItem extends PureComponent {
       const activeFilterClone = _.cloneDeep(activeFilter);
       activeFilterClone.parameters.map((afcItem, index) => {
         // YesNo filters (checkboxes) can be either null, true or false
-        afcItem.value = !afcItem.value && afcItem.value !== false
-          ? filter.parameters[index].defaultValue
-          : afcItem.value;
+        afcItem.value =
+          !afcItem.value && afcItem.value !== false
+            ? filter.parameters[index].defaultValue
+            : afcItem.value;
         return afcItem;
       });
 
