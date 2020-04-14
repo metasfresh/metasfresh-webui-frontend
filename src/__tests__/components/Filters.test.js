@@ -29,9 +29,9 @@ const createStore = function(state = {}) {
 }
 
 const createInitialProps = function(basicFixtures = filtersFixtures.data1, additionalProps = {}) {
-  const filterData = additionalProps.filterData
-    ? additionalProps.filterData
-    : basicFixtures.filterData;
+  const filterData = additionalProps.filters
+    ? additionalProps.filters
+    : basicFixtures.filters;
   const filtersActive = additionalProps.filtersActive
     ? additionalProps.filtersActive
     : basicFixtures.filtersActive;
@@ -87,20 +87,16 @@ describe('Filters tests', () => {
     });
 
     const store = mockStore(initialState)
-    const wrapper = mount(
+    const wrapper = shallow(
         <Provider store={store}>
           <Filters {...dummyProps} />
         </Provider>
     );
-    const html = wrapper.html();
 
-    expect(html).toContain('filter-wrapper');
-    expect(html).toContain('filters-frequent');
-    expect(html).toContain('btn-filter');
-    expect(html).toContain('Aufträge');
+    wrapper.find('.filter-wrapper button[title="Akontozahlung, Completed, Error"]');
   });
 
-  it.skip('opens dropdown and filter details', () => {
+  it('opens dropdown and filter details', () => {
     const dummyProps = createInitialProps();
     const initialState = createStore({
       windowHandler: {
