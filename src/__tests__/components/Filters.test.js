@@ -130,8 +130,8 @@ describe('Filters tests', () => {
   // as the widgets need an architecture overhaul, and filters should be moved to redux state
   describe('Temporary bloated filter tests', () => {
     // https://github.com/metasfresh/me03/issues/3649
-    it.skip('clears list filters and applies without error', () => {
-      const dummyProps = createInitialProps(undefined, { filtersActive: filtersFixtures.filtersActive1 });
+    it('clears list filters and applies without error', () => {
+      const dummyProps = createInitialProps(undefined, { filtersActive: filtersFixtures.filtersActive2 });
       const initialState = createStore({
         windowHandler: {
           allowShortcut: true,
@@ -169,12 +169,12 @@ describe('Filters tests', () => {
       expect(wrapper.find('.filters-overlay').length).toBe(0);
     });
 
-    it.skip('supports `false` values for checkbox widgets', () => {
+    it('supports `false` values for checkbox widgets', () => {
       const updateDocListListener = jest.fn();
       const dummyProps = createInitialProps(
         filtersFixtures.data2,
         {
-          filtersActive: filtersFixtures.filtersActive2,
+          filtersActive: filtersFixtures.filtersActive3,
           updateDocList: updateDocListListener,
         }
       );
@@ -232,7 +232,7 @@ describe('Filters tests', () => {
       expect(updateDocListListener).toBeCalledWith(filterResult);
     });
 
-    it.skip('supports filters without parameters', () => {
+    it('supports filters without parameters', () => {
       const updateDocListListener = jest.fn();
       const dummyProps = createInitialProps(
         filtersFixtures.data3,

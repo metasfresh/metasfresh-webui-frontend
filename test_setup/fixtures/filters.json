@@ -375,6 +375,29 @@
       ]
     }
   ],
+  "filtersActive2": [
+    {
+      "filterId": "default",
+      "parameters": [
+        {
+          "parameterName": "C_DocType_ID",
+          "value": {
+            "key": "540944",
+            "caption": "Akontozahlung"
+          },
+          "valueTo": null
+        },
+        {
+          "parameterName": "DocStatus",
+          "value": {
+            "key": "CO",
+            "caption": "Completed"
+          },
+          "valueTo": null
+        }
+      ]
+    }
+  ],
   "data2": {
     "filters": [
       {
@@ -794,7 +817,7 @@
     "windowType": "540092",
     "viewId": "540092-Ih"
   },
-  "filtersActive2": [
+  "filtersActive3": [
     {
       "filterId": "default",
       "parameters": [
@@ -831,12 +854,17 @@
         "debugProperties": {}
       },
       {
-        "filterId": "userquery-540024",
-        "caption": "Abrechnung_offen_normal",
-        "frequent": false,
-        "inlineRenderMode": "button",
-        "parametersLayoutType": "panel",
-        "debugProperties": {}
+        "caption": "Filters",
+        "includedFilters": [
+          {
+            "filterId": "userquery-540024",
+            "caption": "Abrechnung_offen_normal",
+            "frequent": false,
+            "inlineRenderMode": "button",
+            "parametersLayoutType": "panel",
+            "debugProperties": {}
+          }
+        ]
       }
     ],
     "filtersActive": {},
