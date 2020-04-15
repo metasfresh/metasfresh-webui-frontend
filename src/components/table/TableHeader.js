@@ -133,13 +133,14 @@ TableHeader.propTypes = {
   getSizeClass: PropTypes.func,
   cols: PropTypes.any,
   indentSupported: PropTypes.any,
+  setActiveSort: PropTypes.any,
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
     setActiveSort: (data) => dispatch(setActiveSort(data)),
   };
-}
+};
 
 export default connect(
   null,

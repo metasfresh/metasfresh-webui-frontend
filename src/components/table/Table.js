@@ -1155,8 +1155,6 @@ class Table extends Component {
     return false;
   };
 
-
-
   render() {
     const {
       cols,
@@ -1401,7 +1399,7 @@ const mapStateToProps = (state) => ({
     state.appHandler.me.language && state.appHandler.me.language.key
       ? state.appHandler.me.language.key.includes('de')
       : false,
-  activeSort: state.table.activeSort,
+  activeSort: state.table ? state.table.activeSort : false,
 });
 
 const clickOutsideConfig = {
