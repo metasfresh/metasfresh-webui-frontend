@@ -1036,6 +1036,7 @@ class Table extends Component {
       focusOnFieldName,
       modalVisible,
       isGerman,
+      activeSort,
     } = this.props;
 
     const {
@@ -1084,6 +1085,7 @@ class Table extends Component {
           focusOnFieldName,
           modalVisible,
           isGerman,
+          activeSort,
         }}
         dataHash={dataHash}
         key={`row-${i}${viewId ? `-${viewId}` : ''}`}
@@ -1152,6 +1154,8 @@ class Table extends Component {
 
     return false;
   };
+
+
 
   render() {
     const {
@@ -1397,6 +1401,7 @@ const mapStateToProps = (state) => ({
     state.appHandler.me.language && state.appHandler.me.language.key
       ? state.appHandler.me.language.key.includes('de')
       : false,
+  activeSort: state.table.activeSort,
 });
 
 const clickOutsideConfig = {
