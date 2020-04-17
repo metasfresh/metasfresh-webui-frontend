@@ -129,14 +129,29 @@ class Table extends Component {
       this.table.focus();
     }
 
+    // console.log('Table update: ', selectedEqual, selected, defaultSelectedEqual, this.props.defaultSelected)
+
     if (
-      (!defaultSelectedEqual && !selectedEqual) ||
+      // (!defaultSelectedEqual && !selectedEqual) ||
+      !defaultSelectedEqual ||
       (refreshSelection && prevProps.refreshSelection !== refreshSelection)
     ) {
+      const newSelected =
+        defaultSelected && defaultSelected !== null ? defaultSelected : [];
+
       this.setState({
-        selected:
-          defaultSelected && defaultSelected !== null ? defaultSelected : [],
+        selected: newSelected,
       });
+
+      if (!disconnectFromState) {
+        dispatch(
+          selectTableItems({
+            windowType: windowId,
+            viewId,
+            ids: newSelected,
+          })
+        );
+      }
     } else if (!disconnectFromState && !selectedEqual && selected.length) {
       dispatch(
         selectTableItems({
@@ -149,7 +164,18 @@ class Table extends Component {
 
     if (prevProps.viewId !== viewId && rowData.get(`${tabId}`)) {
       if (defaultSelected && defaultSelected.length === 0) {
+        console.log('componentDidUpdate')
         this.setState({ selected: [] });
+
+        if (!disconnectFromState) {
+          dispatch(
+            selectTableItems({
+              windowType: windowId,
+              viewId,
+              ids: [],
+            })
+          );
+        }
       }
 
       this.setState({
@@ -359,7 +385,7 @@ class Table extends Component {
       dispatch,
       windowId,
       disconnectFromState,
-      tabInfo,
+      // tabInfo,
       viewId,
     } = this.props;
     const { selected } = this.state;
@@ -370,18 +396,20 @@ class Table extends Component {
       newSelected = selected.concat([id]);
     }
 
+    console.log('selectProduct: ', newSelected)
+
     this.setState({ selected: newSelected }, () => {
       const { selected } = this.state;
 
-      if (tabInfo) {
-        dispatch(
-          selectTableItems({
-            windowType: windowId,
-            viewId,
-            ids: selected,
-          })
-        );
-      }
+      // if (tabInfo) {
+        // dispatch(
+        //   selectTableItems({
+        //     windowType: windowId,
+        //     viewId,
+        //     ids: selected,
+        //   })
+        // );
+      // }
 
       if (!disconnectFromState) {
         dispatch(
@@ -400,11 +428,14 @@ class Table extends Component {
   };
 
   selectRangeProduct = (ids) => {
-    const { dispatch, tabInfo, windowId, viewId } = this.props;
+    const { dispatch, tabInfo, windowId, viewId, disconnectFromState } = this.props;
+
+    console.log('selectRangeProduct')
 
     this.setState({ selected: [...ids] });
 
-    if (tabInfo) {
+    // if (tabInfo) {
+    if (!disconnectFromState) {
       dispatch(
         selectTableItems({
           windowType: windowId,
@@ -425,10 +456,13 @@ class Table extends Component {
   };
 
   selectOneProduct = (id, idFocused, idFocusedDown, cb) => {
-    const { dispatch, tabInfo, windowId, viewId } = this.props;
+    const { dispatch, tabInfo, disconnectFromState, windowId, viewId } = this.props;
+    let selected = [id];
 
     if (id === null) {
-      id = undefined;
+      // id = undefined;
+      console.log('selectOneProduct')
+      selected = [];
     }
 
     this.setState(
@@ -436,12 +470,13 @@ class Table extends Component {
         selected: [id],
       },
       () => {
-        if (tabInfo) {
+        if (!disconnectFromState) {
+        // if (tabInfo) {
           dispatch(
             selectTableItems({
               windowType: windowId,
               viewId,
-              ids: [id],
+              ids: selected,
             })
           );
         }
@@ -453,13 +488,15 @@ class Table extends Component {
   };
 
   deselectProduct = (id) => {
-    const { dispatch, tabInfo, windowId, viewId } = this.props;
+    const { dispatch, tabInfo, disconnectFromState, windowId, viewId } = this.props;
     const { selected } = this.state;
     const index = selected.indexOf(id);
     const newSelected = update(selected, { $splice: [[index, 1]] });
 
+    console.log('deselectProduct')
+
     this.setState({ selected: newSelected }, () => {
-      if (tabInfo || !newSelected.length) {
+      if (/*tabInfo ||*/!disconnectFromState || !newSelected.length) {
         dispatch(deselectTableItems([id], windowId, viewId));
       }
     });
@@ -468,16 +505,19 @@ class Table extends Component {
   };
 
   deselectAllProducts = (cb) => {
-    const { dispatch, tabInfo, windowId, viewId } = this.props;
+    const { dispatch, tabInfo, disconnectFromState, windowId, viewId } = this.props;
+
+    console.log('deselectAllProducts');
 
     this.setState(
       {
-        selected: [undefined],
+        selected: [],
       },
       cb && cb()
     );
 
-    if (tabInfo) {
+    if (!disconnectFromState) {
+    // if (tabInfo) {
       dispatch(
         selectTableItems({
           windowType: windowId,
@@ -862,14 +902,25 @@ class Table extends Component {
   };
 
   handlePromptSubmitClick = (selected) => {
-    const { dispatch, windowId, docId, updateDocList, tabId } = this.props;
+    const { dispatch, windowId, docId, viewId, disconnectFromState, updateDocList, tabId } = this.props;
 
     this.setState(
       {
         promptOpen: false,
-        selected: [undefined],
+        selected: [],
       },
       () => {
+        if (!disconnectFromState) {
+        // if (tabInfo) {
+          dispatch(
+            selectTableItems({
+              windowType: windowId,
+              viewId,
+              ids: [],
+            })
+          );
+        }
+
         deleteRequest(
           'window',
           windowId,
@@ -1224,7 +1275,7 @@ class Table extends Component {
                 mainTable,
                 updateDocList,
               }}
-              selected={selected || [undefined]}
+              selected={selected || []}
               blur={this.closeContextMenu}
               tabId={tabId}
               deselect={this.deselectAllProducts}
@@ -1328,7 +1379,7 @@ class Table extends Component {
                 disablePaginationShortcuts,
               }}
               onChangePage={handleChangePage}
-              selected={selected || [undefined]}
+              selected={selected || []}
               pageLength={pageLength}
               rowLength={rows ? rows.length : 0}
               handleSelectAll={this.selectAll}
