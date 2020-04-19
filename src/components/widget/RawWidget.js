@@ -164,6 +164,19 @@ export class RawWidget extends Component {
   };
 
   /**
+   * @method updateTypedCharacters
+   * @summary updates in the state the number of charactes typed
+   * @param {typedText} string
+   */
+  updateTypedCharacters = (typedText) => {
+    const { fieldName } = this.props;
+    let existingCharsTyped = { ...this.state.charsTyped };
+    existingCharsTyped[fieldName] = typedText.length;
+    this.setState({ charsTyped: existingCharsTyped });
+    return true;
+  };
+
+  /**
    * @method handleKeyDown
    * @summary key handler for the widgets. For number fields we're suppressing up/down
    *          arrows to enable table row navigation
@@ -174,7 +187,8 @@ export class RawWidget extends Component {
   handleKeyDown = (e, property, value) => {
     const { lastFormField, widgetType, closeTableField } = this.props;
     const { key } = e;
-
+    this.updateTypedCharacters(e.target.value);
+ 
     // for number fields submit them automatically on up/down arrow pressed and blur the field
     const NumberWidgets = ImmutableList([
       'Integer',
@@ -253,8 +267,13 @@ export class RawWidget extends Component {
    * @param {*} isForce
    */
   handlePatch = (property, value, id, valueTo, isForce) => {
-    const { handlePatch, inProgress, widgetType } = this.props;
+    const { handlePatch, inProgress, widgetType, maxLength } = this.props;
     const willPatch = this.willPatch(property, value, valueTo);
+
+    if (widgetType === 'LongText' || widgetType === 'Text') {
+      value = value.substring(0, maxLength);
+      this.updateTypedCharacters(value);
+    }
 
     // Do patch only when value is not equal state
     // or cache is set and it is not equal value
@@ -390,11 +409,13 @@ export class RawWidget extends Component {
       dateFormat,
       initialFocus,
       timeZone,
+      fieldName,
+      maxLength,
     } = this.props;
 
     let widgetValue = data != null ? data : widgetData[0].value;
-    const { isEdited } = this.state;
-
+    const { isEdited, charsTyped } = this.state;
+   
     // TODO: API SHOULD RETURN THE SAME PROPERTIES FOR FILTERS
     const widgetField = filterWidget
       ? fields[0].parameterName
@@ -430,7 +451,9 @@ export class RawWidget extends Component {
       onFocus: this.handleFocus,
       tabIndex: tabIndex,
       onChange: (e) =>
-        handleChange && handleChange(widgetField, e.target.value),
+        handleChange &&
+        this.updateTypedCharacters(e.target.value) &&
+        handleChange(widgetField, e.target.value),
       onBlur: (e) => this.handleBlur(widgetField, e.target.value, id),
       onKeyDown: (e) =>
         this.handleKeyDown(e, widgetField, e.target.value, widgetType),
@@ -763,6 +786,10 @@ export class RawWidget extends Component {
               }),
               {
                 'input-focused': isEdited,
+              },
+              {
+                'border-danger':
+                  charsTyped && charsTyped[fieldName] > maxLength,
               }
             )}
           >
@@ -780,6 +807,10 @@ export class RawWidget extends Component {
               }),
               {
                 'input-focused': isEdited,
+              },
+              {
+                'border-danger':
+                  charsTyped && charsTyped[fieldName] > maxLength,
               }
             )}
           >
