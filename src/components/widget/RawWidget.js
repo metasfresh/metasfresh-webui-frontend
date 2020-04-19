@@ -24,6 +24,7 @@ import Image from './Image';
 import Tooltips from '../tooltips/Tooltips';
 import Labels from './Labels';
 import Link from './Link';
+import CharacterLimitInfo from './CharacterLimitInfo';
 import List from './List/List';
 import Lookup from './Lookup/Lookup';
 
@@ -188,7 +189,7 @@ export class RawWidget extends Component {
     const { lastFormField, widgetType, closeTableField } = this.props;
     const { key } = e;
     this.updateTypedCharacters(e.target.value);
- 
+
     // for number fields submit them automatically on up/down arrow pressed and blur the field
     const NumberWidgets = ImmutableList([
       'Integer',
@@ -415,7 +416,7 @@ export class RawWidget extends Component {
 
     let widgetValue = data != null ? data : widgetData[0].value;
     const { isEdited, charsTyped } = this.state;
-   
+
     // TODO: API SHOULD RETURN THE SAME PROPERTIES FOR FILTERS
     const widgetField = filterWidget
       ? fields[0].parameterName
@@ -460,7 +461,7 @@ export class RawWidget extends Component {
       title: widgetValue,
       id,
     };
-
+    const showErrorBorder = charsTyped && charsTyped[fieldName] > maxLength;
     let selectedValue = widgetData[0].value
       ? widgetData[0].value
       : widgetData[0].defaultValue;
@@ -779,42 +780,56 @@ export class RawWidget extends Component {
         );
       case 'Text':
         return (
-          <div
-            className={classnames(
-              this.getClassNames({
-                icon: true,
-              }),
-              {
-                'input-focused': isEdited,
-              },
-              {
-                'border-danger':
-                  charsTyped && charsTyped[fieldName] > maxLength,
-              }
+          <div>
+            <div
+              className={classnames(
+                this.getClassNames({
+                  icon: true,
+                }),
+                {
+                  'input-focused': isEdited,
+                },
+                {
+                  'border-danger': showErrorBorder,
+                }
+              )}
+            >
+              <input {...widgetProperties} type="text" />
+              {icon && <i className="meta-icon-edit input-icon-right" />}
+            </div>
+            {charsTyped && charsTyped[fieldName] && (
+              <CharacterLimitInfo
+                charsTyped={charsTyped[fieldName]}
+                maxLength={maxLength}
+              />
             )}
-          >
-            <input {...widgetProperties} type="text" />
-            {icon && <i className="meta-icon-edit input-icon-right" />}
           </div>
         );
       case 'LongText':
         return (
-          <div
-            className={classnames(
-              this.getClassNames({
-                icon: false,
-                forcedPrimary: true,
-              }),
-              {
-                'input-focused': isEdited,
-              },
-              {
-                'border-danger':
-                  charsTyped && charsTyped[fieldName] > maxLength,
-              }
+          <div>
+            <div
+              className={classnames(
+                this.getClassNames({
+                  icon: false,
+                  forcedPrimary: true,
+                }),
+                {
+                  'input-focused': isEdited,
+                },
+                {
+                  'border-danger': showErrorBorder,
+                }
+              )}
+            >
+              <textarea {...widgetProperties} />
+            </div>
+            {charsTyped && charsTyped[fieldName] && (
+              <CharacterLimitInfo
+                charsTyped={charsTyped[fieldName]}
+                maxLength={maxLength}
+              />
             )}
-          >
-            <textarea {...widgetProperties} />
           </div>
         );
       case 'Password':
