@@ -797,7 +797,7 @@ export class RawWidget extends Component {
               <input {...widgetProperties} type="text" />
               {icon && <i className="meta-icon-edit input-icon-right" />}
             </div>
-            {charsTyped && charsTyped[fieldName] && (
+            {charsTyped && charsTyped[fieldName] >= 0 && (
               <CharacterLimitInfo
                 charsTyped={charsTyped[fieldName]}
                 maxLength={maxLength}
@@ -824,7 +824,7 @@ export class RawWidget extends Component {
             >
               <textarea {...widgetProperties} />
             </div>
-            {charsTyped && charsTyped[fieldName] && (
+            {charsTyped && charsTyped[fieldName] >= 0 && (
               <CharacterLimitInfo
                 charsTyped={charsTyped[fieldName]}
                 maxLength={maxLength}
