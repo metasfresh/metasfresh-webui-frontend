@@ -501,7 +501,7 @@ describe('RawWidget component', () => {
         target: { value: 'This is a test' },
       },
     );
-    console.log(wrapper.debug())
+
     const html = wrapper.html();
     expect(html).not.toContain('border-danger');
   });
@@ -526,7 +526,7 @@ describe('RawWidget component', () => {
         target: { value: 'This is a test for checking the limit on inputs' },
       },
     );
-    console.log(wrapper.debug())
+
     const html = wrapper.html();
     expect(html).toContain('border-danger');
   });
