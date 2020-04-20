@@ -6,7 +6,7 @@ const CharacterLimitInfo = ({ charsTyped, maxLength }) => {
   const NO_OF_CHARS_BEFORE_MAX_REACHED = 10;
   const displayGrayedLimit =
     maxLength - charsTyped < NO_OF_CHARS_BEFORE_MAX_REACHED;
-  const displayErrorLimit = charsTyped >= maxLength;
+  const displayErrorLimit = charsTyped > maxLength;
 
   return (
     <Fragment>
