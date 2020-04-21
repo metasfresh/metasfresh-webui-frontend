@@ -6,6 +6,7 @@ import Queue from 'simple-promise-queue';
 import cx from 'classnames';
 
 import { quickActionsRequest } from '../../api';
+import { getQuickactions } from '../../reducers/windowHandler';
 import {
   openModal,
   fetchedQuickActions,
@@ -460,14 +461,9 @@ QuickActions.propTypes = {
   onInvalidViewId: PropTypes.func,
 };
 
-const mapStateToProps = (state, ownProps) => {
-  const { viewId, windowType } = ownProps;
-  const key = `${windowType}${viewId ? `-${viewId}` : ''}`;
-
-  return {
-    actions: state.windowHandler.quickActions[key] || [],
-  };
-};
+const mapStateToProps = (state, { viewId, windowType }) => ({
+  actions: getQuickactions(state, { viewId, windowType }),
+});
 
 export default connect(
   mapStateToProps,
