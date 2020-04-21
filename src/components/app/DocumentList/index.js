@@ -195,8 +195,6 @@ class DocumentListContainer extends Component {
     connectWS.call(this, `/view/${viewId}`, (msg) => {
       const { fullyChanged, changedIds } = msg;
 
-      console.log('WS event: ', msg)
-
       if (changedIds) {
         getViewRowsByIds(windowType, viewId, changedIds.join()).then(
           (response) => {
@@ -510,7 +508,6 @@ class DocumentListContainer extends Component {
         const resultById = {};
         const selection = getSelectionDirect(selections, windowType, viewId);
         const forceSelection =
-          // add `hasIncluded` ?
           (type === 'includedView' || isIncluded || includedView) &&
           response &&
           result.length > 0 &&
@@ -806,8 +803,6 @@ class DocumentListContainer extends Component {
       reduxData: { rowData, pending },
     } = this.props;
     let { selected } = this.getSelected();
-
-    // console.log('RENDER: ', this.props.viewId, this.props.selected, selected)
 
     const hasIncluded =
       layout &&
