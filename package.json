@@ -81,6 +81,7 @@
     "globby": "6.1.0",
     "html-loader": "0.5.5",
     "html-webpack-plugin": "3.0.7",
+    "husky": "^4.2.5",
     "identity-obj-proxy": "3.0.0",
     "jest": "25.1.0",
     "jest-environment-jsdom-sixteen": "1.0.3",
@@ -188,5 +189,10 @@
     "timer-machine": "1.1.0",
     "uuid": "3.3.2",
     "webpack-git-hash": "1.0.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint",
+      "pre-push": "npm run test"
   }
 }
