@@ -242,22 +242,19 @@ export class QuickActions extends Component {
         parentView
       )
         .then((result) => {
-          const [respRel, resp] = result;
+          const [resp, respRel] = result;
 
           if (this.mounted) {
-            const currentActions =
-              resp && resp.data ? resp.data.actions : respRel.data.actions;
+            const currentActions = resp && resp.data ? resp.data.actions : [];
             const relatedActions =
-              resp && resp.data ? respRel.data.actions : null;
+              respRel && respRel.data ? respRel.data.actions : [];
 
-            if ((parentView.viewId || childView.viewId) && relatedActions) {
-              const windowType = parentView.windowType
-                ? parentView.windowType
-                : childView.windowType;
-              const id = parentView.viewId
-                ? parentView.viewId
-                : childView.viewId;
-              fetchedQuickActions(windowType, id, relatedActions);
+            if (childView.viewId && relatedActions) {
+              fetchedQuickActions(
+                childView.windowType,
+                childView.viewId,
+                relatedActions
+              );
             }
 
             fetchedQuickActions(windowId, viewId, currentActions);
