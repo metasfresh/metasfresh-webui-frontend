@@ -216,9 +216,6 @@ class DocumentListContainer extends Component {
               if (filtersActive.size) {
                 this.filterCurrentView();
               }
-
-              // force updating actions
-              this.updateQuickActions();
             }
 
             updateViewData(windowType, rows);
@@ -239,19 +236,8 @@ class DocumentListContainer extends Component {
           });
 
         this.browseView();
-        this.updateQuickActions();
       }
     });
-  };
-
-  /**
-   * @method updateQuickActions
-   * @summary Trigger the QuickActions component to fetch quick actions for the new selection
-   */
-  updateQuickActions = (childSelection) => {
-    if (this.quickActionsComponent) {
-      this.quickActionsComponent.updateActions(childSelection);
-    }
   };
 
   /**

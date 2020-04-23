@@ -377,12 +377,7 @@ class Table extends Component {
   };
 
   selectProduct = (id, idFocused, idFocusedDown) => {
-    const {
-      dispatch,
-      windowId,
-      disconnectFromState,
-      viewId,
-    } = this.props;
+    const { dispatch, windowId, disconnectFromState, viewId } = this.props;
     const { selected } = this.state;
     let newSelected = [];
     if (!selected[0]) {
@@ -411,12 +406,7 @@ class Table extends Component {
   };
 
   selectRangeProduct = (ids) => {
-    const {
-      dispatch,
-      windowId,
-      viewId,
-      disconnectFromState,
-    } = this.props;
+    const { dispatch, windowId, viewId, disconnectFromState } = this.props;
 
     this.setState({ selected: [...ids] });
 
@@ -713,7 +703,6 @@ class Table extends Component {
       openIncludedViewOnSelect,
       showIncludedViewOnSelect,
       keyProperty,
-      updateQuickActions,
     } = this.props;
     const id = item[keyProperty];
     let selectionValue = false;
@@ -742,7 +731,6 @@ class Table extends Component {
           this.selectOneProduct(id);
         }
       } else {
-        updateQuickActions && updateQuickActions(id);
         newSelection = [id];
         this.selectOneProduct(id);
       }
