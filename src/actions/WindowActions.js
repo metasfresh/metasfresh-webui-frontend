@@ -761,6 +761,69 @@ export function fetchTopActions(windowType, docId, tabId) {
   };
 }
 
+const getAPIUrl = function({ windowId, docId, tabId, rowId, path }) {
+  let documentId = docId;
+
+  if (!docId && rowId) {
+    documentId = rowId[0];
+  }
+
+  return `${config.API_URL}/window/${windowId}${
+    documentId ? `/${documentId}` : ''
+  }${rowId && tabId ? `/${tabId}/${rowId}` : ''}/${path}`;
+};
+
+export function fetchAPI({ windowId, docId, tabId, rowId, target }) {
+  return (dispatch) => {
+    let parentUrl;
+    switch (target) {
+      case 'comments':
+        parentUrl = getAPIUrl({
+          windowId,
+          docId,
+          tabId: null,
+          rowId,
+          path: 'notes',
+        });
+        break;
+      default:
+        parentUrl = null;
+        break;
+    }
+    if (!parentUrl) {
+      return;
+    }
+
+    return axios.get(parentUrl).then(async (response) => {
+      const data = response.data;
+      let rowData = null;
+
+      if (docId && rowId) {
+        if (rowId.length === 1) {
+          const childUrl = getChangelogUrl(windowId, docId, tabId, rowId);
+          rowData = await axios.get(childUrl).then((resp) => resp.data);
+        }
+      }
+
+      if (rowData) {
+        data.rowsData = rowData;
+      }
+      // update corresponding target in the store - might be adapted for more separated entities
+      // if (target === 'comments') {
+      //   dispatch(updateCommentsPanel())
+      // }
+      // -- end updating corresponding target
+      dispatch(
+        initDataSuccess({
+          data,
+          docId,
+          scope: 'modal',
+        })
+      );
+    });
+  };
+}
+
 /*
  *  Wrapper for patch request of widget elements
  *  when responses should merge store

@@ -217,6 +217,20 @@ class SubHeader extends Component {
     }
   };
 
+  handleComments = () => {
+    const { openModal, windowId } = this.props;
+    openModal(
+      windowId,
+      'static',
+      'Comments', // counterpart.translate('window.about.caption'),
+      null,
+      null,
+      null,
+      null,
+      'comments'
+    );
+  };
+
   /**
    * @method renderDocLink
    * @summary ToDo: Describe the method.
@@ -263,7 +277,7 @@ class SubHeader extends Component {
       handleLetter,
       handlePrint,
       openModal,
-      standardActions,
+      // standardActions,   // Todo: !!! add back this for filtering the standard actions
       windowId,
     } = this.props;
 
@@ -326,8 +340,17 @@ class SubHeader extends Component {
         caption: counterpart.translate('window.Delete.caption'),
         hotkey: keymap.DELETE_DOCUMENT,
       },
+      {
+        action: 'comments',
+        handler: () => {
+          this.handleComments();
+        },
+        icon: 'meta-icon-message',
+        caption: 'Comments', // add translation for this
+        hotkey: keymap.OPEN_NOTES,
+      },
     ]
-      .filter((docLink) => standardActions.has(docLink.action))
+      // .filter((docLink) => standardActions.has(docLink.action))  // uncomment this and add to standard actions the notes
       .map((docLink) => {
         return this.renderDocLink(docLink);
       });

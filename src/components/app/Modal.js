@@ -11,6 +11,7 @@ import {
   createWindow,
   handleProcessResponse,
   fetchChangeLog,
+  fetchAPI,
   patch,
 } from '../../actions/WindowActions';
 import { startProcess } from '../../api';
@@ -24,6 +25,7 @@ import ModalContextShortcuts from '../keyshortcuts/ModalContextShortcuts';
 import Tooltips from '../tooltips/Tooltips.js';
 import Indicator from './Indicator';
 import OverlayField from './OverlayField';
+import CommentsPanel from '../comments/CommentsPanel';
 
 /**
  * @file Modal is an overlay view that can be opened over the main view.
@@ -172,14 +174,25 @@ class Modal extends Component {
       parentViewId,
       parentViewSelectedIds,
     } = this.props;
+    let request = null;
 
     switch (modalType) {
       case 'static':
         {
-          let request = null;
           if (staticModalType === 'about') {
             request = dispatch(
               fetchChangeLog(windowType, dataId, tabId, rowId)
+            );
+          }
+          if (staticModalType === 'comments') {
+            request = dispatch(
+              fetchAPI({
+                windowId: windowType,
+                docId: dataId,
+                tabId,
+                rowId,
+                target: staticModalType,
+              })
             );
           }
 
@@ -419,6 +432,9 @@ class Modal extends Component {
         let content = null;
         if (staticModalType === 'about') {
           content = <ChangeLogModal data={data} />;
+        }
+        if (staticModalType === 'comments') {
+          content = <CommentsPanel />;
         }
         return (
           <div className="window-wrapper">
