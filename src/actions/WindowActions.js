@@ -81,6 +81,7 @@ import {
 import { openFile } from './GenericActions';
 import { setListIncludedView } from './ListActions';
 import { getWindowBreadcrumb } from './MenuActions';
+import { updateCommentsPanel } from './CommentsPanelActions';
 import { toggleFullScreen } from '../utils';
 import { getScope, parseToDisplay } from '../utils/documentListHelper';
 
@@ -809,9 +810,9 @@ export function fetchAPI({ windowId, docId, tabId, rowId, target }) {
         data.rowsData = rowData;
       }
       // update corresponding target in the store - might be adapted for more separated entities
-      // if (target === 'comments') {
-      //   dispatch(updateCommentsPanel())
-      // }
+      if (target === 'comments') {
+        dispatch(updateCommentsPanel(data));
+      }
       // -- end updating corresponding target
       dispatch(
         initDataSuccess({
