@@ -1,4 +1,5 @@
 import {
+  initLayout,
   getAttributesInstance,
   topActionsRequest,
   getZoomIntoWindow,
@@ -41,6 +42,7 @@ import {
 } from './login';
 
 export {
+  initLayout,
   getData,
   getRowsData,
   getLayout,
