@@ -77,10 +77,6 @@ class RawModal extends Component {
     visibleTooltips: {},
   };
 
-  /**
-   * @method componentDidMount
-   * @summary ToDo: Describe the method.
-   */
   componentDidMount() {
     // Dirty solution, but use only if you need to
     // there is no way to affect body
@@ -92,25 +88,10 @@ class RawModal extends Component {
     this.initEventListeners();
   }
 
-  /**
-   * @method componentWillUnmount
-   * @summary ToDo: Describe the method.
-   */
   componentWillUnmount() {
-    const { masterDocumentList } = this.props;
-
-    if (masterDocumentList) {
-      masterDocumentList.updateQuickActions();
-    }
-
     this.removeEventListeners();
   }
 
-  /**
-   * @method UNSAFE_componentWillUpdate
-   * @summary ToDo: Describe the method.
-   * @param {object} props
-   */
   UNSAFE_componentWillUpdate(props) {
     if (this.resolve) {
       if (!props.success || props.requests.length === 0) {
@@ -328,10 +309,6 @@ class RawModal extends Component {
     return <ModalContextShortcuts {...shortcutActions} />;
   };
 
-  /**
-   * @method render
-   * @summary ToDo: Describe the method.
-   */
   render() {
     const { modalTitle, children, modalDescription, rawModal } = this.props;
     const { scrolled } = this.state;
@@ -384,11 +361,6 @@ class RawModal extends Component {
   }
 }
 
-/**
- * @method mapStateToProps
- * @summary ToDo: Describe the method.
- * @param {object} windowHandler
- */
 const mapStateToProps = ({ windowHandler }) => ({
   modalVisible: windowHandler.modal.visible || false,
   rawModal: windowHandler.rawModal,
