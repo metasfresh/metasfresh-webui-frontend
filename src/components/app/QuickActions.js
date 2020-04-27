@@ -39,6 +39,9 @@ export class QuickActions extends Component {
 
     this.fetchActions = this.fetchActions.bind(this);
 
+    // we are using queuing for fetching quick actions because initially we don't have
+    // selections, ids etc. so response returns empty list. And if thi timing is wrong,
+    // we'll get an empty list rewriting actual valid actions array.
     this.queue = new Queue({
       autoStart: true,
     });
