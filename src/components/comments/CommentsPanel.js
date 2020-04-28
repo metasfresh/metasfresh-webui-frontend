@@ -5,8 +5,8 @@ import CommentsPanelForm from './CommentsPanelForm';
 const CommentsPanel = (props) => {
   return (
     <div className="panel-full-width">
-      <CommentsPanelListing />
       <CommentsPanelForm {...props} />
+      <CommentsPanelListing />
     </div>
   );
 };
