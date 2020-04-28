@@ -1,6 +1,8 @@
 import React from 'react';
 import counterpart from 'counterpart';
 import PropTypes from 'prop-types';
+import Moment from 'moment';
+import { DATE_FORMAT, TIME_FORMAT } from '../../constants/Constants';
 
 const CommentsPanelListingItem = (props) => {
   const { createdBy, text, created } = props.data;
@@ -15,7 +17,9 @@ const CommentsPanelListingItem = (props) => {
           <div className="col-lg-1 float-left">
             {counterpart.translate('view.about.created')}
           </div>
-          <div className="col-lg-11 float-right">{created}</div>
+          <div className="col-lg-11 float-right">
+            {Moment(created).format(`${DATE_FORMAT} ${TIME_FORMAT}`)}
+          </div>
           <div className="clearfix" />
           <div className="col-lg-1 float-left">
             {counterpart.translate('view.about.createdBy')}
