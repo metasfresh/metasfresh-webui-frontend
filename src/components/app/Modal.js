@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
+import { updateCommentsPanelOpenFlag } from '../../actions/CommentsPanelActions';
 
 import { processNewRecord } from '../../actions/GenericActions';
 import {
@@ -327,7 +328,9 @@ class Modal extends Component {
     const { dispatch, rawModalVisible } = this.props;
 
     dispatch(closeModal());
-
+    // make sure that on closing the modal for comments `isOpen `flag is closed
+    // if you don't do this you will have COLLAPSE_INDENT issue  (see: keymap.js)
+    dispatch(updateCommentsPanelOpenFlag(false));
     if (!rawModalVisible) {
       document.body.style.overflow = 'auto';
     }

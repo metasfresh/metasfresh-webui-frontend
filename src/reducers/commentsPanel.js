@@ -3,6 +3,7 @@ import * as types from '../constants/CommentTypes';
 export const initialState = {
   data: [],
   textInput: '',
+  isOpen: false,
 };
 
 export default function commentsPanel(state = initialState, action) {
@@ -13,6 +14,10 @@ export default function commentsPanel(state = initialState, action) {
 
     case types.UPDATE_COMMENTS_PANEL_TEXT_INPUT: {
       return { ...state, textInput: action.payload };
+    }
+
+    case types.UPDATE_COMMENTS_PANEL_OPEN_FLAG: {
+      return { ...state, isOpen: action.payload };
     }
 
     default: {

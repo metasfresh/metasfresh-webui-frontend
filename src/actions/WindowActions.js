@@ -84,6 +84,7 @@ import { getWindowBreadcrumb } from './MenuActions';
 import {
   updateCommentsPanel,
   updateCommentsPanelTextInput,
+  updateCommentsPanelOpenFlag,
 } from './CommentsPanelActions';
 import { toggleFullScreen } from '../utils';
 import { getScope, parseToDisplay } from '../utils/documentListHelper';
@@ -781,7 +782,7 @@ export function callAPI({ windowId, docId, tabId, rowId, target, verb, data }) {
   return (dispatch) => {
     const parentUrl = formatParentUrl({ windowId, docId, rowId, target });
     if (!parentUrl) return;
-
+    dispatch(updateCommentsPanelOpenFlag(true));
     // -- GET call - adapt shape as needed
     if (verb === 'GET') {
       return axios.get(parentUrl).then(async (response) => {
