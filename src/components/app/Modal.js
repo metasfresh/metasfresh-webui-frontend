@@ -11,7 +11,7 @@ import {
   createWindow,
   handleProcessResponse,
   fetchChangeLog,
-  fetchAPI,
+  callAPI,
   patch,
 } from '../../actions/WindowActions';
 import { startProcess } from '../../api';
@@ -186,12 +186,13 @@ class Modal extends Component {
           }
           if (staticModalType === 'comments') {
             request = dispatch(
-              fetchAPI({
+              callAPI({
                 windowId: windowType,
                 docId: dataId,
                 tabId,
                 rowId,
                 target: staticModalType,
+                verb: 'GET',
               })
             );
           }
@@ -434,7 +435,7 @@ class Modal extends Component {
           content = <ChangeLogModal data={data} />;
         }
         if (staticModalType === 'comments') {
-          content = <CommentsPanel />;
+          content = <CommentsPanel windowId={windowType} docId={dataId} />;
         }
         return (
           <div className="window-wrapper">

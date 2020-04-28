@@ -81,7 +81,10 @@ import {
 import { openFile } from './GenericActions';
 import { setListIncludedView } from './ListActions';
 import { getWindowBreadcrumb } from './MenuActions';
-import { updateCommentsPanel } from './CommentsPanelActions';
+import {
+  updateCommentsPanel,
+  updateCommentsPanelTextInput,
+} from './CommentsPanelActions';
 import { toggleFullScreen } from '../utils';
 import { getScope, parseToDisplay } from '../utils/documentListHelper';
 
@@ -774,55 +777,99 @@ const getAPIUrl = function({ windowId, docId, tabId, rowId, path }) {
   }${rowId && tabId ? `/${tabId}/${rowId}` : ''}/${path}`;
 };
 
-export function fetchAPI({ windowId, docId, tabId, rowId, target }) {
+export function callAPI({ windowId, docId, tabId, rowId, target, verb, data }) {
   return (dispatch) => {
-    let parentUrl;
-    switch (target) {
-      case 'comments':
-        parentUrl = getAPIUrl({
-          windowId,
-          docId,
-          tabId: null,
-          rowId,
-          path: 'notes',
-        });
-        break;
-      default:
-        parentUrl = null;
-        break;
-    }
-    if (!parentUrl) {
-      return;
-    }
+    const parentUrl = formatParentUrl({ windowId, docId, rowId, target });
+    if (!parentUrl) return;
 
-    return axios.get(parentUrl).then(async (response) => {
-      const data = response.data;
-      let rowData = null;
+    // -- GET call - adapt shape as needed
+    if (verb === 'GET') {
+      return axios.get(parentUrl).then(async (response) => {
+        const data = response.data;
+        let rowData = null;
 
-      if (docId && rowId) {
-        if (rowId.length === 1) {
-          const childUrl = getChangelogUrl(windowId, docId, tabId, rowId);
-          rowData = await axios.get(childUrl).then((resp) => resp.data);
+        if (docId && rowId) {
+          if (rowId.length === 1) {
+            const childUrl = getChangelogUrl(windowId, docId, tabId, rowId);
+            rowData = await axios.get(childUrl).then((resp) => resp.data);
+          }
         }
-      }
 
-      if (rowData) {
-        data.rowsData = rowData;
-      }
-      // update corresponding target in the store - might be adapted for more separated entities
-      if (target === 'comments') {
-        dispatch(updateCommentsPanel(data));
-      }
-      // -- end updating corresponding target
-      dispatch(
-        initDataSuccess({
-          data,
-          docId,
-          scope: 'modal',
-        })
-      );
-    });
+        if (rowData) {
+          data.rowsData = rowData;
+        }
+        // update corresponding target in the store - might be adapted for more separated entities
+        if (target === 'comments') {
+          dispatch(updateCommentsPanel(data));
+        }
+        // -- end updating corresponding target
+        dispatch(
+          initDataSuccess({
+            data,
+            docId,
+            scope: 'modal',
+          })
+        );
+      });
+    }
+
+    // -- actions dispatched on POST below
+    if (verb === 'POST') {
+      const dataToSend = preFormatPostDATA({ target, postData: { txt: data } });
+      return axios.post(parentUrl, dataToSend).then(async (response) => {
+        const data = response.data;
+        if (target === 'comments') {
+          dispatch(
+            callAPI({
+              windowId,
+              docId,
+              tabId,
+              rowId,
+              target,
+              verb: 'GET',
+            })
+          );
+          dispatch(updateCommentsPanelTextInput('')); // clear the input in the form
+        }
+        return data;
+      });
+    }
   };
+}
+
+/**
+ * Formats the url for the api call
+ */
+export function formatParentUrl({ windowId, docId, rowId, target }) {
+  let parentUrl;
+  switch (target) {
+    case 'comments':
+      parentUrl = getAPIUrl({
+        windowId,
+        docId,
+        tabId: null,
+        rowId,
+        path: target,
+      });
+      break;
+    default:
+      parentUrl = null;
+      break;
+  }
+  return parentUrl;
+}
+
+/**
+ * This can be further adapted to allow pre-formatting of the data before post
+ * @param {string} target
+ * @param {string} data
+ */
+export function preFormatPostDATA({ target, postData }) {
+  const dataToSend = {};
+  if (target === 'comments') {
+    dataToSend.text = postData.txt;
+  }
+  return dataToSend;
 }
 
 /*

@@ -222,7 +222,7 @@ class SubHeader extends Component {
     openModal(
       windowId,
       'static',
-      'Comments', // counterpart.translate('window.about.caption'),
+      counterpart.translate('window.comments.caption'),
       null,
       null,
       null,
@@ -346,7 +346,7 @@ class SubHeader extends Component {
           this.handleComments();
         },
         icon: 'meta-icon-message',
-        caption: 'Comments', // add translation for this
+        caption: counterpart.translate('window.comments.caption'),
         hotkey: keymap.OPEN_NOTES,
       },
     ]
