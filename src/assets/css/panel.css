@@ -257,11 +257,6 @@
     width: 100%;
 }
 
-.panel-sticky {
-    position: -webkit-sticky !important;
-    position: sticky !important;
-}
-
 .prompt-button-wrapper {
     width: 100%;
     text-align: right;
