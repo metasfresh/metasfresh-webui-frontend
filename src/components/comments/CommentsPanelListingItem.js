@@ -38,11 +38,11 @@ const CommentsPanelListingItem = (props) => {
     <div className="col-12">
       <div className="panel panel-spaced panel-distance panel-bordered panel-primary">
         {elementRender({
-          labelText: translateCaption('view.comments.created'),
+          labelText: translateCaption('window.comments.created'),
           actualValue: Moment(created).format(DATE_FIELD_FORMATS['DateTime']),
         })}
         {elementRender({
-          labelText: translateCaption('view.comments.createdBy'),
+          labelText: translateCaption('window.comments.createdBy'),
           actualValue: createdBy,
         })}
         {elementRender({

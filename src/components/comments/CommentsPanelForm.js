@@ -8,7 +8,7 @@ import { translateCaption } from '../../utils/index';
 const CommentsPanelForm = (props) => {
   const { textInput, postComment, updateText, docId, windowId } = props;
   const textRef = useRef(null);
-  const sendButton = translateCaption('comments.send.caption');
+  const sendButton = translateCaption('window.comments.add');
 
   /**
    * Focus by default on the text input
