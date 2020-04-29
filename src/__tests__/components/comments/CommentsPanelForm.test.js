@@ -27,6 +27,6 @@ describe("CommentsPanelForm test", () => {
 
     const html = wrapper.html();
     expect(html).toContain('textarea');
-    expect(html).toContain('missing translation: en.comments.send.caption');
+    expect(html).toContain('missing translation: en.window.comments.add');
   });
 });

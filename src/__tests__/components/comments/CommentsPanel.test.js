@@ -28,6 +28,6 @@ describe("CommentsPanel test", () => {
     const html = wrapper.html();
     expect(html).toContain('col-12');
     expect(html).toContain('textarea');
-    expect(html).toContain('missing translation: en.comments.send.caption');
+    expect(html).toContain('missing translation: en.window.comments.add');
   });
 });

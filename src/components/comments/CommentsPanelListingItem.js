@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { translateCaption } from '../../utils/index';
 import PropTypes from 'prop-types';
 import Moment from 'moment';
@@ -7,27 +7,39 @@ import { DATE_FIELD_FORMATS } from '../../constants/Constants';
 const CommentsPanelListingItem = (props) => {
   const { createdBy, text, created } = props.data;
 
-  const elementRender = ({ labelText, actualValue }) => (
-    <div className="elements-line">
-      <div className="form-group row  form-field-Value">
-        <div className="form-control-label col-sm-3">{labelText}</div>
-        <div className="col-sm-9 ">
-          <div className="input-body-container">
-            <span />
-            <div className="input-block input-icon-container input-disabled input-secondary pulse-off">
-              <input
-                className="input-field js-input-field"
-                disabled
-                tabIndex="-1"
-                type="text"
-                value={actualValue}
-              />
+  const elementRender = ({ labelText, actualValue }) => {
+    const withNewLines = actualValue.split('\n').map((item, key) => {
+      return (
+        <Fragment key={key}>
+          {item}
+          <br />
+        </Fragment>
+      );
+    });
+
+    return (
+      <div className="elements-line">
+        <div className="form-group row  form-field-Value">
+          <div className="form-control-label col-sm-3">{labelText}</div>
+          <div className="col-sm-9 ">
+            <div className="input-body-container">
+              <span />
+              <div className="input-block input-icon-container input-disabled input-secondary pulse-off">
+                <div
+                  className="input-field js-input-field"
+                  disabled
+                  tabIndex="-1"
+                  type="text"
+                >
+                  {withNewLines}
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   elementRender.propTypes = {
     labelText: PropTypes.string,
