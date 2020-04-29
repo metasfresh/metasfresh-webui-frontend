@@ -2,7 +2,7 @@ import React from 'react';
 import CommentsPanelListing from './CommentsPanelListing';
 import CommentsPanelForm from './CommentsPanelForm';
 
-const CommentsPanel = (props) => {
+export const CommentsPanel = (props) => {
   return (
     <div className="panel-full-width">
       <CommentsPanelForm {...props} />

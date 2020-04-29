@@ -3,11 +3,12 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import CommentsPanelListingItem from './CommentsPanelListingItem';
 
-const CommentsPanelListing = (props) => {
+export const CommentsPanelListing = (props) => {
   const { comments } = props;
   return (
     <div>
-      {comments.length > 0 &&
+      {comments &&
+        comments.length > 0 &&
         comments.map((data, index) => (
           <CommentsPanelListingItem key={index} data={data} />
         ))}

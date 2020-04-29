@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { PropTypes } from 'prop-types';
 import { translateCaption } from '../../utils/index';
 
-const CommentsPanelForm = (props) => {
+export const CommentsPanelForm = (props) => {
   const { textInput, postComment, updateText, docId, windowId } = props;
   const textRef = useRef(null);
   const sendButton = translateCaption('comments.send.caption');

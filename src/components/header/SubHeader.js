@@ -277,7 +277,7 @@ class SubHeader extends Component {
       handleLetter,
       handlePrint,
       openModal,
-      // standardActions,   // Todo: !!! add back this for filtering the standard actions
+      standardActions,
       windowId,
     } = this.props;
 
@@ -350,7 +350,7 @@ class SubHeader extends Component {
         hotkey: keymap.OPEN_NOTES,
       },
     ]
-      // .filter((docLink) => standardActions.has(docLink.action))  // uncomment this and add to standard actions the notes
+      .filter((docLink) => standardActions.has(docLink.action))
       .map((docLink) => {
         return this.renderDocLink(docLink);
       });
