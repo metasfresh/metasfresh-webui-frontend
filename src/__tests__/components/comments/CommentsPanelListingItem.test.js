@@ -19,7 +19,7 @@ describe("ComponentsPanelListingItem test", () => {
     const html = wrapper.html();
     expect(html).not.toBe(null);
     expect(html).toContain('My first comment')
-    expect(html).toContain('04/28/2020 7:55:19 AM')
+    expect(html).toContain('04/28/2020')
     expect(html).toContain('branchtest')
   });
 
