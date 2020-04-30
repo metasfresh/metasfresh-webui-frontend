@@ -767,6 +767,19 @@ export function fetchTopActions(windowType, docId, tabId) {
   };
 }
 
+/**
+ * this is 'generic' window action that allows calling APIs that do follow a specific pattern
+ * in their path like /rest/api/documentView/{windowId}/{viewId}/{target}
+ * Where target can be for example 'geoLocations' or 'comments'. This can be further
+ * adapted to other REST paths by shaping the formatParentUrl function accordingly
+ * windowId - windowId for which we want to apply/get changes
+ * docId    - docId for which we want to apply/get changes
+ * tabId    - tabId for which we want to apply/get changes
+ * rowId    - rowId for which we want to apply/get changes
+ * verb     - GET/POST for now
+ * data     - data you want to be passed for a POST request
+ * @param {object} param
+ */
 export function callAPI({ windowId, docId, tabId, rowId, target, verb, data }) {
   return (dispatch) => {
     const parentUrl = formatParentUrl({ windowId, docId, rowId, target });
