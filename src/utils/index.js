@@ -156,3 +156,16 @@ export function translateCaption(caption) {
   // show a default placeholder in case translation is missing such that the BE would know what specific key they need to add
   return !translatedString.includes('{') ? translatedString : `${caption}`;
 }
+
+/**
+ * This can be further adapted to allow pre-formatting of the data before post
+ * @param {string} target
+ * @param {string} data
+ */
+export function preFormatPostDATA({ target, postData }) {
+  const dataToSend = {};
+  if (target === 'comments') {
+    dataToSend.text = postData.txt;
+  }
+  return dataToSend;
+}

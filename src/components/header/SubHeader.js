@@ -329,9 +329,7 @@ class SubHeader extends Component {
       },
       {
         action: 'comments',
-        handler: () => {
-          handleComments();
-        },
+        handler: handleComments,
         icon: 'meta-icon-message',
         caption: counterpart.translate('window.comments.caption'),
         hotkey: keymap.OPEN_COMMENTS,

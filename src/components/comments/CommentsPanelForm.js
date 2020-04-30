@@ -83,14 +83,10 @@ const mapStateToProps = ({ commentsPanel }) => ({
   textInput: commentsPanel.textInput,
 });
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    updateText: (data) => dispatch(updateCommentsPanelTextInput(data)),
-    postComment: (data) => dispatch(callAPI(data)),
-  };
-};
-
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  {
+    updateText: updateCommentsPanelTextInput,
+    postComment: callAPI,
+  }
 )(CommentsPanelForm);

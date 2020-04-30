@@ -70,6 +70,7 @@ import {
   getProcessData,
   getTab,
   startProcess,
+  formatParentUrl,
 } from '../api';
 import {
   addNotification,
@@ -86,7 +87,7 @@ import {
   updateCommentsPanelTextInput,
   updateCommentsPanelOpenFlag,
 } from './CommentsPanelActions';
-import { toggleFullScreen } from '../utils';
+import { toggleFullScreen, preFormatPostDATA } from '../utils';
 import { getScope, parseToDisplay } from '../utils/documentListHelper';
 
 export function fetchedQuickActions(windowId, id, data) {
@@ -766,18 +767,6 @@ export function fetchTopActions(windowType, docId, tabId) {
   };
 }
 
-const getAPIUrl = function({ windowId, docId, tabId, rowId, path }) {
-  let documentId = docId;
-
-  if (!docId && rowId) {
-    documentId = rowId[0];
-  }
-
-  return `${config.API_URL}/window/${windowId}${
-    documentId ? `/${documentId}` : ''
-  }${rowId && tabId ? `/${tabId}/${rowId}` : ''}/${path}`;
-};
-
 export function callAPI({ windowId, docId, tabId, rowId, target, verb, data }) {
   return (dispatch) => {
     const parentUrl = formatParentUrl({ windowId, docId, rowId, target });
@@ -836,41 +825,6 @@ export function callAPI({ windowId, docId, tabId, rowId, target, verb, data }) {
       });
     }
   };
-}
-
-/**
- * Formats the url for the api call
- */
-export function formatParentUrl({ windowId, docId, rowId, target }) {
-  let parentUrl;
-  switch (target) {
-    case 'comments':
-      parentUrl = getAPIUrl({
-        windowId,
-        docId,
-        tabId: null,
-        rowId,
-        path: target,
-      });
-      break;
-    default:
-      parentUrl = null;
-      break;
-  }
-  return parentUrl;
-}
-
-/**
- * This can be further adapted to allow pre-formatting of the data before post
- * @param {string} target
- * @param {string} data
- */
-export function preFormatPostDATA({ target, postData }) {
-  const dataToSend = {};
-  if (target === 'comments') {
-    dataToSend.text = postData.txt;
-  }
-  return dataToSend;
 }
 
 /*
